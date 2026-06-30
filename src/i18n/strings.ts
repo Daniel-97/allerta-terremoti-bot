@@ -84,4 +84,9 @@ export const STRINGS = {
   },
   locationLimitReached:
     "Hai raggiunto il limite massimo di posizioni.",
+  eventDetail: {
+    title: "🔍 *Dettagli evento*",
+    notAvailable: "Dettagli non più disponibili.",
+    source: "_Fonte: INGV_",
+  },
 } as const;

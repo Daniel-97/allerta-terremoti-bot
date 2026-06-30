@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, lt } from "drizzle-orm";
 import { deliveries } from "../schema";
 import { nowIso } from "../../util/time";
 import type { Db } from "../types";
@@ -35,7 +35,7 @@ export async function listPendingForRetry(db: Db, maxAttempts: number) {
   return db
     .select()
     .from(deliveries)
-    .where(and(eq(deliveries.status, "failed_transient"), deliveries.attempts < maxAttempts));
+    .where(and(eq(deliveries.status, "failed_transient"), lt(deliveries.attempts, maxAttempts)));
 }
 
 export async function getDelivery(db: Db, eventId: string, chat: number) {

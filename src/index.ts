@@ -1,9 +1,10 @@
-import { webhookCallback } from "grammy";
+import { webhookCallback, Bot } from "grammy";
 import { loadConfig } from "./config";
 import { verifySecretToken } from "./webhook";
 import { createBot } from "./bot/bot";
 import { createDb } from "./db/client";
 import { createLogger } from "./util/log";
+import { runMainCron } from "./jobs/poll";
 
 const log = createLogger("worker");
 
@@ -50,21 +51,34 @@ export default {
 
   async scheduled(
     controller: ScheduledController,
-    _env: Record<string, string>,
+    env: Record<string, string>,
     _ctx: ExecutionContext,
   ): Promise<void> {
     const start = Date.now();
+      const config = loadConfig(env);
+    const { db, ready } = createDb(config);
+    await ready;
+    const bot = new Bot(config.BOT_TOKEN);
+
     log.info({ cron: controller.cron }, "scheduled trigger started");
+
     try {
-      log.info(
-        { cron: controller.cron, durationMs: Date.now() - start },
-        "scheduled trigger finished",
-      );
+      switch (controller.cron) {
+        case "* * * * *":
+          await runMainCron({ HEALTHCHECKS_URL: config.HEALTHCHECKS_URL, GEONAMES_USERNAME: config.GEONAMES_USERNAME }, db, bot);
+          break;
+        case "*/5 * * * *":
+          log.info({ cron: controller.cron }, "retry cron — M4 stub");
+          break;
+        case "0 3 * * *":
+          log.info({ cron: controller.cron }, "cleanup cron — M4 stub");
+          break;
+        default:
+          log.info({ cron: controller.cron }, "unknown cron — stub");
+      }
+      log.info({ cron: controller.cron, durationMs: Date.now() - start }, "scheduled trigger finished");
     } catch (err) {
-      log.error(
-        { cron: controller.cron, err: String(err) },
-        "scheduled trigger error",
-      );
+      log.error({ cron: controller.cron, err: String(err) }, "scheduled trigger error");
     }
   },
 };

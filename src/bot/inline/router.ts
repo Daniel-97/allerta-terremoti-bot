@@ -9,6 +9,7 @@ import {
   deleteLocation,
 } from "../../db/repositories/locations";
 import { getChat, setAlertFlags } from "../../db/repositories/chats";
+import { getEvent } from "../../db/repositories/history";
 import { STRINGS } from "../../i18n/strings";
 import * as panels from "./panels";
 import type { Db } from "../../db/types";
@@ -110,6 +111,24 @@ export async function handleCallbackQuery(
           });
         }
         await panels.editPanel(ctx, panels.renderSettings(italy, world));
+        break;
+      }
+      case "evDetail": {
+        const ev = await getEvent(db, cb.eventId);
+        if (!ev) {
+          await ctx.answerCallbackQuery({ text: STRINGS.eventDetail.notAvailable });
+          return;
+        }
+        const lines = [
+          `📍 *${ev.zone}*`,
+          `📏 Coordinate: ${ev.lat.toFixed(3)}, ${ev.lon.toFixed(3)}`,
+          `📏 Profondità: ${ev.depth != null ? `${ev.depth.toFixed(1)} km` : "N/D"}`,
+          `📊 Magnitudo: *${ev.magnitude_value.toFixed(1)}* (${ev.magnitude_type ?? "N/D"})`,
+          ev.magnitude_uncertainty != null ? `   Incertezza: ±${ev.magnitude_uncertainty.toFixed(1)}` : "",
+          `📡 Stazioni: ${ev.stations_count ?? "N/D"}`,
+          `🕐 ${ev.date}`,
+        ].filter(Boolean).join("\n");
+        await ctx.reply(`${STRINGS.eventDetail.title}\n\n${lines}\n\n${STRINGS.eventDetail.source}`, { parse_mode: "Markdown" });
         break;
       }
       case "nav": {

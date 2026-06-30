@@ -2,7 +2,7 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    include: ["test/db/**/*.spec.ts", "test/notify/match.spec.ts"],
+    include: ["test/db/**/*.spec.ts"],
     environment: "node",
   },
 });
