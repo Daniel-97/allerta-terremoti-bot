@@ -5,40 +5,33 @@ export interface Logger {
   child(fields: Record<string, unknown>): Logger;
 }
 
+function buildLogger(
+  base: Record<string, unknown>,
+  childCallback: (f: Record<string, unknown>) => Logger,
+): Logger {
+  return {
+    info: (obj, msg) => {
+      const entry = { ts: new Date().toISOString(), level: "info", ...base, ...obj, msg };
+      console.log(JSON.stringify(entry));
+    },
+    warn: (obj, msg) => {
+      const entry = { ts: new Date().toISOString(), level: "warn", ...base, ...obj, msg };
+      console.warn(JSON.stringify(entry));
+    },
+    error: (obj, msg) => {
+      const entry = { ts: new Date().toISOString(), level: "error", ...base, ...obj, msg };
+      console.error(JSON.stringify(entry));
+    },
+    child: (extra) => childCallback({ ...base, ...extra }),
+  };
+}
+
 export function createLogger(name: string): Logger {
   const base = { logger: name };
 
-  function makeLogFn(level: string, consoleFn: (...args: unknown[]) => void) {
-    return (obj: Record<string, unknown>, msg: string): void => {
-      const entry = { ts: new Date().toISOString(), level, ...base, ...obj, msg };
-      consoleFn(JSON.stringify(entry));
-    };
-  }
-
-  const logger: Logger = {
-    info: makeLogFn("info", console.log),
-    warn: makeLogFn("warn", console.warn),
-    error: makeLogFn("error", console.error),
-    child: (_extraFields) => logger,
+  const childFactory = (merged: Record<string, unknown>): Logger => {
+    return buildLogger(merged, childFactory);
   };
 
-  logger.child = (extraFields: Record<string, unknown>): Logger => {
-    const merged = { ...base, ...extraFields };
-    return {
-      info: (obj, msg) => {
-        const entry = { ts: new Date().toISOString(), level: "info", ...merged, ...obj, msg };
-        console.log(JSON.stringify(entry));
-      },
-      warn: (obj, msg) => {
-        const entry = { ts: new Date().toISOString(), level: "warn", ...merged, ...obj, msg };
-        console.warn(JSON.stringify(entry));
-      },
-      error: (obj, msg) => {
-        const entry = { ts: new Date().toISOString(), level: "error", ...merged, ...obj, msg };
-        console.error(JSON.stringify(entry));
-      },
-    };
-  };
-
-  return logger;
+  return buildLogger(base, childFactory);
 }
