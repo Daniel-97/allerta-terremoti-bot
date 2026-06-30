@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "allerta-terremoti-bot",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-05-01",
+  "observability": { "enabled": true },
+  "triggers": {
+    "crons": ["* * * * *", "*/5 * * * *", "0 3 * * *"]
+  }
+}
