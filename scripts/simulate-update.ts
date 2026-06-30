@@ -1,7 +1,14 @@
 import { loadConfig } from "../src/config";
+import { createLogger } from "../src/util/log";
 
-/** Fake Telegram update for a /start command. */
-function makeFakeStartUpdate(chatId: number, firstName: string, lastName: string, username: string) {
+const log = createLogger("simulate-update");
+
+function makeFakeStartUpdate(
+  chatId: number,
+  firstName: string,
+  lastName: string,
+  username: string,
+) {
   return {
     update_id: Math.floor(Math.random() * 1000000),
     message: {
@@ -30,9 +37,15 @@ function makeFakeStartUpdate(chatId: number, firstName: string, lastName: string
 
 async function main(): Promise<void> {
   const config = loadConfig(process.env);
-  const chatId = process.env.TEST_CHAT_ID ? Number(process.env.TEST_CHAT_ID) : 123456789;
+  const chatId = process.env.TEST_CHAT_ID
+    ? Number(process.env.TEST_CHAT_ID)
+    : 123456789;
 
-  const body = JSON.stringify(makeFakeStartUpdate(chatId, "Test", "User", "testuser"));
+  const body = JSON.stringify(
+    makeFakeStartUpdate(chatId, "Test", "User", "testuser"),
+  );
+
+  log.info({ chatId }, "sending fake /start update");
 
   const res = await fetch("http://localhost:8787/webhook", {
     method: "POST",
@@ -43,11 +56,10 @@ async function main(): Promise<void> {
     body,
   });
 
-  console.log(`Status: ${res.status}`);
-  console.log(`Body:   ${await res.text()}`);
+  log.info({ status: res.status, body: await res.text() }, "response received");
 }
 
 main().catch((err) => {
-  console.error(err);
+  log.error({ err: String(err) }, "simulate-update failed");
   process.exit(1);
 });

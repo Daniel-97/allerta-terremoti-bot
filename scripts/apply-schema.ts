@@ -1,16 +1,19 @@
 import { readFileSync } from "node:fs";
 import { createClient } from "@libsql/client";
+import { createLogger } from "../src/util/log";
+
+const log = createLogger("apply-schema");
 
 async function main(): Promise<void> {
   const url = process.env.TURSO_DATABASE_URL;
   const authToken = process.env.TURSO_AUTH_TOKEN;
 
   if (!url) {
-    console.error("TURSO_DATABASE_URL is required");
+    log.error({}, "TURSO_DATABASE_URL is required");
     process.exit(1);
   }
   if (!authToken) {
-    console.error("TURSO_AUTH_TOKEN is required");
+    log.error({}, "TURSO_AUTH_TOKEN is required");
     process.exit(1);
   }
 
@@ -24,14 +27,13 @@ async function main(): Promise<void> {
     authToken,
   });
 
-  console.log("Applying src/db/schema.sql to", url);
+  log.info({ url }, "applying schema");
   await client.executeMultiple(sqlScript);
-  console.log("Schema applied successfully.");
-
+  log.info({}, "schema applied successfully");
   await client.close();
 }
 
 main().catch((err) => {
-  console.error(err);
+  log.error({ err: String(err) }, "apply-schema failed");
   process.exit(1);
 });
