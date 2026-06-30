@@ -14,5 +14,14 @@ const schema = z.object({
 export type AppConfig = z.infer<typeof schema>;
 
 export function loadConfig(env: unknown): AppConfig {
-  return schema.parse(env);
+  // Treat empty string env vars as absent (avoids .optional() rejection)
+  const cleaned = typeof env === "object" && env !== null
+    ? Object.fromEntries(
+        Object.entries(env as Record<string, unknown>).map(([k, v]) => [
+          k,
+          v === "" ? undefined : v,
+        ]),
+      )
+    : env;
+  return schema.parse(cleaned);
 }
