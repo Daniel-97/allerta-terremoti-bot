@@ -230,6 +230,44 @@ bot token (from [@BotFather](https://t.me/BotFather)), and a free GeoNames usern
 
 ---
 
+## Local testing
+
+There are two approaches to test the bot locally:
+
+### Option A — Polling mode (real Telegram, no tunnel)
+
+Runs the bot as a **long-running Node process** using grammY's polling, bypassing the Worker/webhook entirely. It uses the same config, database, and command handlers.
+
+```bash
+# Apply the DB schema first (one-time)
+turso db shell <your-db> < src/db/schema.sql
+
+# Start polling
+npm run start-polling
+```
+
+The bot will receive real Telegram updates directly. Press `Ctrl+C` to stop.
+
+### Option B — Simulate an update against `wrangler dev`
+
+Runs the Worker locally and sends a fake `/start` update via HTTP.
+
+Terminal 1 — start the local Worker (requires `.env` to also be present in `.dev.vars`):
+```bash
+# wrangler dev reads .dev.vars — copy .env there or use wrangler secret
+cp .env .dev.vars
+npx wrangler dev
+```
+
+Terminal 2 — send a simulated `/start` update:
+```bash
+npm run simulate
+```
+
+The Worker will process the fake update through the full pipeline: secret verification, DB, bot middleware, and `/start` handler. Telegram won't receive the reply, but the DB insert and logs confirm everything works. Use `TEST_CHAT_ID` in `.env` to control the simulated user ID.
+
+---
+
 ## Deployment (production)
 
 There is a single **production** environment.

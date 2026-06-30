@@ -13,7 +13,9 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "cf-types": "wrangler types",
-    "set-commands": "tsx --env-file=.env scripts/set-commands.ts"
+    "set-commands": "tsx --env-file=.env scripts/set-commands.ts",
+    "start-polling": "tsx --env-file=.env scripts/start-polling.ts",
+    "simulate": "tsx --env-file=.env scripts/simulate-update.ts"
   },
   "repository": {
     "type": "git",
