@@ -50,6 +50,14 @@ export async function handleCallbackQuery(
         await panels.editPanel(ctx, panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id));
         break;
       }
+      case "radiusMenu": {
+        await panels.editPanel(ctx, panels.renderRadiusPresets(cb.locId));
+        break;
+      }
+      case "magnitudeMenu": {
+        await panels.editPanel(ctx, panels.renderMagnitudePresets(cb.locId));
+        break;
+      }
       case "radius": {
         await updateRadius(db, cb.locId, cb.radius);
         const loc = await getLocation(db, cb.locId);

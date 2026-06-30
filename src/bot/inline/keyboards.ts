@@ -18,8 +18,8 @@ export function locationDetailKeyboard(
   locId: number,
 ): InlineKeyboard {
   return new InlineKeyboard()
-    .text("📏 Raggio", cb.encodeNav("back"))
-    .text("📊 Magnitudo", cb.encodeNav("back"))
+    .text("📏 Raggio", cb.encodeRadiusMenu(locId))
+    .text("📊 Magnitudo", cb.encodeMagnitudeMenu(locId))
     .row()
     .text("🗑 Rimuovi", cb.encodeDelete(locId))
     .row()
@@ -33,7 +33,7 @@ export function radiusPresetsKeyboard(
   for (const r of [25, 50, 75, 100, 150, 200, 300]) {
     kb.text(`${r} km`, cb.encodeRadius(locId, r));
   }
-  kb.row().text("↩️ Indietro", cb.encodeNav("back"));
+  kb.row().text("↩️ Indietro", cb.encodeLoc(locId));
   return kb;
 }
 
@@ -45,7 +45,7 @@ export function magnitudePresetsKeyboard(
     const val = Math.round(m * 10);
     kb.text(`${m.toFixed(1)}`, cb.encodeMagnitude(locId, val));
   }
-  kb.row().text("↩️ Indietro", cb.encodeNav("back"));
+  kb.row().text("↩️ Indietro", cb.encodeLoc(locId));
   return kb;
 }
 
