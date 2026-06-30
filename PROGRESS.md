@@ -1,7 +1,7 @@
 # allerta-terremoti-bot — Progress
 
 **Last updated:** 2026-06-30
-**Current milestone:** M2 (User interaction) — COMPLETED ✅
+**Current milestone:** M3 (Detection & notification) — COMPLETED ✅
 
 ---
 
@@ -69,11 +69,25 @@
 - **Tests:** `test/geocoding/geonames.spec.ts` (7 tests, +2 for enriched log fields).
 - **DoD verified:** 66 total tests (47 workers + 19 db), all green.
 
+### M3 — Detection & notification (the core) ✅
+
+- **INGV client (`src/ingv/`):** FDSN text format parser with zod validation; `fetchItalyEvents` (Italian bbox, low mag floor) and `fetchWorldEvents` (global ≥ WORLD_ALERT_THRESHOLD); both restricted to `LOOKBACK_WINDOW` via `starttime`. Realistic fixture for tests.
+- **Dedup:** `history` repository `insertIfNew` uses `ON CONFLICT DO NOTHING` on `history.id`.
+- **Haversine:** `src/geo/haversine.ts` — distance function with tests (Roma–Milano ~480 km, Roma–NY ~6900 km).
+- **Matching (`src/notify/match.ts`):** union of proximity (per-location distance + magnitude threshold), national (in `ITALY_BBOX` ≥ `ITALY_ALERT_THRESHOLD` + `italy_alerts` toggle), and world (≥ `WORLD_ALERT_THRESHOLD` + `world_alerts` toggle). Nearest-location selection. One `Recipient` per user. Ordered by distance ascending (FR-4.7).
+- **Compose (`src/notify/compose.ts`):** 3 message formats: proximity, national (omits distance if no location), world (no personal distance). INGV page URL: `https://terremoti.ingv.it/event/<id>`. Buttons: Dettagli + INGV page. Time in `Europe/Rome`.
+- **Deliver (`src/notify/deliver.ts`):** `deliveries` rows idempotent (`ON CONFLICT DO NOTHING`), sends via `bot.api.sendMessage`, ~30/s rate (33ms sleep). Permanent errors → `setChatStatus('blocked')`; transient → marked for retry. Logs every delivery error (NFR-5.8.4).
+- **Main cron (`src/jobs/poll.ts`):** dead-man's-switch ping → fetch INGV (italy + world) → dedup → match → deliver first wave → save event. Logs cycle stats (NFR-5.8.6).
+- **Scheduled routing (`src/index.ts`):** dispatches by `event.cron` to main cron (`* * * * *`), with stubs for retry (`*/5`) and cleanup (`0 3`) — M4.
+- **Details callback (`ev;<id>;det`):** reads event from `history`; if found, replies with new message (coords, depth, magnitude, stations, time); if gone, graceful "Dettagli non più disponibili." (FR-4.12).
+- **Tests:** `test/ingv/parser.spec.ts` (4), `test/geo/haversine.spec.ts` (4), `test/db/m3-repos.spec.ts` (9), `test/db/match.spec.ts` (2), `test/notify/errors.spec.ts` (6), `test/notify/compose.spec.ts` (7).
+- **DoD verified:** 99 total tests (69 workers + 30 db), all green.
+
 ---
 
 ```
 src/
-  index.ts            # fetch (webhook + secret verify) + scheduled stub
+  index.ts            # fetch (webhook + secret verify) + scheduled routing (main/retry/cleanup)
   config.ts           # zod env (BOT_TOKEN, WEBHOOK_SECRET, TURSO_* required)
   webhook.ts          # verifySecretToken
   bot/
@@ -82,6 +96,10 @@ src/
     inline/{keyboards,panels,router}.ts
     location-intake.ts  # reply keyboard + location/venue handler + geocoding + validation
   i18n/strings.ts     # all M2 Italian strings (commands, panels, errors)
+  ingv/{types,parser,client}.ts  # FDSN text format, Italy + world queries
+  geo/haversine.ts        # distance function
+  notify/{errors,match,compose,deliver}.ts  # error classification, recipient matching, message composition, delivery
+  jobs/poll.ts            # main cron orchestrator
   geocoding/geonames.ts  # reverse geocode via GeoNames
   db/
     schema.sql        # hand-written DDL (source of truth)
@@ -125,7 +143,7 @@ wrangler.jsonc        # 3 cron triggers, stub scheduled handler
 npm run lint && npm run typecheck && npm test && npm run build
 ```
 
-- 60 tests across 2 pools (41 workers + 19 db), all must pass
+- 99 tests across 2 pools (69 workers + 30 db), all must pass
 - No `any`, no committed secrets, no Workers-incompatible deps
 
 ### Database
@@ -153,13 +171,7 @@ Empty strings in `.env` are treated as absent (handled in `config.ts` preprocess
 
 ## Milestones pending
 
-### M3 — Detection & notification (core) — NEXT
-
-### M3 — Detection & notification (core)
-
-INGV polling, event matching (Haversine + bounding box; proximity / national / world eligibility), message composition, delivery with idempotency.
-
-### M4 — Reliability & operations
+### M4 — Reliability & operations — NEXT
 
 Retry cron, cleanup cron, watchdog, admin commands (`/broadcast`, `/stats`, `/events`, `/delivery`, `/health`), admin push notifications.
 
@@ -189,6 +201,13 @@ Rate-limit handling, structured logging, overlap lock, invariant review, end-to-
 - Area validation via bounding boxes in `src/util/geo-bbox.ts` (IT/SM/AT/CH)
 - `/stop` sets `stopped` status, keeps data; admin notification stub (`TODO M4`)
 - Every slash command and every callback query logged (NFR-5.8.2)
+- INGV FDSN text format parser with zod validation; Italy + world queries; dedup via `history.id ON CONFLICT DO NOTHING`
+- Haversine distance + union eligibility matching (proximity/national/world) + nearest location per user
+- Delivery idempotent via `deliveries(event_id, chat) ON CONFLICT DO NOTHING`; permanent error → `setChatStatus(blocked)`
+- Rate limiting via sleep(33ms) between sends (~30/s); proper `retry_after` handling deferred to M5
+- Details callback responds with a new message (not edit-in-place)
+- INGV event page URL: `https://terremoti.ingv.it/event/<id>`
+- `scheduled` handler routes by `event.cron` (main/retry/cleanup); retry and cleanup stubbed for M4
 
 ---
 
