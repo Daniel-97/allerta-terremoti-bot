@@ -5,7 +5,7 @@ const schema = z.object({
   WEBHOOK_SECRET: z.string().min(1),
   TURSO_DATABASE_URL: z.string().url(),
   TURSO_AUTH_TOKEN: z.string().min(1),
-  GEONAMES_USERNAME: z.string().optional(),
+  GEONAMES_USERNAME: z.string().min(1),
   ADMIN_CHAT_IDS: z.string().optional(),
   HEALTHCHECKS_URL: z.string().url().optional(),
   MAX_ATTEMPTS: z.string().optional(),
