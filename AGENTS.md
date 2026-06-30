@@ -169,6 +169,10 @@ These encode design decisions that are easy to violate by accident:
 11. **Private chats only.** Ignore messages from groups/supergroups/channels.
 12. **`/stop` deactivates, it does not delete.** It sets a `stopped` status and keeps data.
     `/start` reactivates a chat from **any** non-active status (including `blocked`).
+13. **All logs go through `src/util/log.ts`.** No `console.log` / `console.warn` /
+    `console.error` calls in application code or scripts (the logger module itself is
+    the only exception). Logs may include Telegram profile data (`first_name`,
+    `username`, etc. — public data). Never log tokens or secrets.
 
 ---
 

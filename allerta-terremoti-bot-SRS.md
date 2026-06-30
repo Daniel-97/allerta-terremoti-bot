@@ -245,6 +245,39 @@ Notifiche operative inviate automaticamente ai chat ID in `ADMIN_CHAT_IDS`.
 - **NFR-7.1** Il polling deve proseguire in modo resiliente: un errore temporaneo dell'INGV o di Telegram in un ciclo non deve impedire i cicli successivi.
 - **NFR-7.2** Il sistema deve auto-monitorarsi (watchdog, sezione 3.10) e affidarsi a un dead-man's-switch esterno per i guasti totali.
 
+### 5.8 Logging operativo (NFR-5.8)
+
+**Obiettivo:** tracciabilità completa delle richieste utente, dei cicli di polling, degli errori di consegna e dei broadcast amministrativi.
+
+**Formato:** ogni log è una **JSON-line** (un oggetto JSON per riga) scritta via `console.log/warn/error` (intercettata da Cloudflare Workers Logs via `observability`).
+
+**Campi obbligatori di ogni entry:**
+- `ts` — ISO 8601 UTC
+- `level` — `info` | `warn` | `error`
+- `msg` — messaggio testuale breve
+- `logger` — nome del child logger (es. "bot", "ingv", "deliver", "scheduled")
+- campi contestuali opzionali (chatId, userId, first_name, username, updateId, cmd, eventId, durationMs, err.message, err.code, etc.)
+
+**Dati personali:** i log possono includere `first_name`, `username` e altri dati del profilo Telegram (dati pubblici). Il `chatId` è sempre loggato come ID opaco. Mai loggare token o segreti.
+
+**Livelli e loro uso:**
+- `info` — eventi normali: ricezione richiesta, comando gestito, ciclo cron iniziato/terminato, evento processato.
+- `warn` — situazioni anomale ma non bloccanti: GeoNames fallback, rate-limit Telegram, retry transient.
+- `error` — errori bloccanti o degradanti: DB irraggiungibile, errore Telegram permanente, parsing fallito, broadcast interrotto.
+
+**Punti di log obbligatori (minimo):**
+1. **NFR-5.8.1 — Requests**: ogni richiesta in arrivo al `fetch` handler (method, path, esito 200/403/404, durationMs). Logga anche le richieste rifiutate (secret token errato).
+2. **NFR-5.8.2 — User commands**: ogni comando utente riconosciuto, con chatId, userId, first_name, username, command, args sintetici, esito (handled/ignored).
+3. **NFR-5.8.3 — Cron cycles**: ogni `scheduled` handler, con cron expr, esito finale, durationMs.
+4. **NFR-5.8.4 — Delivery errors**: ogni errore di consegna con chatId, eventId, status (failed_transient/permanent), attempts, err.code.
+5. **NFR-5.8.5 — Broadcasts**: ogni `/broadcast` con adminId, recipientCount, successCount, failCount (richiesto da FR-8.3).
+6. **NFR-5.8.6 — INGV polling cycles**: cycle start/end, events fetched, dedup count, recipients matched, delivery wave outcome (richiesto da SRS 7.9).
+7. **NFR-5.8.7 — Admin notifications**: ogni notifica push admin (best-effort), con tipo (new_user / event_summary / user_stopped / watchdog).
+
+**Implementazione:** un modulo `src/util/log.ts` espone `createLogger(name)` e `logger.child(fields)`. Internamente usa `console.log/warn/error` con `JSON.stringify` (Workers-compatible, zero dipendenze). La API è volutamente compatibile con `pino`-style per future migrazioni. **Nessun filtro livello** — tutti i log passano sempre.
+
+**Testing:** il modulo `log.ts` è testato in workers pool: verifica formato JSON, campi obbligatori, binding di `child`, chiamate sui `console.*` corretti.
+
 ---
 
 ## 6. Modello dati (schema logico)
