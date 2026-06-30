@@ -205,7 +205,7 @@ bot token (from [@BotFather](https://t.me/BotFather)), and a free GeoNames usern
    ```
 2. **Create the database schema** by applying the hand-written DDL to your Turso database:
    ```bash
-   turso db shell <your-db> < src/db/schema.sql
+   npm run db:apply
    ```
 3. **Configure secrets** for local runs in `.dev.vars` (see `.dev.vars.example`):
    ```
@@ -240,7 +240,7 @@ Runs the bot as a **long-running Node process** using grammY's polling, bypassin
 
 ```bash
 # Apply the DB schema first (one-time)
-turso db shell <your-db> < src/db/schema.sql
+npm run db:apply
 
 # Start polling
 npm run start-polling
