@@ -1,7 +1,7 @@
 # allerta-terremoti-bot — Progress
 
 **Last updated:** 2026-06-30
-**Current milestone:** M2 (User interaction) — NOT STARTED
+**Current milestone:** M2 (User interaction) — COMPLETED ✅
 
 ---
 
@@ -49,6 +49,18 @@
   - `npm run simulate` — sends fake `/start` update to `wrangler dev`
 - **DoD verified:** lint/typecheck/test/build all green
 
+### M2 — User interaction (inline-first) ✅
+
+- **Location intake (FR-1):** reply keyboard with `request_location`; location/venue accepted; reverse-geocode via GeoNames (`src/geocoding/geonames.ts`) with 4s timeout + graceful fallback; name as `Comune (PROV)`; reject outside IT/SM/AT/CH (bounding boxes in `src/util/geo-bbox.ts`); enforce `(chat, name)` uniqueness + 10-locations cap with explicit, friendly checks.
+- **Settings (FR-2):** per-location `radius` (25–300 km presets) and `magnitude_threshold` (2.0–5.0 presets) via inline buttons; global `italy_alerts` / `world_alerts` toggles via `setAlertFlags`.
+- **Inline panel pattern (FR-7.6):** single message that edits itself in place (`src/bot/inline/panels.ts`). All navigation context in `callback_data` (`src/util/callback-data.ts`, `;` scheme, ≤ 64 bytes). Router dispatch in `src/bot/inline/router.ts`.
+- **Commands:** `/posizioni`, `/impostazioni`, `/aiuto`, `/stop`, `/credits` registered in Telegram menu. `/start` states national alerts are on by default. `/stop` deactivates (keeps data, sets `stopped`) with admin notification stub (`TODO M4`).
+- **Location removal** with two-tap inline confirmation (delete → confirm).
+- **Logging NFR-5.8.2:** every command and every callback query logged (chatId, userId, first_name, command/callback, outcome).
+- **Files:** `src/geocoding/geonames.ts`, `src/util/callback-data.ts`, `src/util/geo-bbox.ts`, `src/util/constants.ts`, `src/db/repositories/locations.ts`, `src/bot/inline/{keyboards,panels,router}.ts`, `src/bot/commands/{start,aiuto,posizioni,impostazioni,stop,credits}.ts`, `src/bot/location-intake.ts`. `src/i18n/strings.ts` expanded with all Italian M2 strings.
+- **Tests:** `test/util/callback-data.spec.ts` (12), `test/util/geo-bbox.spec.ts` (9), `test/geocoding/geonames.spec.ts` (5 — mock fetch), `test/db/locations.spec.ts` (10 — node pool), `test/db/chats-alerts.spec.ts` (3 — node pool).
+- **DoD verified:** 60 total tests (41 workers + 19 db), all green.
+
 ---
 
 ## Current state of the codebase
@@ -58,27 +70,44 @@ src/
   index.ts            # fetch (webhook + secret verify) + scheduled stub
   config.ts           # zod env (BOT_TOKEN, WEBHOOK_SECRET, TURSO_* required)
   webhook.ts          # verifySecretToken
-  bot/bot.ts          # createBot(config, db) — private-only middleware + /start
-  i18n/strings.ts     # STRINGS.start.welcome (Italian)
+  bot/
+    bot.ts            # createBot(config, db) — all commands + callback router + location intake
+    commands/{start,aiuto,posizioni,impostazioni,stop,credits}.ts
+    inline/{keyboards,panels,router}.ts
+    location-intake.ts  # reply keyboard + location/venue handler + geocoding + validation
+  i18n/strings.ts     # all M2 Italian strings (commands, panels, errors)
+  geocoding/geonames.ts  # reverse geocode via GeoNames
   db/
     schema.sql        # hand-written DDL (source of truth)
     schema.ts         # Drizzle defs for all 5 tables
     client.ts         # createDb + PRAGMA foreign_keys=ON
     types.ts          # Db type
-    repositories/chats.ts  # touch/upsert/get/setStatus
-  util/time.ts        # nowIso()
+    repositories/{chats,locations}.ts  # touch/upsert/get/setStatus + setAlertFlags; locations CRUD
+  util/
+    time.ts           # nowIso()
+    log.ts            # structured JSON-lines logger
+    callback-data.ts  # compact ; scheme encode/decode
+    geo-bbox.ts       # IT/SM/AT/CH bounding boxes
+    constants.ts      # MAX_LOCATIONS_PER_USER, thresholds
 scripts/
   set-commands.ts     # npm run set-commands
   apply-schema.ts     # npm run db:apply
   start-polling.ts    # npm run start-polling (local testing)
   simulate-update.ts  # npm run simulate (local testing)
 test/
-  smoke.spec.ts       # workers pool
-  webhook.spec.ts     # workers pool
-  config.spec.ts      # workers pool
+  smoke.spec.ts           # workers pool
+  webhook.spec.ts         # workers pool
+  config.spec.ts          # workers pool
+  log.spec.ts             # workers pool
+  util/
+    callback-data.spec.ts # workers pool
+    geo-bbox.spec.ts      # workers pool
+  geocoding/geonames.spec.ts  # workers pool (mock fetch)
   db/
-    client.spec.ts    # node pool + libsql :memory:
-    chats.spec.ts     # node pool + libsql :memory:
+    client.spec.ts        # node pool + libsql :memory:
+    chats.spec.ts         # node pool + libsql :memory:
+    chats-alerts.spec.ts  # node pool + libsql :memory:
+    locations.spec.ts     # node pool + libsql :memory:
 vitest.config.ts      # workers pool, excludes test/db
 vitest.db.config.ts   # node pool for test/db
 wrangler.jsonc        # 3 cron triggers, stub scheduled handler
@@ -90,7 +119,7 @@ wrangler.jsonc        # 3 cron triggers, stub scheduled handler
 npm run lint && npm run typecheck && npm test && npm run build
 ```
 
-- 20 tests across 2 pools (14 workers + 6 db), all must pass
+- 60 tests across 2 pools (41 workers + 19 db), all must pass
 - No `any`, no committed secrets, no Workers-incompatible deps
 
 ### Database
@@ -107,7 +136,7 @@ npm run lint && npm run typecheck && npm test && npm run build
 | `WEBHOOK_SECRET` | M0 |
 | `TURSO_DATABASE_URL` | M1 |
 | `TURSO_AUTH_TOKEN` | M1 |
-| `GEONAMES_USERNAME` | M2 (optional before) |
+| `GEONAMES_USERNAME` | M2 |
 | `ADMIN_CHAT_IDS` | M4 (optional before) |
 | `HEALTHCHECKS_URL` | M3 (optional before) |
 | `MAX_ATTEMPTS` | optional, code constant fallback |
@@ -118,16 +147,7 @@ Empty strings in `.env` are treated as absent (handled in `config.ts` preprocess
 
 ## Milestones pending
 
-### M2 — User interaction (inline-first) — NEXT
-
-- Location intake: reply keyboard with `request_location`; accept location/venue; reverse-geocode via GeoNames (`src/geocoding/geonames.ts`); name as `Comune (PROV)`; reject outside IT/SM/AT/CH; enforce `(chat, name)` uniqueness and 10-locations cap with explicit checks
-- Settings: per-location `radius` and `magnitude_threshold` via inline presets; global `italy_alerts` / `world_alerts` toggles
-- Inline panel pattern: single message that edits itself in place; all navigation context in `callback_data` (≤ 64 bytes); compact scheme per SRS 8.2
-- Commands: `/posizioni`, `/impostazioni`, `/aiuto`, `/stop`, `/credits`; `/start`/`/aiuto` must state national alerts are on by default; `/stop` deactivates (keeps data) and notifies admin (stub ok)
-- Location removal with two-tap inline confirmation
-- Tests: geocoding fallback + callback_data encode/decode
-
-**Refs:** SRS 3.1, 3.2, 3.7 (FR-7), 7.6; AGENTS (invariants 1–3, 8–10).
+### M3 — Detection & notification (core) — NEXT
 
 ### M3 — Detection & notification (core)
 
@@ -156,6 +176,12 @@ Rate-limit handling, structured logging, overlap lock, invariant review, end-to-
 - Local testing via `npm run start-polling` (polling → real Telegram) or `npm run simulate` (fake update to `wrangler dev`)
 - `/stop` not yet wired; `setChatStatus` in `chats.ts` ready for it
 - Structured logging via `src/util/log.ts` (zero-dependency, JSON-lines, Pino-compatible API). NFR-5.8. No LOG_LEVEL filter — all levels always pass. PII allowed (public Telegram data). Invariant #13
+- Inline panels via `src/bot/inline/` (edit-in-place, compact callback_data scheme, router dispatch)
+- `src/util/callback-data.ts`: compact `;` scheme per SRS 8.2; ≤ 64 bytes enforced
+- `src/geocoding/geonames.ts`: reverse geocode via GeoNames with 4s timeout + graceful fallback (returns null)
+- Area validation via bounding boxes in `src/util/geo-bbox.ts` (IT/SM/AT/CH)
+- `/stop` sets `stopped` status, keeps data; admin notification stub (`TODO M4`)
+- Every slash command and every callback query logged (NFR-5.8.2)
 
 ---
 
