@@ -342,7 +342,7 @@ Le scelte seguenti sono vincoli di progetto e raccomandazioni allineate all'ecos
 ### 7.4 Database e accesso ai dati
 - **Turso** (libSQL) con driver **`@libsql/client`** (variante web `@libsql/client/web` su Workers).
 - **Drizzle ORM** (`drizzle-orm/libsql`) per query type-safe.
-- **Schema SQL scritto a mano** in `db/schema.sql`, unica fonte di verità del database, applicato manualmente alla Turso (es. via Turso CLI). **Nessun drizzle-kit / migrazioni automatiche.** Le definizioni Drizzle in `db/schema.ts` (per le query) sono mantenute coerenti con `schema.sql` a mano.
+- **Schema SQL scritto a mano** in `src/db/schema.sql`, unica fonte di verità del database, applicato manualmente alla Turso (es. via Turso CLI). **Nessun drizzle-kit / migrazioni automatiche.** Le definizioni Drizzle in `db/schema.ts` (per le query) sono mantenute coerenti con `schema.sql` a mano.
 
 ### 7.5 Integrazione INGV e parsing
 - Recupero eventi via **`fetch`** nativo verso il web service FDSN, con filtri bounding box (`ITALY_BBOX`) / magnitudo / tempo (`starttime`); query globale per gli eventi mondiali.
