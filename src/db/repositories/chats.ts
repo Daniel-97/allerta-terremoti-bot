@@ -83,3 +83,14 @@ export async function setChatStatus(
     .set({ status, updated_at: nowIso() })
     .where(eq(chats.id, id));
 }
+
+export async function setAlertFlags(
+  db: Db,
+  id: number,
+  flags: { italy_alerts: boolean; world_alerts: boolean },
+): Promise<void> {
+  await db
+    .update(chats)
+    .set({ ...flags, updated_at: nowIso() })
+    .where(eq(chats.id, id));
+}
