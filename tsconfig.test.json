@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": ["@cloudflare/vitest-pool-workers/types"]
+    "types": ["@cloudflare/vitest-pool-workers/types", "@cloudflare/workers-types/2023-07-01"]
   },
   "include": ["test", "src"]
 }
