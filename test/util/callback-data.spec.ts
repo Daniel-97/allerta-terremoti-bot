@@ -4,6 +4,10 @@ import {
   decodeRadius,
   encodeMagnitude,
   decodeMagnitude,
+  encodeRadiusMenu,
+  decodeRadiusMenu,
+  encodeMagnitudeMenu,
+  decodeMagnitudeMenu,
   encodeDelete,
   encodeDeleteOk,
   isDelete,
@@ -41,6 +45,32 @@ describe("callback-data magnitude", () => {
 
   it("decode rejects invalid magnitude", () => {
     expect(decodeMagnitude("l;7;m;999")).toBeNull();
+  });
+});
+
+describe("callback-data radius menu", () => {
+  it("encodes and decodes", () => {
+    const s = encodeRadiusMenu(42);
+    expect(s).toBe("l;42;r");
+    expect(decodeRadiusMenu(s)).toEqual({ kind: "radiusMenu", locId: 42 });
+    expect(s.length).toBeLessThanOrEqual(64);
+  });
+
+  it("does not collide with radius value", () => {
+    expect(decodeRadiusMenu("l;5;r;100")).toBeNull();
+  });
+});
+
+describe("callback-data magnitude menu", () => {
+  it("encodes and decodes", () => {
+    const s = encodeMagnitudeMenu(42);
+    expect(s).toBe("l;42;m");
+    expect(decodeMagnitudeMenu(s)).toEqual({ kind: "magnitudeMenu", locId: 42 });
+    expect(s.length).toBeLessThanOrEqual(64);
+  });
+
+  it("does not collide with magnitude value", () => {
+    expect(decodeMagnitudeMenu("l;5;m;45")).toBeNull();
   });
 });
 
@@ -102,12 +132,16 @@ describe("decode generic", () => {
     expect(decode("l;5")!.kind).toBe("loc");
 
     expect(decode("l;5;r;100")!.kind).toBe("radius");
+    expect(decode("l;5;r")!.kind).toBe("radiusMenu");
+    expect(decode("l;5;m")!.kind).toBe("magnitudeMenu");
   });
 
   it("always ≤ 64 bytes", () => {
     for (const [fn, args] of [
       [encodeRadius, [100000, 300]],
       [encodeMagnitude, [100000, 50]],
+      [encodeRadiusMenu, [100000]],
+      [encodeMagnitudeMenu, [100000]],
       [encodeDelete, [100000]],
       [encodeDeleteOk, [100000]],
       [encodeToggle, ["ita", true]],

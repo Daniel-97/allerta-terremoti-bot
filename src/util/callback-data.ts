@@ -21,6 +21,14 @@ export interface ToggleCb {
   flag: "ita" | "wld";
   value: boolean;
 }
+export interface RadiusMenuCb {
+  kind: "radiusMenu";
+  locId: number;
+}
+export interface MagnitudeMenuCb {
+  kind: "magnitudeMenu";
+  locId: number;
+}
 export interface NavCb {
   kind: "nav";
   target: "back" | "home";
@@ -33,6 +41,8 @@ export interface LocCb {
 export type Callback =
   | RadiusCb
   | MagnitudeCb
+  | RadiusMenuCb
+  | MagnitudeMenuCb
   | DeleteCb
   | DeleteOkCb
   | ToggleCb
@@ -61,6 +71,26 @@ export function decodeMagnitude(s: string): MagnitudeCb | null {
   const v = Number(m[2]);
   if (v < 20 || v > 50) return null;
   return { kind: "magnitude", locId: Number(m[1]), magnitude: v };
+}
+
+// radius menu (open preset picker, no value)
+export function encodeRadiusMenu(locId: number): string {
+  return `l;${locId};r`;
+}
+export function decodeRadiusMenu(s: string): RadiusMenuCb | null {
+  const m = s.match(/^l;(\d+);r$/);
+  if (!m) return null;
+  return { kind: "radiusMenu", locId: Number(m[1]) };
+}
+
+// magnitude menu (open preset picker, no value)
+export function encodeMagnitudeMenu(locId: number): string {
+  return `l;${locId};m`;
+}
+export function decodeMagnitudeMenu(s: string): MagnitudeMenuCb | null {
+  const m = s.match(/^l;(\d+);m$/);
+  if (!m) return null;
+  return { kind: "magnitudeMenu", locId: Number(m[1]) };
 }
 
 // delete
@@ -123,6 +153,8 @@ export function decode(s: string): Callback | null {
   return (
     decodeRadius(s) ??
     decodeMagnitude(s) ??
+    decodeRadiusMenu(s) ??
+    decodeMagnitudeMenu(s) ??
     decodeDeleteOk(s) ??
     decodeDelete(s) ??
     decodeToggle(s) ??
