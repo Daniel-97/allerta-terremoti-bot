@@ -27,6 +27,8 @@
   },
   "homepage": "https://github.com/Daniel-97/allerta-terremoti-bot#readme",
   "dependencies": {
+    "@libsql/client": "^0.17.4",
+    "drizzle-orm": "^0.45.2",
     "grammy": "^1.44.0",
     "zod": "^4.4.3"
   },
