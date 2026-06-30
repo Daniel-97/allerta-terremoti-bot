@@ -20,6 +20,17 @@
 - **DoD verified:** lint/typecheck/test/build green; 7 tests pass
 - **Note:** production deploy + Telegram webhook registration documented in README but not executed (no Cloudflare account / bot token at the time)
 
+### M0a — Logging foundation ✅
+
+- SRS: added **NFR-5.8** (Logging operativo) — JSON-lines format, levels info/warn/error, 7 required log points (requests, commands, cron cycles, delivery errors, broadcasts, INGV polling, admin notifications). PII allowed (public Telegram data). No filter — all levels always pass. Zero-dependency implementation.
+- AGENTS: new invariant #13 — all logs go through `src/util/log.ts`; no `console.log`/`warn`/`error` scattered in application code.
+- `src/util/log.ts`: `createLogger(name)` and `logger.child(fields)`. JSON-lines via `console.log/warn/error`. `{ ts, level, logger, ...fields, msg }`. Zero dependencies. API compatible with `pino`-style.
+- `src/index.ts`: logs every fetch request (method, path, status, durationMs) and every scheduled trigger (cron expr, durationMs).
+- `src/bot/bot.ts`: logs every user touch (chatId, userId, first_name, username) and every command (chatId, command, outcome).
+- All scripts (`apply-schema`, `set-commands`, `start-polling`, `simulate-update`) use `log.info/error` instead of `console.log/error`.
+- **Tests:** `test/log.spec.ts` (5 tests in workers pool) — verifies JSON format, levels, child binding, field merging.
+- **DoD verified:** 20 total tests (14 workers + 6 db), all green.
+
 ### M1 — Data foundation & config ✅
 
 - `db/schema.sql` moved to `src/db/schema.sql` (AGENTS location); empty `db/` removed
@@ -79,7 +90,7 @@ wrangler.jsonc        # 3 cron triggers, stub scheduled handler
 npm run lint && npm run typecheck && npm test && npm run build
 ```
 
-- 15 tests across 2 pools, all must pass
+- 20 tests across 2 pools (14 workers + 6 db), all must pass
 - No `any`, no committed secrets, no Workers-incompatible deps
 
 ### Database
@@ -144,6 +155,7 @@ Rate-limit handling, structured logging, overlap lock, invariant review, end-to-
 - No stub folders created in M0/M1 (`jobs/`, `ingv/`, `geocoding/`, `notify/`, `geo/` appear in their milestones)
 - Local testing via `npm run start-polling` (polling → real Telegram) or `npm run simulate` (fake update to `wrangler dev`)
 - `/stop` not yet wired; `setChatStatus` in `chats.ts` ready for it
+- Structured logging via `src/util/log.ts` (zero-dependency, JSON-lines, Pino-compatible API). NFR-5.8. No LOG_LEVEL filter — all levels always pass. PII allowed (public Telegram data). Invariant #13
 
 ---
 
