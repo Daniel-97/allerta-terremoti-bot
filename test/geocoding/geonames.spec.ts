@@ -39,3 +39,30 @@ describe("reverseGeocode", () => {
 
   // timeout test skipped: requires real timers and AbortController, fragile under fake timers
 });
+
+describe("reverseGeocode logging", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("logs status and body for 401 with geonames client error msg", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const body = JSON.stringify({ status: { message: "invalid user" } });
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response(body, { status: 401 }),
+    );
+    await reverseGeocode(41.9, 12.5, "user");
+    const entry = JSON.parse(warn.mock.calls[0][0] as string);
+    expect(entry.status).toBe(401);
+    expect(entry.msg).toBe("geonames client error");
+    expect(entry.body).toBe(body);
+  });
+
+  it("logs errName and errMsg for network error", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(new Error("network"));
+    await reverseGeocode(41.9, 12.5, "user");
+    const entry = JSON.parse(warn.mock.calls[0][0] as string);
+    expect(entry.errName).toBe("Error");
+    expect(entry.errMsg).toBe("network");
+    expect(entry.msg).toBe("geonames network error");
+  });
+});
