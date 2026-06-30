@@ -61,9 +61,15 @@
 - **Tests:** `test/util/callback-data.spec.ts` (12), `test/util/geo-bbox.spec.ts` (9), `test/geocoding/geonames.spec.ts` (5 — mock fetch), `test/db/locations.spec.ts` (10 — node pool), `test/db/chats-alerts.spec.ts` (3 — node pool).
 - **DoD verified:** 60 total tests (41 workers + 19 db), all green.
 
----
+### M2a — Error logging enrichment ✅
 
-## Current state of the codebase
+- `SRS.md`: added **FR-10.6** — external service errors logged in structured format with full detail (HTTP status, body excerpt, error name/message, context). No Telegram admin push in v1 to avoid rate-limit conflicts with seismic alerts. Admin push via Telegram deferred to M4 with rate-limit handling.
+- `AGENTS.md`: new invariant #14 — external service errors are logged, not pushed to admin in v1.
+- `src/geocoding/geonames.ts`: enriched logging — distinguishes client error (4xx) vs server error (5xx) vs network error (catch). HTTP response body included (first 500 chars). Error name and message included for network/timeout errors.
+- **Tests:** `test/geocoding/geonames.spec.ts` (7 tests, +2 for enriched log fields).
+- **DoD verified:** 66 total tests (47 workers + 19 db), all green.
+
+---
 
 ```
 src/
@@ -175,7 +181,8 @@ Rate-limit handling, structured logging, overlap lock, invariant review, end-to-
 - No stub folders created in M0/M1 (`jobs/`, `ingv/`, `geocoding/`, `notify/`, `geo/` appear in their milestones)
 - Local testing via `npm run start-polling` (polling → real Telegram) or `npm run simulate` (fake update to `wrangler dev`)
 - `/stop` not yet wired; `setChatStatus` in `chats.ts` ready for it
-- Structured logging via `src/util/log.ts` (zero-dependency, JSON-lines, Pino-compatible API). NFR-5.8. No LOG_LEVEL filter — all levels always pass. PII allowed (public Telegram data). Invariant #13
+- Structured logging via `src/util/log.ts` (zero-dependency, JSON-lines, Pino-compatible API). NFR-5.8. No LOG_LEVEL filter — all levels always pass. PII allowed (public Telegram data). Invariants #13, #14
+- External service errors logged with full detail (HTTP status, body, error type, context). **No Telegram admin push in v1** to conserve rate-limit for seismic alerts (FR-10.6). Admin push via Telegram introduced in M4 with rate-limit handling.
 - Inline panels via `src/bot/inline/` (edit-in-place, compact callback_data scheme, router dispatch)
 - `src/util/callback-data.ts`: compact `;` scheme per SRS 8.2; ≤ 64 bytes enforced
 - `src/geocoding/geonames.ts`: reverse geocode via GeoNames with 4s timeout + graceful fallback (returns null)

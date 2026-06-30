@@ -50,7 +50,7 @@ describe("reverseGeocode logging", () => {
       new Response(body, { status: 401 }),
     );
     await reverseGeocode(41.9, 12.5, "user");
-    const entry = JSON.parse(warn.mock.calls[0][0] as string);
+    const entry = JSON.parse(warn.mock.calls[0]![0] as string);
     expect(entry.status).toBe(401);
     expect(entry.msg).toBe("geonames client error");
     expect(entry.body).toBe(body);
@@ -60,7 +60,7 @@ describe("reverseGeocode logging", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(new Error("network"));
     await reverseGeocode(41.9, 12.5, "user");
-    const entry = JSON.parse(warn.mock.calls[0][0] as string);
+    const entry = JSON.parse(warn.mock.calls[0]![0] as string);
     expect(entry.errName).toBe("Error");
     expect(entry.errMsg).toBe("network");
     expect(entry.msg).toBe("geonames network error");
