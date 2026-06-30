@@ -1,0 +1,5 @@
+export const MAX_LOCATIONS_PER_USER = 10;
+export const ITALY_ALERT_THRESHOLD = 5.0;
+export const WORLD_ALERT_THRESHOLD = 7.0;
+export const LOOKBACK_WINDOW_MIN = 60;
+export const INGV_FAILURE_ALERT_THRESHOLD = 5;

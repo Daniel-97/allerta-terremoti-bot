@@ -1,5 +1,5 @@
 import { eq, and, sql } from "drizzle-orm";
-import { locations, chats } from "../schema";
+import { locations } from "../schema";
 import type { Db } from "../types";
 
 export interface NewLocation {

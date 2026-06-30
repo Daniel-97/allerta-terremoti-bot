@@ -1,6 +1,5 @@
 import type { Context } from "grammy";
 import type { Logger } from "../../util/log";
-import { STRINGS } from "../../i18n/strings";
 import * as panels from "../inline/panels";
 import { listLocations } from "../../db/repositories/locations";
 import { requestLocationKeyboard } from "../location-intake";

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { reverseGeocode } from "../../src/geocoding/geonames";
 
 function mockFetchOnce(body: unknown, status = 200) {

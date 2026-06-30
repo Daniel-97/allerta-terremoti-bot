@@ -12,6 +12,11 @@ async function main(): Promise<void> {
   const bot = new Bot(token);
   await bot.api.setMyCommands([
     { command: "start", description: "Avvia il bot" },
+    { command: "aiuto", description: "Mostra l'aiuto" },
+    { command: "posizioni", description: "Le tue posizioni salvate" },
+    { command: "impostazioni", description: "Raggio, magnitudo, allerti nazionali/mondiali" },
+    { command: "stop", description: "Disattiva le notifiche" },
+    { command: "credits", description: "Fonti e crediti" },
   ]);
   log.info({}, "commands registered");
 }

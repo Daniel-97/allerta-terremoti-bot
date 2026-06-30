@@ -110,7 +110,6 @@ export async function handleCallbackQuery(
         const chatId = msg.chat.id;
         if (cb.target === "home" || cb.target === "back") {
           const locs = await listLocations(db, chatId);
-          const chat = await getChat(db, chatId);
           if (cb.target === "home") {
             await panels.editPanel(ctx, panels.renderLocationsList(locs));
           } else {
