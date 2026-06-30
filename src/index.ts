@@ -2,6 +2,7 @@ import { webhookCallback } from "grammy";
 import { loadConfig } from "./config";
 import { verifySecretToken } from "./webhook";
 import { createBot } from "./bot/bot";
+import { createDb } from "./db/client";
 
 export default {
   async fetch(
@@ -19,7 +20,9 @@ export default {
       return new Response("Forbidden", { status: 403 });
     }
 
-    const bot = createBot(config);
+    const { db, ready } = createDb(config);
+    await ready;
+    const bot = createBot(config, db);
     return webhookCallback(bot, "cloudflare-mod")(request);
   },
 

@@ -7,9 +7,9 @@ export type ChatStatus = "active" | "blocked" | "stopped" | "deleted";
 
 export interface ChatRef {
   id: number;
-  first_name?: string | null;
-  last_name?: string | null;
-  username?: string | null;
+  first_name: string | null | undefined;
+  last_name: string | null | undefined;
+  username: string | null | undefined;
 }
 
 export async function touchChat(db: Db, chat: ChatRef): Promise<void> {

@@ -54,10 +54,10 @@ describe("chats repository", () => {
   });
 
   it("touch does not change status or updated_at on existing chat", async () => {
-    await upsertActiveChat(db, { id: 200, first_name: "Bo" });
+    await upsertActiveChat(db, { id: 200, first_name: "Bo", last_name: null, username: null });
     await setChatStatus(db, 200, "stopped");
     const before = await getChat(db, 200);
-    await touchChat(db, { id: 200, first_name: "Bo2" });
+    await touchChat(db, { id: 200, first_name: "Bo2", last_name: null, username: null });
     const after = await getChat(db, 200);
     expect(after?.status).toBe("stopped");
     expect(after?.updated_at).toBe(before?.updated_at);
@@ -67,10 +67,10 @@ describe("chats repository", () => {
 
   it("upsertActiveChat reactivates from stopped/blocked/deleted", async () => {
     for (const s of ["stopped", "blocked", "deleted"] as const) {
-      await upsertActiveChat(db, { id: 300, first_name: "C" });
+      await upsertActiveChat(db, { id: 300, first_name: "C", last_name: null, username: null });
       await setChatStatus(db, 300, s);
       const beforeStatusUpdate = (await getChat(db, 300))!.updated_at;
-      await upsertActiveChat(db, { id: 300, first_name: "C" });
+      await upsertActiveChat(db, { id: 300, first_name: "C", last_name: null, username: null });
       const after = await getChat(db, 300);
       expect(after?.status).toBe("active");
       expect(after?.updated_at).not.toBe(beforeStatusUpdate);
@@ -78,7 +78,7 @@ describe("chats repository", () => {
   });
 
   it("setChatStatus transitions status", async () => {
-    await upsertActiveChat(db, { id: 400, first_name: "D" });
+    await upsertActiveChat(db, { id: 400, first_name: "D", last_name: null, username: null });
     await setChatStatus(db, 400, "blocked");
     expect((await getChat(db, 400))?.status).toBe("blocked");
   });
