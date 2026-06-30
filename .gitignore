@@ -1,0 +1,5 @@
+node_modules/
+.wrangler/
+.env
+docs/superpowers/
+worker-configuration.d.ts

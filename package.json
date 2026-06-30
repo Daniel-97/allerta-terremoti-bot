@@ -1,0 +1,41 @@
+{
+  "name": "allerta-terremoti-bot",
+  "version": "1.0.0",
+  "description": "A Telegram bot that sends **real-time earthquake alerts** to users based on their saved locations. Seismic data comes from the **INGV** (Istituto Nazionale di Geofisica e Vulcanologia). The bot runs entirely on **Cloudflare Workers** with a **Turso** (libSQL) database. It works in **private chats only** (no groups).",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Daniel-97/allerta-terremoti-bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Daniel-97/allerta-terremoti-bot/issues"
+  },
+  "homepage": "https://github.com/Daniel-97/allerta-terremoti-bot#readme",
+  "dependencies": {
+    "grammy": "^1.44.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.16.20",
+    "@types/node": "^26.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.62.1",
+    "@typescript-eslint/parser": "^8.62.1",
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "prettier": "^3.9.4",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9",
+    "wrangler": "^4.105.0"
+  }
+}
