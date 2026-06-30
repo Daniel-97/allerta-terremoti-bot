@@ -173,6 +173,11 @@ These encode design decisions that are easy to violate by accident:
     `console.error` calls in application code or scripts (the logger module itself is
     the only exception). Logs may include Telegram profile data (`first_name`,
     `username`, etc. — public data). Never log tokens or secrets.
+14. **External service errors are logged, not pushed to admin in v1.** Errors from
+    GeoNames, INGV, DB, or Telegram delivery are logged with full detail (HTTP status,
+    error type, context). No Telegram notification to admin in v1 to avoid consuming
+    rate-limit capacity that must be reserved for seismic alerts. Admin push
+    notifications via Telegram will be introduced in M4 with rate-limit handling.
 
 ---
 
