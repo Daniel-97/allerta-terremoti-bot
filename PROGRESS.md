@@ -173,9 +173,21 @@ Empty strings in `.env` are treated as absent (handled in `config.ts` preprocess
 
 ## Milestones pending
 
-### M5 — Hardening — NEXT
+None — all milestones completed.
 
-Rate-limit handling, structured logging, overlap lock, invariant review, end-to-end README verification.
+---
+
+## M5 — Hardening ✅
+
+- **Fixed `src/notify/errors.ts` bug:** `msg.includes("5")` was removed — it incorrectly classified permanent errors containing the digit "5" as transient. The fallback `return "transient"` already catches legitimate unclassified errors. 2 new tests added (permanent with "5" stays permanent; 503 transient).
+- **Rate-limit handling:** 429 responses already classified as `failed_transient` and retried by the retry cron. No custom `retry_after` logic needed for v1 (accepted simplification).
+- **Overlap lock:** Skipped for v1 — idempotency via `history.id` + `deliveries(event_id, chat) ON CONFLICT DO NOTHING` is sufficient. Decision documented in README.
+- **Invariant review:**
+  - AGENTS.md invariant 14 updated: admin push via Telegram is now implemented (M4), best-effort fire-and-forget
+  - SRS FR-10.1/10.2/10.6 updated: watchdog simplified (immediate alert, no threshold/counter/recovery); admin push now active
+- **README verification:** stale references to `INGV_FAILURE_ALERT_THRESHOLD` removed; monitoring section updated; project structure updated for `admin-strings.ts`; overlap lock decision documented.
+- **Onboarding copy:** reviewed and accepted as-is (`/start` and `/aiuto` already clear).
+- **DoD verified:** 116 total tests (77 workers + 39 db), all green.
 
 ---
 
