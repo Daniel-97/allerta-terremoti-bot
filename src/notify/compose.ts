@@ -1,7 +1,6 @@
 import { InlineKeyboard } from "grammy";
 import { encodeEventDetail } from "../util/callback-data";
 import type { ParsedEvent } from "../ingv/types";
-import type { Recipient } from "./match";
 import { getLocation } from "../db/repositories/locations";
 import type { Db } from "../db/types";
 

@@ -108,7 +108,7 @@ main-cron run, with idempotent delivery tracking.
 
 **Scope:**
 - **INGV client (`src/ingv/`):** fetch events with FDSN filters — Italy query over
-  `ITALY_BBOX` (lat 35–48, lon 6–27) with a low magnitude floor, plus a global query for
+  `ITALY_BBOX` (lat 35–48, lon 6–27) without a magnitude floor, plus a global query for
   `magnitude ≥ WORLD_ALERT_THRESHOLD`; restrict to `LOOKBACK_WINDOW` via `starttime`. Prefer
   the FDSN text format; parse and validate (zod). Keep a real INGV response as a test fixture.
 - **Dedup:** claim each event by unique `history.id`; store all processed events (FR-3.6).

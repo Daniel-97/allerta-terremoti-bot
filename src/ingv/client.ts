@@ -1,6 +1,6 @@
 import { createLogger } from "../util/log";
-import { ITALY_BBOX, inBbox } from "../util/geo-bbox";
-import { ITALY_ALERT_THRESHOLD, WORLD_ALERT_THRESHOLD, LOOKBACK_WINDOW_MIN } from "../util/constants";
+import { ITALY_BBOX } from "../util/geo-bbox";
+import { WORLD_ALERT_THRESHOLD, LOOKBACK_WINDOW_MIN } from "../util/constants";
 import { parseFdsnText } from "./parser";
 import type { ParsedEvent } from "./types";
 
@@ -13,7 +13,7 @@ function buildUrl(params: Record<string, string>): string {
   return `${ENDPOINT}?${qs}`;
 }
 
-export async function fetchItalyEvents(username: string): Promise<ParsedEvent[]> {
+export async function fetchItalyEvents(): Promise<ParsedEvent[]> {
   const startTime = new Date(Date.now() - LOOKBACK_WINDOW_MIN * 60_000).toISOString();
   const url = buildUrl({
     format: "text",
@@ -22,19 +22,16 @@ export async function fetchItalyEvents(username: string): Promise<ParsedEvent[]>
     maxlatitude: String(ITALY_BBOX.maxLat),
     minlongitude: String(ITALY_BBOX.minLon),
     maxlongitude: String(ITALY_BBOX.maxLon),
-    minmagnitude: "2.0",
-    username,
   });
   return fetchText(url);
 }
 
-export async function fetchWorldEvents(username: string): Promise<ParsedEvent[]> {
+export async function fetchWorldEvents(): Promise<ParsedEvent[]> {
   const startTime = new Date(Date.now() - LOOKBACK_WINDOW_MIN * 60_000).toISOString();
   const url = buildUrl({
     format: "text",
     starttime: startTime,
     minmagnitude: String(WORLD_ALERT_THRESHOLD),
-    username,
   });
   return fetchText(url);
 }

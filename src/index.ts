@@ -65,7 +65,7 @@ export default {
     try {
       switch (controller.cron) {
         case "* * * * *":
-          await runMainCron({ HEALTHCHECKS_URL: config.HEALTHCHECKS_URL, GEONAMES_USERNAME: config.GEONAMES_USERNAME }, db, bot);
+          await runMainCron({ HEALTHCHECKS_URL: config.HEALTHCHECKS_URL }, db, bot);
           break;
         case "*/5 * * * *":
           log.info({ cron: controller.cron }, "retry cron — M4 stub");

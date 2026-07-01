@@ -71,7 +71,7 @@
 
 ### M3 — Detection & notification (the core) ✅
 
-- **INGV client (`src/ingv/`):** FDSN text format parser with zod validation; `fetchItalyEvents` (Italian bbox, low mag floor) and `fetchWorldEvents` (global ≥ WORLD_ALERT_THRESHOLD); both restricted to `LOOKBACK_WINDOW` via `starttime`. Realistic fixture for tests.
+- **INGV client (`src/ingv/`):** FDSN text format parser with zod validation; `fetchItalyEvents` (Italian bbox, no mag floor) and `fetchWorldEvents` (global ≥ WORLD_ALERT_THRESHOLD); both restricted to `LOOKBACK_WINDOW` via `starttime`. Realistic fixture for tests.
 - **Dedup:** `history` repository `insertIfNew` uses `ON CONFLICT DO NOTHING` on `history.id`.
 - **Haversine:** `src/geo/haversine.ts` — distance function with tests (Roma–Milano ~480 km, Roma–NY ~6900 km).
 - **Matching (`src/notify/match.ts`):** union of proximity (per-location distance + magnitude threshold), national (in `ITALY_BBOX` ≥ `ITALY_ALERT_THRESHOLD` + `italy_alerts` toggle), and world (≥ `WORLD_ALERT_THRESHOLD` + `world_alerts` toggle). Nearest-location selection. One `Recipient` per user. Ordered by distance ascending (FR-4.7).
@@ -80,8 +80,8 @@
 - **Main cron (`src/jobs/poll.ts`):** dead-man's-switch ping → fetch INGV (italy + world) → dedup → match → deliver first wave → save event. Logs cycle stats (NFR-5.8.6).
 - **Scheduled routing (`src/index.ts`):** dispatches by `event.cron` to main cron (`* * * * *`), with stubs for retry (`*/5`) and cleanup (`0 3`) — M4.
 - **Details callback (`ev;<id>;det`):** reads event from `history`; if found, replies with new message (coords, depth, magnitude, stations, time); if gone, graceful "Dettagli non più disponibili." (FR-4.12).
-- **Tests:** `test/ingv/parser.spec.ts` (4), `test/geo/haversine.spec.ts` (4), `test/db/m3-repos.spec.ts` (9), `test/db/match.spec.ts` (2), `test/notify/errors.spec.ts` (6), `test/notify/compose.spec.ts` (7).
-- **DoD verified:** 99 total tests (69 workers + 30 db), all green.
+- **Tests:** `test/ingv/parser.spec.ts` (6), `test/geo/haversine.spec.ts` (4), `test/db/m3-repos.spec.ts` (9), `test/db/match.spec.ts` (2), `test/notify/errors.spec.ts` (6), `test/notify/compose.spec.ts` (7).
+- **DoD verified:** 101 total tests (71 workers + 30 db), all green.
 
 ---
 

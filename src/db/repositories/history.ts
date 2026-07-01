@@ -1,6 +1,5 @@
 import { eq } from "drizzle-orm";
 import { history } from "../schema";
-import { nowIso } from "../../util/time";
 import type { Db } from "../types";
 
 export async function insertIfNew(db: Db, event: {

@@ -3,7 +3,6 @@ import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { sql } from "drizzle-orm";
 import * as schema from "../../src/db/schema";
-import { insertIfNew } from "../../src/db/repositories/history";
 import { upsertActiveChat } from "../../src/db/repositories/chats";
 import { addLocation } from "../../src/db/repositories/locations";
 import { findRecipients } from "../../src/notify/match";

@@ -1,7 +1,13 @@
 import { z } from "zod";
 import type { ParsedEvent } from "./types";
 
-const HEADER = "#EventID|Time|Latitude|Longitude|Depth/km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName";
+const KNOWN_HEADER_COLUMNS = [
+  "#eventid", "time", "latitude", "longitude", "depth/km",
+  "author", "catalog", "contributor", "contributorid",
+  "magtype", "magnitude", "magauthor", "eventlocationname",
+] as const;
+
+const MIN_COLUMNS = KNOWN_HEADER_COLUMNS.length;
 
 const eventSchema = z.object({
   eventId: z.string().min(1),
@@ -19,11 +25,19 @@ const eventSchema = z.object({
   zone: z.string(),
 });
 
+function validateHeader(header: string): void {
+  const cols = header.toLowerCase().split("|");
+  if (cols.length < MIN_COLUMNS) throw new Error("Invalid INGV FDSN text format header");
+  for (let i = 0; i < MIN_COLUMNS; i++) {
+    if (cols[i] !== KNOWN_HEADER_COLUMNS[i]) throw new Error("Invalid INGV FDSN text format header");
+  }
+}
+
 export function parseFdsnText(text: string): ParsedEvent[] {
   const rawLines = text.trim().split("\n");
   const lines = rawLines.filter((l) => l.length > 0);
   if (lines.length === 0) return [];
-  if (lines[0] !== HEADER) throw new Error("Invalid INGV FDSN text format header");
+  validateHeader(lines[0]!);
   if (lines.length < 2) return [];
 
   const events: ParsedEvent[] = [];
@@ -31,6 +45,7 @@ export function parseFdsnText(text: string): ParsedEvent[] {
     const line = lines[i]!.trim();
     if (!line) continue;
     const parts = line.split("|");
+    if (parts.length < MIN_COLUMNS) continue;
     const raw: Record<string, string> = {
       eventId: parts[0] ?? "",
       time: parts[1] ?? "",

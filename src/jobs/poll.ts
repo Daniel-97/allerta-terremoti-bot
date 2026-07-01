@@ -1,19 +1,16 @@
 import { createLogger } from "../util/log";
-import { inBbox, ITALY_BBOX } from "../util/geo-bbox";
-import { ITALY_ALERT_THRESHOLD, WORLD_ALERT_THRESHOLD } from "../util/constants";
 import { fetchItalyEvents, fetchWorldEvents } from "../ingv/client";
-import { insertIfNew as insertHistory, getEvent } from "../db/repositories/history";
-import { incrementState, setState, getState } from "../db/repositories/system-state";
+import { insertIfNew as insertHistory } from "../db/repositories/history";
+import { setState } from "../db/repositories/system-state";
 import { findRecipients } from "../notify/match";
 import { deliverFirstWave } from "../notify/deliver";
-import type { ParsedEvent } from "../ingv/types";
 import type { Db } from "../db/types";
 import type { Bot } from "grammy";
 
 const log = createLogger("poll");
 
 export async function runMainCron(
-  config: { HEALTHCHECKS_URL: string | undefined; GEONAMES_USERNAME: string },
+  config: { HEALTHCHECKS_URL: string | undefined },
   db: Db,
   bot: Bot,
 ): Promise<void> {
@@ -27,8 +24,8 @@ export async function runMainCron(
 
   // 2. Fetch INGV
   const [italyEvents, worldEvents] = await Promise.all([
-    fetchItalyEvents(config.GEONAMES_USERNAME).catch(() => []),
-    fetchWorldEvents(config.GEONAMES_USERNAME).catch(() => []),
+    fetchItalyEvents().catch(() => []),
+    fetchWorldEvents().catch(() => []),
   ]);
 
   const allEvents = [...italyEvents, ...worldEvents];
