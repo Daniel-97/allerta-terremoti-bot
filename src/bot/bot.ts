@@ -1,6 +1,7 @@
 import { Bot } from "grammy";
 import type { RuntimeConfig } from "../config";
 import type { Db } from "../db/types";
+import { captureError } from "../util/error-handler";
 import { getChat, touchChat } from "../db/repositories/chats";
 import { createLogger } from "../util/log";
 import { handleCallbackQuery } from "./inline/router";
@@ -24,6 +25,11 @@ const log = createLogger("bot");
 
 export function createBot(config: RuntimeConfig, db: Db): Bot {
   const bot = new Bot(config.BOT_TOKEN);
+
+  bot.catch((error) => {
+    const updateId = error.ctx?.update?.update_id;
+    captureError(log, error.error, { updateId, handler: "bot.catch" });
+  });
 
   // private-only middleware + touch on every private message
   bot.use(async (ctx, next) => {

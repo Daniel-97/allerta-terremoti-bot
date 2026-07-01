@@ -2,6 +2,10 @@ import type { Context } from "grammy";
 import type { InlineKeyboard } from "grammy";
 import { STRINGS } from "../../i18n/strings";
 import * as kb from "./keyboards";
+import { captureWarning } from "../../util/error-handler";
+import { createLogger } from "../../util/log";
+
+const log = createLogger("panels");
 
 export interface Panel {
   text: string;
@@ -69,8 +73,8 @@ export async function editPanel(ctx: Context, panel: Panel): Promise<void> {
       reply_markup: panel.keyboard,
       parse_mode: "Markdown",
     });
-  } catch {
-    // "message is not modified" when same content — silently ignored
+  } catch (err) {
+    captureWarning(log, err, { action: "editMessageText" });
   }
 }
 

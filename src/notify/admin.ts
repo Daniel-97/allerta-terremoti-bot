@@ -1,4 +1,5 @@
 import { createLogger } from "../util/log";
+import { captureWarning } from "../util/error-handler";
 import type { Bot } from "grammy";
 import type { ParsedEvent } from "../ingv/types";
 import type { DeliveryOutcome } from "./deliver";
@@ -24,7 +25,7 @@ export async function notifyNewUser(
         { parse_mode: "Markdown" },
       );
     } catch (err) {
-      log.warn({ adminChatId: id, err: String(err) }, "new-user notification failed");
+      captureWarning(log, err, { adminChatId: id, action: "new-user notification" });
     }
   }
 }
@@ -44,7 +45,7 @@ export async function notifyEventSummary(
         { parse_mode: "Markdown" },
       );
     } catch (err) {
-      log.warn({ adminChatId: id, err: String(err) }, "event-summary notification failed");
+      captureWarning(log, err, { adminChatId: id, action: "event-summary notification" });
     }
   }
 }
@@ -62,7 +63,7 @@ export async function notifyUserStop(
         { parse_mode: "Markdown" },
       );
     } catch (err) {
-      log.warn({ adminChatId: id, err: String(err) }, "user-stop notification failed");
+      captureWarning(log, err, { adminChatId: id, action: "user-stop notification" });
     }
   }
 }
@@ -82,7 +83,7 @@ export async function notifyIngvFailure(
         { parse_mode: "Markdown" },
       );
     } catch (notifyErr) {
-      log.warn({ adminChatId: id, err: String(notifyErr) }, "ingv-failure notification failed");
+      captureWarning(log, notifyErr, { adminChatId: id, action: "ingv-failure notification" });
     }
   }
 }

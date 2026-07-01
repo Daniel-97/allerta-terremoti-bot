@@ -1,4 +1,5 @@
 import { createLogger } from "../util/log";
+import { captureWarning } from "../util/error-handler";
 import { ITALY_BBOX } from "../util/geo-bbox";
 import { WORLD_ALERT_THRESHOLD, LOOKBACK_WINDOW_MIN } from "../util/constants";
 import { parseFdsnText } from "./parser";
@@ -55,9 +56,7 @@ async function fetchText(url: string): Promise<ParsedEvent[]> {
     log.info({ count: parsed.length }, "ingv events fetched");
     return parsed;
   } catch (err) {
-    const errName = err instanceof Error ? err.name : "unknown";
-    const errMsg = err instanceof Error ? err.message : String(err);
-    log.warn({ errName, errMsg, url }, "ingv fetch error");
+    captureWarning(log, err, { url, action: "ingv fetch" });
     throw err;
   } finally {
     clearTimeout(tid);

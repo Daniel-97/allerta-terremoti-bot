@@ -1,4 +1,5 @@
 import { createLogger } from "../util/log";
+import { captureError, captureWarning } from "../util/error-handler";
 import { classifyTelegramError } from "./errors";
 import { insertIfNew as insertDelivery, updateStatus, getDelivery } from "../db/repositories/deliveries";
 import { setChatStatus } from "../db/repositories/chats";
@@ -58,11 +59,11 @@ export async function deliverFirstWave(
         await setChatStatus(db, rec.chatId, "blocked");
         if (deliveryId) await updateStatus(db, deliveryId, "failed_permanent", existing?.attempts ?? 1);
         outcome.failedPermanent++;
-        log.warn({ chatId: rec.chatId, eventId: event.eventId, err: String(err) }, "delivery failed permanent");
+        captureError(log, err, { chatId: rec.chatId, eventId: event.eventId, action: "delivery permanent" });
       } else {
         if (deliveryId) await updateStatus(db, deliveryId, "failed_transient", existing?.attempts ?? 1);
         outcome.failedTransient++;
-        log.warn({ chatId: rec.chatId, eventId: event.eventId, err: String(err) }, "delivery failed transient");
+        captureWarning(log, err, { chatId: rec.chatId, eventId: event.eventId, action: "delivery transient" });
       }
     }
 

@@ -1,6 +1,7 @@
 import type { Context } from "grammy";
 import type { Logger } from "../../util/log";
 import { ADMIN } from "../../i18n/admin-strings";
+import { captureError } from "../../util/error-handler";
 import { setChatStatus } from "../../db/repositories/chats";
 import type { Db } from "../../db/types";
 
@@ -38,7 +39,7 @@ export async function handle(
       await ctx.api.sendMessage(chat.id, args, { parse_mode: "Markdown" });
       sent++;
     } catch (err) {
-      log.warn({ chatId: chat.id, err: String(err) }, "broadcast: send failed");
+      captureError(log, err, { chatId: chat.id, action: "broadcast send" });
       await setChatStatus(db, chat.id, "blocked");
     }
     await sleep(33);
