@@ -1,5 +1,5 @@
 import { Bot } from "grammy";
-import type { AppConfig } from "../config";
+import type { RuntimeConfig } from "../config";
 import type { Db } from "../db/types";
 import { touchChat } from "../db/repositories/chats";
 import { createLogger } from "../util/log";
@@ -11,11 +11,16 @@ import * as posizioni from "./commands/posizioni";
 import * as impostazioni from "./commands/impostazioni";
 import * as stopCmd from "./commands/stop";
 import * as credits from "./commands/credits";
+import * as broadcast from "./commands/broadcast";
+import * as stats from "./commands/stats";
+import * as events from "./commands/events";
+import * as delivery from "./commands/delivery";
+import * as health from "./commands/health";
 import { STRINGS } from "../i18n/strings";
 
 const log = createLogger("bot");
 
-export function createBot(config: AppConfig, db: Db): Bot {
+export function createBot(config: RuntimeConfig, db: Db): Bot {
   const bot = new Bot(config.BOT_TOKEN);
 
   // private-only middleware + touch on every private message
@@ -38,13 +43,37 @@ export function createBot(config: AppConfig, db: Db): Bot {
     return next();
   });
 
-  // slash commands
+  // user slash commands
   bot.command("start", (ctx) => start.handle(ctx, db, log));
   bot.command("aiuto", (ctx) => aiuto.handle(ctx, db, log));
   bot.command("posizioni", (ctx) => posizioni.handle(ctx, db, log));
   bot.command("impostazioni", (ctx) => impostazioni.handle(ctx, db, log));
   bot.command("stop", (ctx) => stopCmd.handle(ctx, db, log));
   bot.command("credits", (ctx) => credits.handle(ctx, db, log));
+
+  // admin commands (gated, hidden from public menu)
+  bot.command("broadcast", async (ctx) => {
+    if (!ctx.chat || !config.adminChatIds.includes(ctx.chat.id)) return;
+    const args = (ctx.match as string) ?? "";
+    await broadcast.handle(ctx, db, log, args);
+  });
+  bot.command("stats", async (ctx) => {
+    if (!ctx.chat || !config.adminChatIds.includes(ctx.chat.id)) return;
+    await stats.handle(ctx, db, log);
+  });
+  bot.command("events", async (ctx) => {
+    if (!ctx.chat || !config.adminChatIds.includes(ctx.chat.id)) return;
+    await events.handle(ctx, db, log);
+  });
+  bot.command("delivery", async (ctx) => {
+    if (!ctx.chat || !config.adminChatIds.includes(ctx.chat.id)) return;
+    const args = (ctx.match as string) ?? "";
+    await delivery.handle(ctx, db, log, args);
+  });
+  bot.command("health", async (ctx) => {
+    if (!ctx.chat || !config.adminChatIds.includes(ctx.chat.id)) return;
+    await health.handle(ctx, db, log, "", config, bot);
+  });
 
   // callback queries (inline button presses)
   bot.on("callback_query:data", (ctx) => handleCallbackQuery(ctx, db));

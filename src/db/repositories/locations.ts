@@ -86,3 +86,10 @@ export async function deleteLocation(
 ): Promise<void> {
   await db.delete(locations).where(eq(locations.id, id));
 }
+
+export async function countAll(db: Db): Promise<number> {
+  const rows = await db
+    .select({ c: sql<number>`count(*)` })
+    .from(locations);
+  return rows[0]!.c;
+}

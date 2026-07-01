@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { chats } from "../schema";
 import { nowIso } from "../../util/time";
 import type { Db } from "../types";
@@ -93,4 +93,18 @@ export async function setAlertFlags(
     .update(chats)
     .set({ ...flags, updated_at: nowIso() })
     .where(eq(chats.id, id));
+}
+
+export async function listActiveChats(db: Db) {
+  return db
+    .select()
+    .from(chats)
+    .where(eq(chats.status, "active"));
+}
+
+export async function countByStatus(db: Db) {
+  return db
+    .select({ status: chats.status, count: sql<number>`count(*)` })
+    .from(chats)
+    .groupBy(chats.status);
 }

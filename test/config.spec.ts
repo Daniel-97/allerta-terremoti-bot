@@ -36,4 +36,23 @@ describe("loadConfig", () => {
   it("rejects missing GEONAMES_USERNAME", () => {
     expect(() => loadConfig({ ...valid, GEONAMES_USERNAME: undefined })).toThrow();
   });
+
+  it("parses ADMIN_CHAT_IDS as empty array when absent", () => {
+    const cfg = loadConfig(valid);
+    expect(cfg.adminChatIds).toEqual([]);
+  });
+
+  it("parses ADMIN_CHAT_IDS as comma-separated numbers", () => {
+    const cfg = loadConfig({ ...valid, ADMIN_CHAT_IDS: "123,456,789" });
+    expect(cfg.adminChatIds).toEqual([123, 456, 789]);
+  });
+
+  it("parses ADMIN_CHAT_IDS with spaces", () => {
+    const cfg = loadConfig({ ...valid, ADMIN_CHAT_IDS: " 123 , 456 " });
+    expect(cfg.adminChatIds).toEqual([123, 456]);
+  });
+
+  it("rejects ADMIN_CHAT_IDS with non-numeric entries", () => {
+    expect(() => loadConfig({ ...valid, ADMIN_CHAT_IDS: "123,abc" })).toThrow();
+  });
 });

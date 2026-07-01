@@ -1,4 +1,4 @@
-import { eq, lt, and, notExists } from "drizzle-orm";
+import { eq, lt, and, notExists, sql } from "drizzle-orm";
 import { history, deliveries } from "../schema";
 import type { Db } from "../types";
 
@@ -44,4 +44,17 @@ export async function deleteOrphansOlderThan(db: Db, minutes: number): Promise<n
     .where(and(lt(history.date, cutoff), notExists(sub)))
     .returning({ id: history.id });
   return result.length;
+}
+
+export async function listRecentEvents(db: Db, limit: number) {
+  return db
+    .select({
+      id: history.id,
+      zone: history.zone,
+      mag: history.magnitude_value,
+      date: history.date,
+    })
+    .from(history)
+    .orderBy(sql`${history.date} desc`)
+    .limit(limit);
 }

@@ -14,7 +14,25 @@ const schema = z.object({
 
 export type AppConfig = z.infer<typeof schema>;
 
-export function loadConfig(env: unknown): AppConfig & { maxAttempts: number } {
+export interface RuntimeConfig extends AppConfig {
+  maxAttempts: number;
+  adminChatIds: number[];
+}
+
+function parseAdminChatIds(raw: string | undefined): number[] {
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .map((s) => {
+      const n = Number(s);
+      if (!Number.isInteger(n) || n <= 0) throw new Error(`Invalid ADMIN_CHAT_IDS entry: ${s}`);
+      return n;
+    });
+}
+
+export function loadConfig(env: unknown): RuntimeConfig {
   const cleaned = typeof env === "object" && env !== null
     ? Object.fromEntries(
         Object.entries(env as Record<string, unknown>).map(([k, v]) => [
@@ -25,5 +43,6 @@ export function loadConfig(env: unknown): AppConfig & { maxAttempts: number } {
     : env;
   const raw = schema.parse(cleaned);
   const maxAttempts = raw.MAX_ATTEMPTS ? Number(raw.MAX_ATTEMPTS) : FALLBACK_MAX_ATTEMPTS;
-  return { ...raw, maxAttempts };
+  const adminChatIds = parseAdminChatIds(raw.ADMIN_CHAT_IDS);
+  return { ...raw, maxAttempts, adminChatIds };
 }
