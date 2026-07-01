@@ -686,7 +686,7 @@ Update if it still references `db/schema.sql`.
 - [ ] **Step 2:** confirm no remaining references to `db/schema.sql` anywhere:
 
 ```bash
-grep -rn "db/schema.sql" README.md AGENTS.md MILESTONES.md || echo "no stale references"
+grep -rn "db/schema.sql" README.md AGENTS.md docs/milestones.md || echo "no stale references"
 ```
 
 - [ ] **Step 3:** DoD gate — run all checks

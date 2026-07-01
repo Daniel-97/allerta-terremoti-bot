@@ -249,7 +249,7 @@ None — all milestones completed.
 ## How to start a new coding session
 
 1. Read `AGENTS.md` (invariants, anti-goals, structure)
-2. Read `MILESTONES.md` (full milestone spec)
+2. Read `docs/milestones.md` (full milestone spec)
 3. Read this file for current state + completed work
 4. Check `.opencode/plans/` for an existing plan for the current milestone
 5. Run the test gate (`npm run lint && npm run typecheck && npm test && npm run build`) to confirm baseline green before starting

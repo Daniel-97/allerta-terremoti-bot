@@ -1,7 +1,7 @@
 # AGENTS.md
 
 Instructions for coding agents working on **allerta-terremoti-bot**. Read this before making
-changes. For *what* the system must do, see `allerta-terremoti-bot-SRS.md`. For architecture and
+changes. For *what* the system must do, see `docs/srs.md`. For architecture and
 setup, see `README.md`.
 
 ---

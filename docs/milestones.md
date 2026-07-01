@@ -5,7 +5,7 @@ one at a time. Each milestone is a self-contained task with an objective, scope,
 **Definition of Done (DoD)** that must be fully met before moving on.
 
 **Before starting any milestone, read `AGENTS.md` and the relevant parts of
-`allerta-terremoti-bot-SRS.md`.** `AGENTS.md` invariants and anti-goals apply at all times.
+`docs/srs.md`.** `AGENTS.md` invariants and anti-goals apply at all times.
 `schema.sql` is the source of truth for the database.
 
 **Definition of Done applies to every milestone** (in addition to its specific DoD):

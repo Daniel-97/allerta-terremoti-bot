@@ -9,7 +9,7 @@ database. It works in **private chats only** (no groups).
 > **English**. User-facing strings are centralized in a single module.
 
 This README covers how the bot works, its architecture, the data sources, and how to set
-it up and deploy it. For the full requirements see `allerta-terremoti-bot-SRS.md`. For contributor
+it up and deploy it. For the full requirements see `docs/srs.md`. For contributor
 and coding-agent rules see `AGENTS.md`.
 
 ---
