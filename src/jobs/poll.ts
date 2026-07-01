@@ -4,13 +4,14 @@ import { insertIfNew as insertHistory } from "../db/repositories/history";
 import { setState } from "../db/repositories/system-state";
 import { findRecipients } from "../notify/match";
 import { deliverFirstWave } from "../notify/deliver";
+import { notifyIngvFailure, notifyEventSummary } from "../notify/admin";
 import type { Db } from "../db/types";
 import type { Bot } from "grammy";
 
 const log = createLogger("poll");
 
 export async function runMainCron(
-  config: { HEALTHCHECKS_URL: string | undefined },
+  config: { HEALTHCHECKS_URL: string | undefined; adminChatIds: number[] },
   db: Db,
   bot: Bot,
 ): Promise<void> {
@@ -23,13 +24,19 @@ export async function runMainCron(
   }
 
   // 2. Fetch INGV
-  const [italyEvents, worldEvents] = await Promise.all([
-    fetchItalyEvents().catch(() => []),
-    fetchWorldEvents().catch(() => []),
-  ]);
-
-  const allEvents = [...italyEvents, ...worldEvents];
-  log.info({ italy: italyEvents.length, world: worldEvents.length, total: allEvents.length }, "events fetched");
+  const allEvents: ParsedEventFromClient[] = [];
+  try {
+    const [italy, world] = await Promise.all([
+      fetchItalyEvents(),
+      fetchWorldEvents(),
+    ]);
+    allEvents.push(...italy, ...world);
+    log.info({ italy: italy.length, world: world.length, total: allEvents.length }, "events fetched");
+  } catch (err) {
+    log.warn({ err: String(err) }, "ingv fetch failed, notifying admin");
+    await notifyIngvFailure(bot, config.adminChatIds, err, "fetch");
+    return;
+  }
 
   // 3. Process each event
   for (const event of allEvents) {
@@ -59,6 +66,7 @@ export async function runMainCron(
         failedTransient: outcome.failedTransient,
         failedPermanent: outcome.failedPermanent,
       }, "delivery wave completed");
+      await notifyEventSummary(bot, config.adminChatIds, event, recipients.length, outcome);
     } else {
       log.info({ eventId: event.eventId }, "no recipients for event");
     }
@@ -66,7 +74,8 @@ export async function runMainCron(
 
   // 5. Update system_state
   await setState(db, "last_successful_sync_at", new Date().toISOString());
-  await setState(db, "ingv_consecutive_failures", "0");
 
   log.info({ durationMs: Date.now() - start }, "main cron cycle finished");
 }
+
+type ParsedEventFromClient = Awaited<ReturnType<typeof fetchItalyEvents>>[number];

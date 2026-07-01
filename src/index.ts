@@ -67,7 +67,7 @@ export default {
     try {
       switch (controller.cron) {
         case "* * * * *":
-          await runMainCron({ HEALTHCHECKS_URL: config.HEALTHCHECKS_URL }, db, bot);
+          await runMainCron({ HEALTHCHECKS_URL: config.HEALTHCHECKS_URL, adminChatIds: config.adminChatIds }, db, bot);
           break;
         case "*/5 * * * *":
           await runRetryCron({ maxAttempts: config.maxAttempts }, db, bot);

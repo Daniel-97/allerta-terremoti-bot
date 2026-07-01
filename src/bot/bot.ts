@@ -1,7 +1,7 @@
 import { Bot } from "grammy";
 import type { RuntimeConfig } from "../config";
 import type { Db } from "../db/types";
-import { touchChat } from "../db/repositories/chats";
+import { getChat, touchChat } from "../db/repositories/chats";
 import { createLogger } from "../util/log";
 import { handleCallbackQuery } from "./inline/router";
 import { handleLocation } from "./location-intake";
@@ -16,6 +16,7 @@ import * as stats from "./commands/stats";
 import * as events from "./commands/events";
 import * as delivery from "./commands/delivery";
 import * as health from "./commands/health";
+import { notifyNewUser, notifyUserStop } from "../notify/admin";
 import { STRINGS } from "../i18n/strings";
 
 const log = createLogger("bot");
@@ -33,12 +34,22 @@ export function createBot(config: RuntimeConfig, db: Db): Bot {
       return;
     }
     if (ctx.from) {
+      const existing = await getChat(db, ctx.chat!.id);
+      const isNew = !existing;
       await touchChat(db, {
         id: ctx.chat!.id,
         first_name: ctx.from.first_name ?? null,
         last_name: ctx.from.last_name ?? null,
         username: ctx.from.username ?? null,
       });
+      if (isNew) {
+        void notifyNewUser(bot, config.adminChatIds, {
+          id: ctx.chat!.id,
+          first_name: ctx.from.first_name ?? null,
+          last_name: ctx.from.last_name ?? null,
+          username: ctx.from.username ?? null,
+        });
+      }
     }
     return next();
   });
@@ -48,7 +59,10 @@ export function createBot(config: RuntimeConfig, db: Db): Bot {
   bot.command("aiuto", (ctx) => aiuto.handle(ctx, db, log));
   bot.command("posizioni", (ctx) => posizioni.handle(ctx, db, log));
   bot.command("impostazioni", (ctx) => impostazioni.handle(ctx, db, log));
-  bot.command("stop", (ctx) => stopCmd.handle(ctx, db, log));
+  bot.command("stop", async (ctx) => {
+    await stopCmd.handle(ctx, db, log);
+    void notifyUserStop(bot, config.adminChatIds, ctx.chat!.id);
+  });
   bot.command("credits", (ctx) => credits.handle(ctx, db, log));
 
   // admin commands (gated, hidden from public menu)

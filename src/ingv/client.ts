@@ -43,7 +43,7 @@ async function fetchText(url: string): Promise<ParsedEvent[]> {
     const res = await fetch(url, { signal: ctrl.signal });
     if (!res.ok) {
       log.warn({ status: res.status, url }, "ingv http error");
-      return [];
+      throw new Error(`INGV HTTP ${res.status}`);
     }
     const text = await res.text();
     const parsed = parseFdsnText(text);
@@ -53,7 +53,7 @@ async function fetchText(url: string): Promise<ParsedEvent[]> {
     const errName = err instanceof Error ? err.name : "unknown";
     const errMsg = err instanceof Error ? err.message : String(err);
     log.warn({ errName, errMsg, url }, "ingv fetch error");
-    return [];
+    throw err;
   } finally {
     clearTimeout(tid);
   }

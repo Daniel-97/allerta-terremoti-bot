@@ -14,6 +14,6 @@ export async function handle(ctx: Context, db: Db, log: Logger): Promise<void> {
     command: "/stop",
     outcome: "deactivated",
   }, "command handled");
-  log.warn({ chatId }, "TODO M4: notify admin of /stop");
   await ctx.reply(STRINGS.stop.done);
 }
+
