@@ -36,7 +36,7 @@ export async function findRecipients(event: ParsedEvent, db: Db): Promise<Recipi
   });
 }
 
-async function matchChat(event: ParsedEvent, chatId: number, db: Db): Promise<Recipient | null> {
+export async function matchChat(event: ParsedEvent, chatId: number, db: Db): Promise<Recipient | null> {
   const chat = await getChat(db, chatId);
   if (!chat || chat.status !== "active") return null;
 

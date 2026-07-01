@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MAX_ATTEMPTS as FALLBACK_MAX_ATTEMPTS } from "./util/constants";
 
 const schema = z.object({
   BOT_TOKEN: z.string().min(1),
@@ -13,8 +14,7 @@ const schema = z.object({
 
 export type AppConfig = z.infer<typeof schema>;
 
-export function loadConfig(env: unknown): AppConfig {
-  // Treat empty string env vars as absent (avoids .optional() rejection)
+export function loadConfig(env: unknown): AppConfig & { maxAttempts: number } {
   const cleaned = typeof env === "object" && env !== null
     ? Object.fromEntries(
         Object.entries(env as Record<string, unknown>).map(([k, v]) => [
@@ -23,5 +23,7 @@ export function loadConfig(env: unknown): AppConfig {
         ]),
       )
     : env;
-  return schema.parse(cleaned);
+  const raw = schema.parse(cleaned);
+  const maxAttempts = raw.MAX_ATTEMPTS ? Number(raw.MAX_ATTEMPTS) : FALLBACK_MAX_ATTEMPTS;
+  return { ...raw, maxAttempts };
 }

@@ -1,5 +1,5 @@
-import { eq } from "drizzle-orm";
-import { history } from "../schema";
+import { eq, lt, and, notExists } from "drizzle-orm";
+import { history, deliveries } from "../schema";
 import type { Db } from "../types";
 
 export async function insertIfNew(db: Db, event: {
@@ -34,4 +34,14 @@ export async function getEvent(db: Db, id: string) {
     .where(eq(history.id, id))
     .limit(1);
   return rows[0];
+}
+
+export async function deleteOrphansOlderThan(db: Db, minutes: number): Promise<number> {
+  const cutoff = new Date(Date.now() - minutes * 60_000).toISOString();
+  const sub = db.select().from(deliveries).where(eq(deliveries.event_id, history.id));
+  const result = await db
+    .delete(history)
+    .where(and(lt(history.date, cutoff), notExists(sub)))
+    .returning({ id: history.id });
+  return result.length;
 }

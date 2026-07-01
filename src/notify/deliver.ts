@@ -2,7 +2,7 @@ import { createLogger } from "../util/log";
 import { classifyTelegramError } from "./errors";
 import { insertIfNew as insertDelivery, updateStatus, getDelivery } from "../db/repositories/deliveries";
 import { setChatStatus } from "../db/repositories/chats";
-import { getNearestLocationName } from "./compose";
+import { composeMessage } from "./compose";
 import type { Recipient } from "./match";
 import type { ParsedEvent } from "../ingv/types";
 import type { Db } from "../db/types";
@@ -75,24 +75,4 @@ export async function deliverFirstWave(
 async function getDeliveryId(db: Db, eventId: string, chat: number): Promise<number | null> {
   const d = await getDelivery(db, eventId, chat);
   return d?.id ?? null;
-}
-
-async function composeMessage(
-  event: ParsedEvent,
-  rec: Recipient,
-  db: Db,
-): Promise<{ text: string; keyboard: ReturnType<typeof import("./compose")["composeProximity"]>["keyboard"] }> {
-  const locName = await getNearestLocationName(db, rec.nearestLocationId);
-
-  if (rec.reason === "world" || (!locName && rec.reason === "national")) {
-    const { composeWorld, composeNational } = await import("./compose");
-    if (rec.reason === "world") return composeWorld(event);
-    return composeNational(event, null, null);
-  }
-
-  const { composeProximity, composeNational } = await import("./compose");
-  if (rec.reason === "proximity") {
-    return composeProximity(event, rec.distanceKm!, locName!);
-  }
-  return composeNational(event, rec.distanceKm, locName);
 }

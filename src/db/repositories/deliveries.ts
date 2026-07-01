@@ -1,4 +1,4 @@
-import { eq, and, lt } from "drizzle-orm";
+import { eq, and, lt, lte } from "drizzle-orm";
 import { deliveries } from "../schema";
 import { nowIso } from "../../util/time";
 import type { Db } from "../types";
@@ -45,4 +45,20 @@ export async function getDelivery(db: Db, eventId: string, chat: number) {
     .where(and(eq(deliveries.event_id, eventId), eq(deliveries.chat, chat)))
     .limit(1);
   return rows[0];
+}
+
+export async function listByEvent(db: Db, eventId: string) {
+  return db
+    .select()
+    .from(deliveries)
+    .where(eq(deliveries.event_id, eventId));
+}
+
+export async function deleteOlderThan(db: Db, days: number): Promise<number> {
+  const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+  const result = await db
+    .delete(deliveries)
+    .where(lte(deliveries.updated_at, cutoff))
+    .returning({ id: deliveries.id });
+  return result.length;
 }

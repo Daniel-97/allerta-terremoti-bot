@@ -5,6 +5,8 @@ import { createBot } from "./bot/bot";
 import { createDb } from "./db/client";
 import { createLogger } from "./util/log";
 import { runMainCron } from "./jobs/poll";
+import { runRetryCron } from "./jobs/retry";
+import { runCleanupCron } from "./jobs/cleanup";
 
 const log = createLogger("worker");
 
@@ -68,10 +70,10 @@ export default {
           await runMainCron({ HEALTHCHECKS_URL: config.HEALTHCHECKS_URL }, db, bot);
           break;
         case "*/5 * * * *":
-          log.info({ cron: controller.cron }, "retry cron — M4 stub");
+          await runRetryCron({ maxAttempts: config.maxAttempts }, db, bot);
           break;
         case "0 3 * * *":
-          log.info({ cron: controller.cron }, "cleanup cron — M4 stub");
+          await runCleanupCron(db);
           break;
         default:
           log.info({ cron: controller.cron }, "unknown cron — stub");

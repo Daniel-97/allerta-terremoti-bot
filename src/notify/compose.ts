@@ -1,6 +1,7 @@
 import { InlineKeyboard } from "grammy";
 import { encodeEventDetail } from "../util/callback-data";
 import type { ParsedEvent } from "../ingv/types";
+import type { Recipient } from "./match";
 import { getLocation } from "../db/repositories/locations";
 import type { Db } from "../db/types";
 
@@ -64,4 +65,22 @@ export async function getNearestLocationName(db: Db, locId: number | null): Prom
   if (!locId) return null;
   const loc = await getLocation(db, locId);
   return loc?.name ?? null;
+}
+
+export async function composeMessage(
+  event: ParsedEvent,
+  rec: Recipient,
+  db: Db,
+): Promise<{ text: string; keyboard: InlineKeyboard }> {
+  const locName = await getNearestLocationName(db, rec.nearestLocationId);
+
+  if (rec.reason === "world" || (!locName && rec.reason === "national")) {
+    if (rec.reason === "world") return composeWorld(event);
+    return composeNational(event, null, null);
+  }
+
+  if (rec.reason === "proximity") {
+    return composeProximity(event, rec.distanceKm!, locName!);
+  }
+  return composeNational(event, rec.distanceKm, locName);
 }
