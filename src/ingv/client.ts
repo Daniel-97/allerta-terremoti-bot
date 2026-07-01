@@ -14,7 +14,9 @@ function buildUrl(params: Record<string, string>): string {
 }
 
 export async function fetchItalyEvents(): Promise<ParsedEvent[]> {
-  const startTime = new Date(Date.now() - LOOKBACK_WINDOW_MIN * 60_000).toISOString();
+  const startTime = new Date(Date.now() - LOOKBACK_WINDOW_MIN * 60_000)
+    .toISOString()
+    .replace(/\.\d{3}Z$/, 'Z');
   const url = buildUrl({
     format: "text",
     starttime: startTime,
@@ -27,7 +29,9 @@ export async function fetchItalyEvents(): Promise<ParsedEvent[]> {
 }
 
 export async function fetchWorldEvents(): Promise<ParsedEvent[]> {
-  const startTime = new Date(Date.now() - LOOKBACK_WINDOW_MIN * 60_000).toISOString();
+  const startTime = new Date(Date.now() - LOOKBACK_WINDOW_MIN * 60_000)
+    .toISOString()
+    .replace(/\.\d{3}Z$/, 'Z');
   const url = buildUrl({
     format: "text",
     starttime: startTime,
@@ -43,7 +47,7 @@ async function fetchText(url: string): Promise<ParsedEvent[]> {
     const res = await fetch(url, { signal: ctrl.signal });
     if (!res.ok) {
       log.warn({ status: res.status, url }, "ingv http error");
-      throw new Error(`INGV HTTP ${res.status}`);
+      return [];
     }
     const text = await res.text();
     const parsed = parseFdsnText(text);
