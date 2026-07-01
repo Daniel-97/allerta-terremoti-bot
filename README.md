@@ -110,9 +110,8 @@ INGV ◀──poll── Worker.scheduled (main cron) ──▶ match ──▶ 
 
 ### Monitoring
 
-The bot watches itself: if INGV fetches fail for several consecutive cycles, admins get an
-alert (and a recovery notice when it returns); DB errors trigger a best-effort admin alert.
-The main cron also pings an external monitor (e.g. healthchecks.io) on every run — if the
+The bot watches itself: if an INGV fetch fails, admins get an immediate alert. The main cron
+also pings an external monitor (e.g. healthchecks.io) on every run — if the
 pings stop, the external service flags that the whole system is down (the one case internal
 monitoring can't catch).
 
@@ -134,7 +133,7 @@ harmless, the critical operations are **idempotent** via unique constraints: an 
 "claimed" by its unique `history.id`, and each send is recorded with an
 `INSERT ... ON CONFLICT DO NOTHING` on the unique `(event_id, chat)` pair in `deliveries`.
 No user is ever notified twice. An optional lightweight lock (with TTL) can further reduce
-overlap.
+overlap — skipped for v1 (idempotency is sufficient).
 
 ---
 
@@ -187,7 +186,7 @@ src/
   notify/             Eligibility matching, message composition, delivery + error handling
   db/                 libSQL/Drizzle client, schema.ts (queries), schema.sql (DDL), repositories
   geo/                Haversine + bounding box
-  i18n/               Centralized Italian user-facing strings
+   i18n/               Italian user-facing strings + English admin strings (admin-strings.ts)
 test/                 Tests for core modules
 wrangler.jsonc        Worker config: cron triggers, bindings
 ```
@@ -310,7 +309,7 @@ There is a single **production** environment.
 > Other tunables are **code constants**, not env vars: `ITALY_ALERT_THRESHOLD` (5.0),
 > `WORLD_ALERT_THRESHOLD` (7.0, not below 6.0 — INGV's guaranteed global floor),
 > `ITALY_BBOX` (lat 35–48, lon 6–27, INGV reference box), `LOOKBACK_WINDOW`
-> (60 min), `INGV_FAILURE_ALERT_THRESHOLD` (5 cycles), `MAX_LOCATIONS_PER_USER` (10).
+> (60 min), `MAX_LOCATIONS_PER_USER` (10).
 
 ---
 

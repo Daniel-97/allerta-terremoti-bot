@@ -25,4 +25,12 @@ describe("classifyTelegramError", () => {
   it("returns transient for generic error", () => {
     expect(classifyTelegramError(new Error("unknown error"))).toBe("transient");
   });
+
+  it("does not classify permanent error with '5' in text as transient", () => {
+    expect(classifyTelegramError(new Error("Forbidden: user blocked 12345"))).toBe("permanent");
+  });
+
+  it("classifies 500-like transient errors correctly", () => {
+    expect(classifyTelegramError(new Error("Telegram API error 503 Service Unavailable"))).toBe("transient");
+  });
 });
