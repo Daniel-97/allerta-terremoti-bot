@@ -43,4 +43,13 @@ export const ADMIN = {
     line: (service: string, ok: boolean, detail: string) =>
       `${ok ? "✅" : "❌"} *${service}*: ${detail}`,
   },
+  help: {
+    body:
+      "🛠 *Admin Commands*\n\n" +
+      "• /broadcast <message> — Send a message to all active users\n" +
+      "• /stats — View bot statistics\n" +
+      "• /events — View recent events\n" +
+      "• /delivery <event-id> — Check delivery status\n" +
+      "• /health — Check system health",
+  },
 } as const;

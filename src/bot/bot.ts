@@ -16,6 +16,7 @@ import * as stats from "./commands/stats";
 import * as events from "./commands/events";
 import * as delivery from "./commands/delivery";
 import * as health from "./commands/health";
+import * as help from "./commands/help";
 import { notifyNewUser, notifyUserStop } from "../notify/admin";
 import { STRINGS } from "../i18n/strings";
 
@@ -87,6 +88,13 @@ export function createBot(config: RuntimeConfig, db: Db): Bot {
   bot.command("health", async (ctx) => {
     if (!ctx.chat || !config.adminChatIds.includes(ctx.chat.id)) return;
     await health.handle(ctx, db, log, "", config, bot);
+  });
+  bot.command("help", async (ctx) => {
+    if (!ctx.chat || !config.adminChatIds.includes(ctx.chat.id)) {
+      await ctx.reply(STRINGS.unknownCommand.hint);
+      return;
+    }
+    await help.handle(ctx, log);
   });
 
   // callback queries (inline button presses)
