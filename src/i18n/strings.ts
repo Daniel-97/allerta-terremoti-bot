@@ -2,8 +2,10 @@ export const STRINGS = {
   start: {
     welcome:
       "👋 *Allerta Terremoti (INGV)*\n\n" +
-      "Riceverai le allerte nazionali per l'Italia (M ≥ 5.0) **di default**.\n\n" +
-      "Per le allerte di prossimità, aggiungi una o più posizioni con /posizioni.\n" +
+      "Riceverai le allerte nazionali per **tutti** gli eventi sismici rilevanti (M ≥ 5.0) " +
+      "che avvengono sul territorio italiano, indipendentemente dalle posizioni che hai salvato.\n\n" +
+      "Questa funzione è attiva **di default**.\n\n" +
+      "Per le allerte di prossimità (eventi vicini alle tue posizioni), aggiungi una o più posizioni con /posizioni.\n" +
       "Per le allerte mondiali (M ≥ 7.0), attivale in /impostazioni.",
   },
   aiuto: {
