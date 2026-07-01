@@ -16,7 +16,8 @@
     "db:apply": "tsx --env-file=.env scripts/apply-schema.ts",
     "set-commands": "tsx --env-file=.env scripts/set-commands.ts",
     "start-polling": "tsx --env-file=.env scripts/start-polling.ts",
-    "simulate": "tsx --env-file=.env scripts/simulate-update.ts"
+    "simulate": "tsx --env-file=.env scripts/simulate-update.ts",
+    "sync-ingv": "tsx --env-file=.env scripts/sync-ingv.ts"
   },
   "repository": {
     "type": "git",
