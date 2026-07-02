@@ -32,7 +32,7 @@ describe("findRecipients", () => {
   it("finds proximity recipient", async () => {
     await addLocation(db, { chat: 1, lat: 41.9, lon: 12.5, name: "RM" });
     const ev = { eventId: "ev1", lat: 41.9, lon: 12.5, magnitude: 3.0, zone: "Roma", time: "2026-06-30T12:00:00", depth: 10, author: "INGV", catalog: "INGV", contributor: "INGV", contributorId: "I1", magType: "ML", magAuthor: "INGV" };
-    const r = await findRecipients(ev, db);
+    const r = await findRecipients(ev, db, 5.0, 7.0);
     expect(r).toHaveLength(1);
     expect(r[0]!.chatId).toBe(1);
     expect(r[0]!.reason).toBe("proximity");
@@ -42,6 +42,6 @@ describe("findRecipients", () => {
     await addLocation(db, { chat: 1, lat: 41.9, lon: 12.5, name: "RM" });
     await db.update(schema.chats).set({ status: "stopped" }).where(sql`id=1`);
     const ev = { eventId: "ev1", lat: 41.9, lon: 12.5, magnitude: 3.0, zone: "Roma", time: "2026-06-30T12:00:00", depth: 10, author: "INGV", catalog: "INGV", contributor: "INGV", contributorId: "I1", magType: "ML", magAuthor: "INGV" };
-    expect(await findRecipients(ev, db)).toEqual([]);
+    expect(await findRecipients(ev, db, 5.0, 7.0)).toEqual([]);
   });
 });

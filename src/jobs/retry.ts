@@ -15,7 +15,7 @@ function sleep(ms: number): Promise<void> {
 }
 
 export async function runRetryCron(
-  config: { maxAttempts: number },
+  config: { maxAttempts: number; italyAlertThreshold: number; worldAlertThreshold: number },
   db: Db,
   bot: Bot,
 ): Promise<void> {
@@ -56,7 +56,7 @@ export async function runRetryCron(
       zone: event.zone,
     };
 
-    const recipient = await matchChat(parsedEvent, delivery.chat, db);
+    const recipient = await matchChat(parsedEvent, delivery.chat, db, config.italyAlertThreshold, config.worldAlertThreshold);
     if (!recipient) {
       skipped++;
       continue;

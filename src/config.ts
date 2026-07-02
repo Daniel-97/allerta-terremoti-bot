@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { MAX_ATTEMPTS as FALLBACK_MAX_ATTEMPTS } from "./util/constants";
 
 const schema = z.object({
   BOT_TOKEN: z.string().min(1),
@@ -9,7 +8,12 @@ const schema = z.object({
   GEONAMES_USERNAME: z.string().min(1),
   ADMIN_CHAT_IDS: z.string().optional(),
   HEALTHCHECKS_URL: z.string().url().optional(),
-  MAX_ATTEMPTS: z.string().optional(),
+  MAX_ATTEMPTS: z.coerce.number().positive().int().default(3),
+  ITALY_ALERT_THRESHOLD: z.coerce.number().positive().default(5.0),
+  WORLD_ALERT_THRESHOLD: z.coerce.number().positive().default(7.0),
+  MAX_LOCATIONS_PER_USER: z.coerce.number().positive().int().default(10),
+  LOOKBACK_WINDOW_MIN: z.coerce.number().positive().int().default(60),
+  DELIVERIES_RETENTION_DAYS: z.coerce.number().positive().int().default(90),
 });
 
 export type AppConfig = z.infer<typeof schema>;
@@ -17,6 +21,11 @@ export type AppConfig = z.infer<typeof schema>;
 export interface RuntimeConfig extends AppConfig {
   maxAttempts: number;
   adminChatIds: number[];
+  italyAlertThreshold: number;
+  worldAlertThreshold: number;
+  maxLocationsPerUser: number;
+  lookbackWindowMin: number;
+  deliveriesRetentionDays: number;
 }
 
 function parseAdminChatIds(raw: string | undefined): number[] {
@@ -42,7 +51,15 @@ export function loadConfig(env: unknown): RuntimeConfig {
       )
     : env;
   const raw = schema.parse(cleaned);
-  const maxAttempts = raw.MAX_ATTEMPTS ? Number(raw.MAX_ATTEMPTS) : FALLBACK_MAX_ATTEMPTS;
   const adminChatIds = parseAdminChatIds(raw.ADMIN_CHAT_IDS);
-  return { ...raw, maxAttempts, adminChatIds };
+  return {
+    ...raw,
+    maxAttempts: raw.MAX_ATTEMPTS,
+    adminChatIds,
+    italyAlertThreshold: raw.ITALY_ALERT_THRESHOLD,
+    worldAlertThreshold: raw.WORLD_ALERT_THRESHOLD,
+    maxLocationsPerUser: raw.MAX_LOCATIONS_PER_USER,
+    lookbackWindowMin: raw.LOOKBACK_WINDOW_MIN,
+    deliveriesRetentionDays: raw.DELIVERIES_RETENTION_DAYS,
+  };
 }

@@ -215,6 +215,10 @@ bot token (from [@BotFather](https://t.me/BotFather)), and a free GeoNames usern
    WEBHOOK_SECRET=...
    ADMIN_CHAT_IDS=...
    HEALTHCHECKS_URL=...
+   # Optional tunables (defaults shown in .dev.vars.example):
+   # MAX_ATTEMPTS=3
+   # ITALY_ALERT_THRESHOLD=5.0
+   # WORLD_ALERT_THRESHOLD=7.0
    ```
 4. **Run locally**
    ```bash
@@ -285,9 +289,9 @@ Configure these repository secrets under **Settings → Secrets and variables �
 |---|---|
 | `CLOUDFLARE_API_TOKEN` | Token with "Edit Cloudflare Workers" permissions on the target account |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
-| `BOT_TOKEN`, `WEBHOOK_SECRET`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `GEONAMES_USERNAME` | Required app secrets, see below |
-| `ADMIN_CHAT_IDS` | Optional app secret — if unused, remove it from the workflow's `secrets`/`env` instead of leaving it empty |
-| `HEALTHCHECKS_URL` | Optional app secret — the workflow only pushes it to Cloudflare when this GitHub secret is set, so it's safe to leave unconfigured |
+| `BOT_TOKEN`, `WEBHOOK_SECRET`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `GEONAMES_USERNAME` | Required app secrets |
+| `ADMIN_CHAT_IDS`, `HEALTHCHECKS_URL` | Optional app secrets |
+| `MAX_ATTEMPTS`, `ITALY_ALERT_THRESHOLD`, `WORLD_ALERT_THRESHOLD`, `MAX_LOCATIONS_PER_USER`, `LOOKBACK_WINDOW_MIN`, `DELIVERIES_RETENTION_DAYS` | Optional app secrets — each defaults to a sensible value when unset |
 
 These are synced to Cloudflare on every deploy, so updating a GitHub secret is enough to roll
 the new value out on the next push (or manual run).
@@ -309,6 +313,13 @@ automatically with the Worker.
    wrangler secret put GEONAMES_USERNAME
    wrangler secret put WEBHOOK_SECRET
    wrangler secret put HEALTHCHECKS_URL  # optional, skip if unused
+   # Optional tunables — each has a sensible default; only set to override:
+   # wrangler secret put MAX_ATTEMPTS
+   # wrangler secret put ITALY_ALERT_THRESHOLD
+   # wrangler secret put WORLD_ALERT_THRESHOLD
+   # wrangler secret put MAX_LOCATIONS_PER_USER
+   # wrangler secret put LOOKBACK_WINDOW_MIN
+   # wrangler secret put DELIVERIES_RETENTION_DAYS
    ```
 
 ### Telegram webhook
@@ -326,21 +337,25 @@ by the GitHub Actions workflow.
 
 ### Configuration
 
-| Variable | Purpose |
-|---|---|
-| `BOT_TOKEN` | Telegram bot token |
-| `WEBHOOK_SECRET` | Secret token verified via the `X-Telegram-Bot-Api-Secret-Token` header |
-| `TURSO_DATABASE_URL` | Turso/libSQL connection URL |
-| `TURSO_AUTH_TOKEN` | Turso auth token |
-| `GEONAMES_USERNAME` | GeoNames username for reverse geocoding |
-| `ADMIN_CHAT_IDS` | Comma-separated chat IDs allowed to run admin commands |
-| `HEALTHCHECKS_URL` | External monitor endpoint pinged each main-cron run (dead-man's-switch) |
-| `MAX_ATTEMPTS` | Max send attempts for transient failures |
+All variables are optional unless marked as **required**.
 
-> Other tunables are **code constants**, not env vars: `ITALY_ALERT_THRESHOLD` (5.0),
-> `WORLD_ALERT_THRESHOLD` (7.0, not below 6.0 — INGV's guaranteed global floor),
-> `ITALY_BBOX` (lat 35–48, lon 6–27, INGV reference box), `LOOKBACK_WINDOW`
-> (60 min), `MAX_LOCATIONS_PER_USER` (10).
+| Variable | Required | Default | Purpose |
+|---|---|---|---|
+| `BOT_TOKEN` | **yes** | — | Telegram bot token |
+| `WEBHOOK_SECRET` | **yes** | — | Secret token verified via the `X-Telegram-Bot-Api-Secret-Token` header |
+| `TURSO_DATABASE_URL` | **yes** | — | Turso/libSQL connection URL |
+| `TURSO_AUTH_TOKEN` | **yes** | — | Turso auth token |
+| `GEONAMES_USERNAME` | **yes** | — | GeoNames username for reverse geocoding |
+| `ADMIN_CHAT_IDS` | no | — | Comma-separated chat IDs allowed to run admin commands |
+| `HEALTHCHECKS_URL` | no | — | External monitor endpoint pinged each main-cron run (dead-man's-switch) |
+| `MAX_ATTEMPTS` | no | `3` | Max send attempts for transient failures |
+| `ITALY_ALERT_THRESHOLD` | no | `5.0` | Minimum magnitude for national alerts (within `ITALY_BBOX`) |
+| `WORLD_ALERT_THRESHOLD` | no | `7.0` | Minimum magnitude for world alerts (not below 6.0 — INGV's guaranteed global floor) |
+| `MAX_LOCATIONS_PER_USER` | no | `10` | Maximum number of saved locations per user |
+| `LOOKBACK_WINDOW_MIN` | no | `60` | Lookback window (minutes) when polling INGV for new events |
+| `DELIVERIES_RETENTION_DAYS` | no | `90` | Days to keep delivery records before cleanup |
+
+> Other tunables are **code constants**: `ITALY_BBOX` (lat 35–48, lon 6–27, INGV reference box).
 
 ---
 

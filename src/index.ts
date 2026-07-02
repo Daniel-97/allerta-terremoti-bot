@@ -67,13 +67,26 @@ export default {
     try {
       switch (controller.cron) {
         case "* * * * *":
-          await runMainCron({ HEALTHCHECKS_URL: config.HEALTHCHECKS_URL, adminChatIds: config.adminChatIds }, db, bot);
+          await runMainCron({
+        HEALTHCHECKS_URL: config.HEALTHCHECKS_URL,
+        adminChatIds: config.adminChatIds,
+        italyAlertThreshold: config.italyAlertThreshold,
+        worldAlertThreshold: config.worldAlertThreshold,
+        lookbackWindowMin: config.lookbackWindowMin,
+      }, db, bot);
           break;
         case "*/5 * * * *":
-          await runRetryCron({ maxAttempts: config.maxAttempts }, db, bot);
+          await runRetryCron({
+            maxAttempts: config.maxAttempts,
+            italyAlertThreshold: config.italyAlertThreshold,
+            worldAlertThreshold: config.worldAlertThreshold,
+          }, db, bot);
           break;
         case "0 3 * * *":
-          await runCleanupCron(db);
+          await runCleanupCron(db, {
+            lookbackWindowMin: config.lookbackWindowMin,
+            deliveriesRetentionDays: config.deliveriesRetentionDays,
+          });
           break;
         default:
           log.info({ cron: controller.cron }, "unknown cron — stub");

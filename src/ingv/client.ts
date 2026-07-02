@@ -1,7 +1,6 @@
 import { createLogger } from "../util/log";
 import { captureWarning } from "../util/error-handler";
 import { ITALY_BBOX } from "../util/geo-bbox";
-import { WORLD_ALERT_THRESHOLD, LOOKBACK_WINDOW_MIN } from "../util/constants";
 import { parseFdsnText } from "./parser";
 import type { ParsedEvent } from "./types";
 
@@ -14,8 +13,8 @@ function buildUrl(params: Record<string, string>): string {
   return `${ENDPOINT}?${qs}`;
 }
 
-export async function fetchItalyEvents(): Promise<ParsedEvent[]> {
-  const startTime = new Date(Date.now() - LOOKBACK_WINDOW_MIN * 60_000)
+export async function fetchItalyEvents(lookbackWindowMin: number): Promise<ParsedEvent[]> {
+  const startTime = new Date(Date.now() - lookbackWindowMin * 60_000)
     .toISOString()
     .replace(/\.\d{3}Z$/, '');
   const url = buildUrl({
@@ -29,14 +28,14 @@ export async function fetchItalyEvents(): Promise<ParsedEvent[]> {
   return fetchText(url);
 }
 
-export async function fetchWorldEvents(): Promise<ParsedEvent[]> {
-  const startTime = new Date(Date.now() - LOOKBACK_WINDOW_MIN * 60_000)
+export async function fetchWorldEvents(lookbackWindowMin: number, minMagnitude: number): Promise<ParsedEvent[]> {
+  const startTime = new Date(Date.now() - lookbackWindowMin * 60_000)
     .toISOString()
     .replace(/\.\d{3}Z$/, '');
   const url = buildUrl({
     format: "text",
     starttime: startTime,
-    minmagnitude: String(WORLD_ALERT_THRESHOLD),
+    minmagnitude: String(minMagnitude),
   });
   return fetchText(url);
 }

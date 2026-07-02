@@ -1,6 +1,6 @@
 import { Keyboard } from "grammy";
 import type { Context } from "grammy";
-import type { AppConfig } from "../config";
+import type { RuntimeConfig } from "../config";
 import type { Db } from "../db/types";
 import { isAllowedArea } from "../util/geo-bbox";
 import { reverseGeocode } from "../geocoding/geonames";
@@ -9,7 +9,6 @@ import {
   countLocations,
   findByName,
 } from "../db/repositories/locations";
-import { MAX_LOCATIONS_PER_USER } from "../util/constants";
 import { STRINGS } from "../i18n/strings";
 import { createLogger } from "../util/log";
 
@@ -25,7 +24,7 @@ export function requestLocationKeyboard(): Keyboard {
 export async function handleLocation(
   ctx: Context,
   db: Db,
-  config: AppConfig,
+  config: RuntimeConfig,
 ): Promise<void> {
   const loc = ctx.message?.location ?? ctx.message?.venue?.location;
   if (!loc) return;
@@ -47,7 +46,7 @@ export async function handleLocation(
   }
 
   const count = await countLocations(db, chatId);
-  if (count >= MAX_LOCATIONS_PER_USER) {
+  if (count >= config.maxLocationsPerUser) {
     await ctx.reply(STRINGS.posizioni.cap);
     return;
   }

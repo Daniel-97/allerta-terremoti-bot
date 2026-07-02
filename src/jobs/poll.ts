@@ -11,7 +11,7 @@ import type { Bot } from "grammy";
 const log = createLogger("poll");
 
 export async function runMainCron(
-  config: { HEALTHCHECKS_URL: string | undefined; adminChatIds: number[] },
+  config: { HEALTHCHECKS_URL: string | undefined; adminChatIds: number[]; italyAlertThreshold: number; worldAlertThreshold: number; lookbackWindowMin: number },
   db: Db,
   bot: Bot,
 ): Promise<void> {
@@ -27,8 +27,8 @@ export async function runMainCron(
   const allEvents: ParsedEventFromClient[] = [];
   try {
     const [italy, world] = await Promise.all([
-      fetchItalyEvents(),
-      fetchWorldEvents(),
+      fetchItalyEvents(config.lookbackWindowMin),
+      fetchWorldEvents(config.lookbackWindowMin, config.worldAlertThreshold),
     ]);
     allEvents.push(...italy, ...world);
     log.info({ italy: italy.length, world: world.length, total: allEvents.length }, "events fetched");
@@ -56,7 +56,7 @@ export async function runMainCron(
     if (!isNew) continue; // already processed
 
     // 4. Match + deliver
-    const recipients = await findRecipients(event, db);
+    const recipients = await findRecipients(event, db, config.italyAlertThreshold, config.worldAlertThreshold);
     if (recipients.length > 0) {
       const outcome = await deliverFirstWave(bot, event, recipients, db);
       log.info({
