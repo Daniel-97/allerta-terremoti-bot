@@ -271,6 +271,32 @@ The Worker will process the fake update through the full pipeline: secret verifi
 
 There is a single **production** environment.
 
+### Automatic deploy (GitHub Actions)
+
+Every push to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which
+installs dependencies, deploys the Worker via
+[`cloudflare/wrangler-action`](https://github.com/cloudflare/wrangler-action), and pushes the
+application secrets to Cloudflare via `wrangler secret put`. It can also be triggered manually
+from the **Actions** tab (`workflow_dispatch`).
+
+Configure these repository secrets under **Settings → Secrets and variables → Actions**:
+
+| Secret | Purpose |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | Token with "Edit Cloudflare Workers" permissions on the target account |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
+| `BOT_TOKEN`, `WEBHOOK_SECRET`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `GEONAMES_USERNAME` | Required app secrets, see below |
+| `ADMIN_CHAT_IDS` | Optional app secret — if unused, remove it from the workflow's `secrets`/`env` instead of leaving it empty |
+| `HEALTHCHECKS_URL` | Optional app secret — the workflow only pushes it to Cloudflare when this GitHub secret is set, so it's safe to leave unconfigured |
+
+These are synced to Cloudflare on every deploy, so updating a GitHub secret is enough to roll
+the new value out on the next push (or manual run).
+
+**Cron triggers** (main + retry + cleanup) are configured in `wrangler.jsonc` and deploy
+automatically with the Worker.
+
+### Manual deploy (fallback)
+
 1. **Deploy the Worker**
    ```bash
    npx wrangler deploy
@@ -282,16 +308,21 @@ There is a single **production** environment.
    wrangler secret put TURSO_AUTH_TOKEN
    wrangler secret put GEONAMES_USERNAME
    wrangler secret put WEBHOOK_SECRET
-   wrangler secret put HEALTHCHECKS_URL
+   wrangler secret put HEALTHCHECKS_URL  # optional, skip if unused
    ```
-3. **Register the Telegram webhook** to the deployed Worker URL, passing `WEBHOOK_SECRET` as
-   the secret token. Telegram will then send it back in the `X-Telegram-Bot-Api-Secret-Token`
-   header on every update, which the Worker verifies:
-   ```bash
-   curl "https://api.telegram.org/bot<BOT_TOKEN>/setWebhook?url=https://<worker-url>/webhook&secret_token=<WEBHOOK_SECRET>"
-   ```
-4. **Cron triggers** (main + retry + cleanup) are configured in `wrangler.jsonc` and deploy
-   with the Worker.
+
+### Telegram webhook
+
+**Register the Telegram webhook** to the deployed Worker URL, passing `WEBHOOK_SECRET` as
+the secret token. Telegram will then send it back in the `X-Telegram-Bot-Api-Secret-Token`
+header on every update, which the Worker verifies. Use the `set-webhook` script:
+```bash
+npm run set-webhook -- set https://<worker-url>
+npm run set-webhook -- info
+npm run set-webhook -- delete
+```
+This is a one-time step (unless the Worker URL or `WEBHOOK_SECRET` changes) and isn't handled
+by the GitHub Actions workflow.
 
 ### Configuration
 
