@@ -42,7 +42,6 @@ jobs:
             TURSO_AUTH_TOKEN
             GEONAMES_USERNAME
             ADMIN_CHAT_IDS
-            HEALTHCHECKS_URL
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
@@ -50,4 +49,11 @@ jobs:
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           GEONAMES_USERNAME: ${{ secrets.GEONAMES_USERNAME }}
           ADMIN_CHAT_IDS: ${{ secrets.ADMIN_CHAT_IDS }}
+
+      - name: Set optional HEALTHCHECKS_URL secret
+        if: ${{ secrets.HEALTHCHECKS_URL != '' }}
+        run: echo "$HEALTHCHECKS_URL" | npx wrangler secret put HEALTHCHECKS_URL
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           HEALTHCHECKS_URL: ${{ secrets.HEALTHCHECKS_URL }}

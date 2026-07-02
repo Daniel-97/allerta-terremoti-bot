@@ -286,7 +286,8 @@ Configure these repository secrets under **Settings → Secrets and variables �
 | `CLOUDFLARE_API_TOKEN` | Token with "Edit Cloudflare Workers" permissions on the target account |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
 | `BOT_TOKEN`, `WEBHOOK_SECRET`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `GEONAMES_USERNAME` | Required app secrets, see below |
-| `ADMIN_CHAT_IDS`, `HEALTHCHECKS_URL` | Optional app secrets — if unused, remove them from the workflow's `secrets`/`env` instead of leaving them empty |
+| `ADMIN_CHAT_IDS` | Optional app secret — if unused, remove it from the workflow's `secrets`/`env` instead of leaving it empty |
+| `HEALTHCHECKS_URL` | Optional app secret — the workflow only pushes it to Cloudflare when this GitHub secret is set, so it's safe to leave unconfigured |
 
 These are synced to Cloudflare on every deploy, so updating a GitHub secret is enough to roll
 the new value out on the next push (or manual run).
@@ -307,16 +308,18 @@ automatically with the Worker.
    wrangler secret put TURSO_AUTH_TOKEN
    wrangler secret put GEONAMES_USERNAME
    wrangler secret put WEBHOOK_SECRET
-   wrangler secret put HEALTHCHECKS_URL
+   wrangler secret put HEALTHCHECKS_URL  # optional, skip if unused
    ```
 
 ### Telegram webhook
 
 **Register the Telegram webhook** to the deployed Worker URL, passing `WEBHOOK_SECRET` as
 the secret token. Telegram will then send it back in the `X-Telegram-Bot-Api-Secret-Token`
-header on every update, which the Worker verifies:
+header on every update, which the Worker verifies. Use the `set-webhook` script:
 ```bash
-curl "https://api.telegram.org/bot<BOT_TOKEN>/setWebhook?url=https://<worker-url>/webhook&secret_token=<WEBHOOK_SECRET>"
+npm run set-webhook -- set https://<worker-url>
+npm run set-webhook -- info
+npm run set-webhook -- delete
 ```
 This is a one-time step (unless the Worker URL or `WEBHOOK_SECRET` changes) and isn't handled
 by the GitHub Actions workflow.
