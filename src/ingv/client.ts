@@ -28,14 +28,13 @@ export async function fetchItalyEvents(lookbackWindowMin: number): Promise<Parse
   return fetchText(url);
 }
 
-export async function fetchWorldEvents(lookbackWindowMin: number, minMagnitude: number): Promise<ParsedEvent[]> {
+export async function fetchWorldEvents(lookbackWindowMin: number): Promise<ParsedEvent[]> {
   const startTime = new Date(Date.now() - lookbackWindowMin * 60_000)
     .toISOString()
     .replace(/\.\d{3}Z$/, '');
   const url = buildUrl({
     format: "text",
     starttime: startTime,
-    minmagnitude: String(minMagnitude),
   });
   return fetchText(url);
 }

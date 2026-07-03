@@ -28,7 +28,7 @@ export async function runMainCron(
   try {
     const [italy, world] = await Promise.all([
       fetchItalyEvents(config.lookbackWindowMin),
-      fetchWorldEvents(config.lookbackWindowMin, config.worldAlertThreshold),
+      fetchWorldEvents(config.lookbackWindowMin),
     ]);
     allEvents.push(...italy, ...world);
     log.info({ italy: italy.length, world: world.length, total: allEvents.length }, "events fetched");
