@@ -62,12 +62,11 @@ export async function runRetryCron(
       continue;
     }
 
-    const { text, keyboard } = await composeMessage(parsedEvent, recipient, db);
+    const venue = await composeMessage(parsedEvent, recipient, db);
 
     try {
-      await bot.api.sendMessage(delivery.chat, text, {
-        reply_markup: keyboard,
-        parse_mode: "Markdown",
+      await bot.api.sendVenue(delivery.chat, venue.latitude, venue.longitude, venue.title, venue.address, {
+        reply_markup: venue.keyboard,
       });
       await updateStatus(db, delivery.id, "sent", delivery.attempts + 1);
       sent++;
