@@ -14,6 +14,7 @@ const schema = z.object({
   MAX_LOCATIONS_PER_USER: z.coerce.number().positive().int().default(10),
   LOOKBACK_WINDOW_MIN: z.coerce.number().positive().int().default(60),
   DELIVERIES_RETENTION_DAYS: z.coerce.number().positive().int().default(90),
+  EVENTS_RETENTION_DAYS: z.coerce.number().positive().int().default(365),
 });
 
 export type AppConfig = z.infer<typeof schema>;
@@ -26,6 +27,7 @@ export interface RuntimeConfig extends AppConfig {
   maxLocationsPerUser: number;
   lookbackWindowMin: number;
   deliveriesRetentionDays: number;
+  eventsRetentionDays: number;
 }
 
 function parseAdminChatIds(raw: string | undefined): number[] {
@@ -61,5 +63,6 @@ export function loadConfig(env: unknown): RuntimeConfig {
     maxLocationsPerUser: raw.MAX_LOCATIONS_PER_USER,
     lookbackWindowMin: raw.LOOKBACK_WINDOW_MIN,
     deliveriesRetentionDays: raw.DELIVERIES_RETENTION_DAYS,
+    eventsRetentionDays: raw.EVENTS_RETENTION_DAYS,
   };
 }

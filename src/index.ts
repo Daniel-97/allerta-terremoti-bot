@@ -86,6 +86,7 @@ export default {
           await runCleanupCron(db, {
             lookbackWindowMin: config.lookbackWindowMin,
             deliveriesRetentionDays: config.deliveriesRetentionDays,
+            eventsRetentionDays: config.eventsRetentionDays,
           });
           break;
         default:

@@ -96,6 +96,7 @@ invii dopo un evento sismico, utente che disattiva le notifiche con `/stop`.
 | `MAX_LOCATIONS_PER_USER` | no | `10` | Numero massimo di posizioni salvabili per utente |
 | `LOOKBACK_WINDOW_MIN` | no | `60` | Finestra temporale (minuti) usata per interrogare l'INGV alla ricerca di nuovi eventi |
 | `DELIVERIES_RETENTION_DAYS` | no | `90` | Giorni di conservazione dello storico invii prima della pulizia automatica |
+| `EVENTS_RETENTION_DAYS` | no | `365` | Giorni di conservazione degli eventi sismici prima della pulizia automatica |
 
 ---
 
@@ -152,7 +153,7 @@ secret `BOT_TOKEN`, `WEBHOOK_SECRET`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`,
 avviato anche manualmente dalla tab **Actions** (`workflow_dispatch`).
 
 Le variabili opzionali (`MAX_ATTEMPTS`, `ITALY_ALERT_THRESHOLD`, `WORLD_ALERT_THRESHOLD`,
-`MAX_LOCATIONS_PER_USER`, `LOOKBACK_WINDOW_MIN`, `DELIVERIES_RETENTION_DAYS`) **non** sono
+`MAX_LOCATIONS_PER_USER`, `LOOKBACK_WINDOW_MIN`, `DELIVERIES_RETENTION_DAYS`, `EVENTS_RETENTION_DAYS`) **non** sono
 sincronizzate automaticamente da questo workflow: se servono in produzione vanno impostate
 a mano (vedi sotto).
 
@@ -178,6 +179,7 @@ wrangler secret put HEALTHCHECKS_URL  # opzionale
 # wrangler secret put MAX_LOCATIONS_PER_USER
 # wrangler secret put LOOKBACK_WINDOW_MIN
 # wrangler secret put DELIVERIES_RETENTION_DAYS
+# wrangler secret put EVENTS_RETENTION_DAYS
 ```
 
 ### Registrazione del webhook Telegram

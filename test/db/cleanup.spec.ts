@@ -8,13 +8,13 @@ import {
   insertIfNew as deliveryInsert,
   deleteOlderThan,
 } from "../../src/db/repositories/deliveries";
-import { deleteOrphansOlderThan } from "../../src/db/repositories/history";
+import { deleteOrphansOlderThan, deleteOlderThan as deleteHistoryOlderThan } from "../../src/db/repositories/history";
 import { upsertActiveChat } from "../../src/db/repositories/chats";
 
 const DDL = `
 CREATE TABLE IF NOT EXISTS chats (id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, username TEXT, status TEXT NOT NULL DEFAULT 'active', italy_alerts INTEGER NOT NULL DEFAULT 1, world_alerts INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, last_seen_at TEXT NOT NULL, updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS history (id TEXT PRIMARY KEY, zone TEXT NOT NULL, date TEXT NOT NULL, lat REAL NOT NULL, lon REAL NOT NULL, depth REAL, stations_count INTEGER, magnitude_type TEXT, magnitude_value REAL NOT NULL, magnitude_uncertainty REAL);
-CREATE TABLE IF NOT EXISTS deliveries (id INTEGER PRIMARY KEY, event_id TEXT NOT NULL, chat INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'pending', attempts INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL, FOREIGN KEY (event_id) REFERENCES history (id), FOREIGN KEY (chat) REFERENCES chats (id));
+CREATE TABLE IF NOT EXISTS deliveries (id INTEGER PRIMARY KEY, event_id TEXT NOT NULL, chat INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'pending', attempts INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL, FOREIGN KEY (event_id) REFERENCES history (id) ON DELETE CASCADE, FOREIGN KEY (chat) REFERENCES chats (id) ON DELETE CASCADE);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_deliveries_event_chat ON deliveries (event_id, chat);
 CREATE TABLE IF NOT EXISTS system_state (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL);
 `;
@@ -58,6 +58,49 @@ describe("deliveries cleanup", () => {
     expect(deleted).toBe(0);
     const remaining = await db.select().from(schema.deliveries);
     expect(remaining).toHaveLength(1);
+  });
+});
+
+describe("history retention cleanup", () => {
+  let db: Awaited<ReturnType<typeof freshDb>>;
+
+  beforeEach(async () => {
+    db = await freshDb();
+    await historyInsert(db, {
+      id: "ev-ret-1", zone: "Roma", date: "2020-01-01T00:00:00Z",
+      lat: 41.9, lon: 12.5, depth: 10, stations_count: 5,
+      magnitude_type: "ML", magnitude_value: 4.2, magnitude_uncertainty: 0.3,
+    });
+    await historyInsert(db, {
+      id: "ev-ret-2", zone: "Milano", date: new Date().toISOString(),
+      lat: 45.46, lon: 9.19, depth: 8, stations_count: 3,
+      magnitude_type: "ML", magnitude_value: 3.5, magnitude_uncertainty: 0.2,
+    });
+  });
+
+  it("deletes events older than cutoff", async () => {
+    const deleted = await deleteHistoryOlderThan(db, 30);
+    expect(deleted).toBe(1);
+    const remaining = await db.select().from(schema.history);
+    expect(remaining.map((r: { id: string }) => r.id)).toEqual(["ev-ret-2"]);
+  });
+
+  it("preserves events within cutoff", async () => {
+    const deleted = await deleteHistoryOlderThan(db, 36500);
+    expect(deleted).toBe(0);
+    const remaining = await db.select().from(schema.history);
+    expect(remaining).toHaveLength(2);
+  });
+
+  it("cascades to deliveries when event is deleted", async () => {
+    await upsertActiveChat(db, { id: 100, first_name: "U", last_name: null, username: null });
+    await deliveryInsert(db, { event_id: "ev-ret-1", chat: 100 });
+
+    const deleted = await deleteHistoryOlderThan(db, 30);
+    expect(deleted).toBe(1);
+
+    const remainingDeliveries = await db.select().from(schema.deliveries);
+    expect(remainingDeliveries).toHaveLength(0);
   });
 });
 

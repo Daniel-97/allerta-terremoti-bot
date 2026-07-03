@@ -36,6 +36,15 @@ export async function getEvent(db: Db, id: string) {
   return rows[0];
 }
 
+export async function deleteOlderThan(db: Db, days: number): Promise<number> {
+  const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+  const result = await db
+    .delete(history)
+    .where(lt(history.date, cutoff))
+    .returning({ id: history.id });
+  return result.length;
+}
+
 export async function deleteOrphansOlderThan(db: Db, minutes: number): Promise<number> {
   const cutoff = new Date(Date.now() - minutes * 60_000).toISOString();
   const sub = db.select().from(deliveries).where(eq(deliveries.event_id, history.id));
