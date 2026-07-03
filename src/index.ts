@@ -62,8 +62,6 @@ export default {
     await ready;
     const bot = new Bot(config.BOT_TOKEN);
 
-    log.info({ cron: controller.cron }, "scheduled trigger started");
-
     try {
       switch (controller.cron) {
         case "* * * * *":
@@ -92,7 +90,6 @@ export default {
         default:
           log.info({ cron: controller.cron }, "unknown cron — stub");
       }
-      log.info({ cron: controller.cron, durationMs: Date.now() - start }, "scheduled trigger finished");
     } catch (err) {
       log.error({ cron: controller.cron, err: String(err) }, "scheduled trigger error");
     }
