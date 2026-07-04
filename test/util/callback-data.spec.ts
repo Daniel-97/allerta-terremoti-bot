@@ -20,6 +20,8 @@ import {
   decodeLoc,
   encodeEventDetail,
   decodeEvDetail,
+  encodeEventMap,
+  decodeEvMap,
   decode,
 } from "../../src/util/callback-data";
 
@@ -85,6 +87,15 @@ describe("callback-data event detail", () => {
   });
 });
 
+describe("callback-data event map", () => {
+  it("encodes and decodes", () => {
+    const s = encodeEventMap("INGV_20260630_1234");
+    expect(s).toBe("ev;INGV_20260630_1234;map");
+    expect(decodeEvMap(s)).toEqual({ kind: "evMap", eventId: "INGV_20260630_1234" });
+    expect(s.length).toBeLessThanOrEqual(64);
+  });
+});
+
 describe("callback-data delete", () => {
   it("encodeDelete", () => {
     expect(encodeDelete(3)).toBe("l;3;del");
@@ -146,6 +157,7 @@ describe("decode generic", () => {
     expect(decode("l;5;r")!.kind).toBe("radiusMenu");
     expect(decode("l;5;m")!.kind).toBe("magnitudeMenu");
     expect(decode("ev;id123;det")!.kind).toBe("evDetail");
+    expect(decode("ev;id123;map")!.kind).toBe("evMap");
   });
 
   it("always ≤ 64 bytes", () => {
@@ -162,6 +174,7 @@ describe("decode generic", () => {
       [encodeNav, ["home"]],
       [encodeLoc, [100000]],
       [encodeEventDetail, ["INGV_20260630_123456"]],
+      [encodeEventMap, ["INGV_20260630_123456"]],
     ] as const) {
       const s = (fn as (...a: unknown[]) => string)(...args);
       expect(s.length).toBeLessThanOrEqual(64);
