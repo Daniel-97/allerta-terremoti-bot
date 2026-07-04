@@ -23,7 +23,6 @@ export async function runRetryCron(
   const pending = await listPendingForRetry(db, config.maxAttempts);
 
   if (pending.length === 0) {
-    log.info({}, "no deliveries to retry");
     return;
   }
 

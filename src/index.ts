@@ -56,8 +56,7 @@ export default {
     env: Record<string, string>,
     _ctx: ExecutionContext,
   ): Promise<void> {
-    const start = Date.now();
-      const config = loadConfig(env);
+    const config = loadConfig(env);
     const { db, ready } = createDb(config);
     await ready;
     const bot = new Bot(config.BOT_TOKEN);

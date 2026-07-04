@@ -15,9 +15,6 @@ export async function runMainCron(
   db: Db,
   bot: Bot,
 ): Promise<void> {
-  const start = Date.now();
-  log.info({}, "main cron cycle started");
-
   // 1. Dead-man's-switch ping (fire-and-forget)
   if (config.HEALTHCHECKS_URL) {
     void fetch(config.HEALTHCHECKS_URL, { method: "GET" }).catch(() => {});
@@ -31,7 +28,9 @@ export async function runMainCron(
       fetchWorldEvents(config.lookbackWindowMin),
     ]);
     allEvents.push(...italy, ...world);
-    log.info({ italy: italy.length, world: world.length, total: allEvents.length }, "events fetched");
+    if (allEvents.length > 0) {
+      log.info({ italy: italy.length, world: world.length, total: allEvents.length }, "events fetched");
+    }
   } catch (err) {
     log.warn({ err: String(err) }, "ingv fetch failed, notifying admin");
     await notifyIngvFailure(bot, config.adminChatIds, err, "fetch");
@@ -67,15 +66,11 @@ export async function runMainCron(
         failedPermanent: outcome.failedPermanent,
       }, "delivery wave completed");
       await notifyEventSummary(bot, config.adminChatIds, event, recipients.length, outcome);
-    } else {
-      log.info({ eventId: event.eventId }, "no recipients for event");
     }
   }
 
   // 5. Update system_state
   await setState(db, "last_successful_sync_at", new Date().toISOString());
-
-  log.info({ durationMs: Date.now() - start }, "main cron cycle finished");
 }
 
 type ParsedEventFromClient = Awaited<ReturnType<typeof fetchItalyEvents>>[number];

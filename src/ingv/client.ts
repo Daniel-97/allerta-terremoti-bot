@@ -51,7 +51,9 @@ async function fetchText(url: string): Promise<ParsedEvent[]> {
     }
     const text = await res.text();
     const parsed = parseFdsnText(text);
-    log.info({ count: parsed.length }, "ingv events fetched");
+    if (parsed.length > 0) {
+      log.info({ count: parsed.length }, "ingv events fetched");
+    }
     return parsed;
   } catch (err) {
     captureWarning(log, err, { url, action: "ingv fetch" });

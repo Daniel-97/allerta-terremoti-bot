@@ -14,13 +14,14 @@ async function main(): Promise<void> {
   log.info({}, "fetching INGV events...");
 
   const [italyEvents, worldEvents] = await Promise.all([
-    fetchItalyEvents(),
-    fetchWorldEvents(),
+    fetchItalyEvents(config.lookbackWindowMin),
+    fetchWorldEvents(config.lookbackWindowMin),
   ]);
 
   const allEvents = [...italyEvents, ...worldEvents];
-  log.info({ italy: italyEvents.length, world: worldEvents.length }, "events fetched");
-
+  if (allEvents.length > 0) {
+    log.info({ italy: italyEvents.length, world: worldEvents.length }, "events fetched");
+  }
   let newCount = 0;
   for (const event of allEvents) {
     const isNew = await insertIfNew(db, {
