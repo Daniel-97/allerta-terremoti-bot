@@ -131,6 +131,15 @@ export async function handleCallbackQuery(
         await ctx.reply(`${STRINGS.eventDetail.title}\n\n${lines}\n\n${STRINGS.eventDetail.source}`, { parse_mode: "Markdown" });
         break;
       }
+      case "evMap": {
+        const ev = await getEvent(db, cb.eventId);
+        if (!ev) {
+          await ctx.answerCallbackQuery({ text: STRINGS.eventMap.notAvailable });
+          return;
+        }
+        await ctx.replyWithLocation(ev.lat, ev.lon);
+        break;
+      }
       case "nav": {
         const msg = ctx.callbackQuery?.message;
         if (!msg) return;

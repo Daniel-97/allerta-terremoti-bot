@@ -91,4 +91,7 @@ export const STRINGS = {
     notAvailable: "Dettagli non più disponibili.",
     source: "_Fonte: INGV_",
   },
+  eventMap: {
+    notAvailable: "Mappa non più disponibile.",
+  },
 } as const;
