@@ -59,7 +59,7 @@ function buildTitle(event: ParsedEvent): string {
 
 export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string): VenuePayload {
   const address = truncate(
-    `${distanceKm.toFixed(0)} km da ${locName} — ${formatTime(event.time)}, prof. ${depthLabel(event.depth)}`,
+    `${distanceKm.toFixed(0)} km da ${locName} — prof. ${depthLabel(event.depth)}, ${formatTime(event.time)}`,
     ADDRESS_MAX,
   );
   return { latitude: event.lat, longitude: event.lon, title: buildTitle(event), address, keyboard: buildKeyboard(event) };
@@ -68,7 +68,7 @@ export function composeProximity(event: ParsedEvent, distanceKm: number, locName
 export function composeNational(event: ParsedEvent, distanceKm: number | null, locName: string | null): VenuePayload {
   const locPart = locName && distanceKm != null ? `${distanceKm.toFixed(0)} km da ${locName}` : event.zone;
   const address = truncate(
-    `${locPart} — ${formatTime(event.time)}, prof. ${depthLabel(event.depth)}`,
+    `${locPart} — prof. ${depthLabel(event.depth)}, ${formatTime(event.time)}`,
     ADDRESS_MAX,
   );
   return { latitude: event.lat, longitude: event.lon, title: buildTitle(event), address, keyboard: buildKeyboard(event) };
@@ -76,7 +76,7 @@ export function composeNational(event: ParsedEvent, distanceKm: number | null, l
 
 export function composeWorld(event: ParsedEvent): VenuePayload {
   const address = truncate(
-    `${event.zone} — ${formatTime(event.time)}, prof. ${depthLabel(event.depth)}`,
+    `${event.zone} — prof. ${depthLabel(event.depth)}, ${formatTime(event.time)}`,
     ADDRESS_MAX,
   );
   return { latitude: event.lat, longitude: event.lon, title: buildTitle(event), address, keyboard: buildKeyboard(event) };
