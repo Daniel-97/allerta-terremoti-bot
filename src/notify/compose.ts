@@ -54,7 +54,7 @@ function buildKeyboard(event: ParsedEvent): InlineKeyboard {
 }
 
 function buildTitle(event: ParsedEvent): string {
-  return truncate(`Terremoto M${event.magnitude.toFixed(1)} rilevato`, TITLE_MAX);
+  return truncate(`⚠️ Terremoto M${event.magnitude.toFixed(1)} - ${event.zone}`, TITLE_MAX);
 }
 
 export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string): VenuePayload {

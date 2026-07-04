@@ -21,8 +21,10 @@ describe("composeProximity", () => {
     expect(msg.longitude).toBe(12.5);
   });
 
-  it("includes magnitude in title", () => {
+  it("includes magnitude, zone and alert emoji in title", () => {
     expect(msg.title).toContain("4.2");
+    expect(msg.title).toContain(EVENT.zone);
+    expect(msg.title).toContain("⚠️");
   });
 
   it("includes location name and distance in address", () => {
@@ -47,6 +49,12 @@ describe("composeNational", () => {
     expect(msg.address).toContain(EVENT.zone);
     expect(msg.address).not.toMatch(/\d+ km da/);
   });
+
+  it("includes zone and alert emoji in title", () => {
+    const msg = composeNational(EVENT, 200, "Milano");
+    expect(msg.title).toContain(EVENT.zone);
+    expect(msg.title).toContain("⚠️");
+  });
 });
 
 describe("composeWorld", () => {
@@ -54,6 +62,12 @@ describe("composeWorld", () => {
     const msg = composeWorld(EVENT);
     expect(msg.address).toContain("Roma");
     expect(msg.address).not.toMatch(/\d+ km da/);
+  });
+
+  it("includes zone and alert emoji in title", () => {
+    const msg = composeWorld(EVENT);
+    expect(msg.title).toContain(EVENT.zone);
+    expect(msg.title).toContain("⚠️");
   });
 });
 
