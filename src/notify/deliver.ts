@@ -34,7 +34,7 @@ export async function deliverFirstWave(
     const existing = await getDelivery(db, event.eventId, rec.chatId);
     if (existing && existing.status === "sent") continue;
 
-    const venue = await composeMessage(event, rec, db);
+    const { text, keyboard } = await composeMessage(event, rec, db);
 
     // Register delivery (idempotent)
     const isNew = await insertDelivery(db, { event_id: event.eventId, chat: rec.chatId });
@@ -47,8 +47,9 @@ export async function deliverFirstWave(
     const deliveryId = await getDeliveryId(db, event.eventId, rec.chatId);
 
     try {
-      await bot.api.sendVenue(rec.chatId, venue.latitude, venue.longitude, venue.title, venue.address, {
-        reply_markup: venue.keyboard,
+      await bot.api.sendMessage(rec.chatId, text, {
+        reply_markup: keyboard,
+        parse_mode: "Markdown",
       });
       if (deliveryId) await updateStatus(db, deliveryId, "sent", existing?.attempts ?? 1);
       outcome.sent++;
