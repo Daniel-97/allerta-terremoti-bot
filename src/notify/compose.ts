@@ -1,19 +1,14 @@
 import { InlineKeyboard } from "grammy";
-import { encodeEventDetail } from "../util/callback-data";
+import { encodeEventMap } from "../util/callback-data";
 import type { ParsedEvent } from "../ingv/types";
 import type { Recipient } from "./match";
 import { getLocation } from "../db/repositories/locations";
 import type { Db } from "../db/types";
 
-const TITLE_MAX = 50;
-const ADDRESS_MAX = 100;
 const INGV_SOURCE_URL_PREFIX = "https://terremoti.ingv.it/event/";
 
-export interface VenuePayload {
-  latitude: number;
-  longitude: number;
-  title: string;
-  address: string;
+export interface ComposedMessage {
+  text: string;
   keyboard: InlineKeyboard;
 }
 
@@ -29,57 +24,55 @@ export function formatTime(dateStr: string): string {
   });
 }
 
-function truncate(s: string, maxLen: number): string {
-  if (s.length <= maxLen) return s;
-  return s.slice(0, maxLen - 1).trimEnd() + "…";
-}
-
 function depthLabel(depth: number | null): string {
   return depth != null ? `${depth.toFixed(1)} km` : "N/D";
 }
 
-function buildIngvSourceUrl(eventId: string): string | null {
-  const id = eventId?.trim();
-  if (!id) return null;
-  return `${INGV_SOURCE_URL_PREFIX}${encodeURIComponent(id)}`;
+function buildLocationLine(distanceKm: number, locName: string): string {
+  return `📍 *${locName}* — ${distanceKm.toFixed(0)} km`;
 }
 
 function buildKeyboard(event: ParsedEvent): InlineKeyboard {
-  const kb = new InlineKeyboard().text("🔍 Dettagli", encodeEventDetail(event.eventId));
-  const sourceUrl = buildIngvSourceUrl(event.eventId);
-  if (sourceUrl) {
-    kb.url("📡 INGV", sourceUrl);
+  const kb = new InlineKeyboard();
+  const id = event.eventId?.trim();
+  if (id) {
+    kb.url("📡 INGV", `${INGV_SOURCE_URL_PREFIX}${encodeURIComponent(id)}`);
+    kb.text("🗺️ Mappa", encodeEventMap(id));
   }
   return kb;
 }
 
-function buildTitle(event: ParsedEvent): string {
-  return truncate(`⚠️ Terremoto M${event.magnitude.toFixed(1)} - ${event.zone}`, TITLE_MAX);
+export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string): ComposedMessage {
+  const text =
+    `⚠️ *M ${event.magnitude.toFixed(1)}*\n` +
+    `${buildLocationLine(distanceKm, locName)}\n` +
+    `📌 ${event.zone}\n` +
+    `📏 Profondità: ${depthLabel(event.depth)}\n` +
+    `🕐 ${formatTime(event.time)}\n` +
+    `_Fonte: INGV_`;
+  return { text, keyboard: buildKeyboard(event) };
 }
 
-export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string): VenuePayload {
-  const address = truncate(
-    `${distanceKm.toFixed(0)} km da ${locName} — prof. ${depthLabel(event.depth)}, ${formatTime(event.time)}`,
-    ADDRESS_MAX,
-  );
-  return { latitude: event.lat, longitude: event.lon, title: buildTitle(event), address, keyboard: buildKeyboard(event) };
+export function composeNational(event: ParsedEvent, distanceKm: number | null, locName: string | null): ComposedMessage {
+  const locLine = locName && distanceKm != null ? `${buildLocationLine(distanceKm, locName)}\n` : "";
+  const text =
+    `⚠️ *M ${event.magnitude.toFixed(1)}*\n` +
+    locLine +
+    `📌 ${event.zone}\n` +
+    `📏 Profondità: ${depthLabel(event.depth)}\n` +
+    `🕐 ${formatTime(event.time)}\n` +
+    `_Fonte: INGV_`;
+  return { text, keyboard: buildKeyboard(event) };
 }
 
-export function composeNational(event: ParsedEvent, distanceKm: number | null, locName: string | null): VenuePayload {
-  const locPart = locName && distanceKm != null ? `${distanceKm.toFixed(0)} km da ${locName}` : event.zone;
-  const address = truncate(
-    `${locPart} — prof. ${depthLabel(event.depth)}, ${formatTime(event.time)}`,
-    ADDRESS_MAX,
-  );
-  return { latitude: event.lat, longitude: event.lon, title: buildTitle(event), address, keyboard: buildKeyboard(event) };
-}
-
-export function composeWorld(event: ParsedEvent): VenuePayload {
-  const address = truncate(
-    `${event.zone} — prof. ${depthLabel(event.depth)}, ${formatTime(event.time)}`,
-    ADDRESS_MAX,
-  );
-  return { latitude: event.lat, longitude: event.lon, title: buildTitle(event), address, keyboard: buildKeyboard(event) };
+export function composeWorld(event: ParsedEvent): ComposedMessage {
+  const text =
+    `⚠️ *M ${event.magnitude.toFixed(1)}*\n` +
+    `📌 ${event.zone}\n` +
+    `📏 Profondità: ${depthLabel(event.depth)}\n` +
+    `🕐 ${formatTime(event.time)}\n` +
+    `_Fonte: INGV_`;
+  return { text, keyboard: buildKeyboard(event) };
 }
 
 export async function getNearestLocationName(db: Db, locId: number | null): Promise<string | null> {
@@ -92,7 +85,7 @@ export async function composeMessage(
   event: ParsedEvent,
   rec: Recipient,
   db: Db,
-): Promise<VenuePayload> {
+): Promise<ComposedMessage> {
   const locName = await getNearestLocationName(db, rec.nearestLocationId);
 
   if (rec.reason === "world" || (!locName && rec.reason === "national")) {

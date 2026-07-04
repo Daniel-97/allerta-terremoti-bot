@@ -16,74 +16,70 @@ function buttonCount(kb: { inline_keyboard: unknown[][] }): number {
 describe("composeProximity", () => {
   const msg = composeProximity(EVENT, 15, "Roma");
 
-  it("uses event coordinates for the venue", () => {
-    expect(msg.latitude).toBe(41.9);
-    expect(msg.longitude).toBe(12.5);
+  it("includes magnitude with alert emoji", () => {
+    expect(msg.text).toContain("⚠️ *M 4.2*");
   });
 
-  it("includes magnitude, zone and alert emoji in title", () => {
-    expect(msg.title).toContain("4.2");
-    expect(msg.title).toContain(EVENT.zone);
-    expect(msg.title).toContain("⚠️");
+  it("includes location name and distance", () => {
+    expect(msg.text).toContain("📍 *Roma* — 15 km");
   });
 
-  it("includes location name and distance in address", () => {
-    expect(msg.address).toContain("Roma");
-    expect(msg.address).toContain("15 km");
+  it("includes zone, depth and time", () => {
+    expect(msg.text).toContain("📌 Roma");
+    expect(msg.text).toContain("📏 Profondità: 10.0 km");
+    expect(msg.text).toContain(formatTime(EVENT.time));
   });
 
-  it("has inline keyboard with details and source buttons", () => {
+  it("includes INGV source line", () => {
+    expect(msg.text).toContain("_Fonte: INGV_");
+  });
+
+  it("has inline keyboard with INGV and Mappa buttons", () => {
     expect(buttonCount(msg.keyboard)).toBe(2);
   });
 });
 
 describe("composeNational", () => {
-  it("includes location and distance in address when present", () => {
+  it("includes location and distance when present", () => {
     const msg = composeNational(EVENT, 200, "Milano");
-    expect(msg.address).toContain("Milano");
-    expect(msg.address).toContain("200 km");
+    expect(msg.text).toContain("📍 *Milano* — 200 km");
   });
 
   it("falls back to event.zone when no location", () => {
     const msg = composeNational(EVENT, null, null);
-    expect(msg.address).toContain(EVENT.zone);
-    expect(msg.address).not.toMatch(/\d+ km da/);
+    expect(msg.text).not.toContain("📍");
+    expect(msg.text).toContain("📌 Roma");
   });
 
-  it("includes zone and alert emoji in title", () => {
+  it("includes alert emoji", () => {
     const msg = composeNational(EVENT, 200, "Milano");
-    expect(msg.title).toContain(EVENT.zone);
-    expect(msg.title).toContain("⚠️");
+    expect(msg.text).toContain("⚠️");
   });
 });
 
 describe("composeWorld", () => {
-  it("uses event.zone in address with no distance phrase", () => {
+  it("uses event.zone with no location line", () => {
     const msg = composeWorld(EVENT);
-    expect(msg.address).toContain("Roma");
-    expect(msg.address).not.toMatch(/\d+ km da/);
+    expect(msg.text).toContain("📌 Roma");
+    expect(msg.text).not.toContain("📍");
   });
 
-  it("includes zone and alert emoji in title", () => {
+  it("includes alert emoji", () => {
     const msg = composeWorld(EVENT);
-    expect(msg.title).toContain(EVENT.zone);
-    expect(msg.title).toContain("⚠️");
+    expect(msg.text).toContain("⚠️");
   });
 });
 
-describe("source url guard", () => {
-  it("omits the source button when eventId is empty", () => {
+describe("keyboard eventId guard", () => {
+  it("omits both buttons when eventId is empty", () => {
     const noIdEvent = { ...EVENT, eventId: "" };
     const msg = composeWorld(noIdEvent);
-    expect(buttonCount(msg.keyboard)).toBe(1);
+    expect(buttonCount(msg.keyboard)).toBe(0);
   });
-});
 
-describe("title/address length limits", () => {
-  it("truncates address when location name is very long", () => {
-    const longName = "A".repeat(200);
-    const msg = composeProximity(EVENT, 15, longName);
-    expect(msg.address.length).toBeLessThanOrEqual(100);
+  it("includes both buttons when eventId is present", () => {
+    const msg = composeWorld(EVENT);
+    expect(buttonCount(msg.keyboard)).toBe(2);
   });
 });
 
