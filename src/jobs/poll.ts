@@ -32,7 +32,7 @@ export async function runMainCron(
       log.info({ italy: italy.length, world: world.length, total: allEvents.length }, "events fetched");
     }
   } catch (err) {
-    log.warn({ err: String(err) }, "ingv fetch failed");
+    log.error({ err: String(err) }, "ingv fetch failed");
     return;
   }
 
