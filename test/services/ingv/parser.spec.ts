@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseFdsnText } from "../../src/ingv/parser";
+import { parseFdsnText } from "@/services/ingv/parser";
 
 const FIXTURE = [
   "#EventID|Time|Latitude|Longitude|Depth/Km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName|EventType",

@@ -1,11 +1,11 @@
-import { createLogger } from "../util/log";
-import { fetchItalyEvents, fetchWorldEvents } from "../ingv/client";
-import { insertIfNew as insertHistory } from "../db/repositories/history";
-import { setState } from "../db/repositories/system-state";
-import { findRecipients } from "../notify/match";
-import { deliverFirstWave } from "../notify/deliver";
-import { notifyEventSummary } from "../notify/admin";
-import type { Db } from "../db/types";
+import { createLogger } from "@/util/log";
+import { fetchItalyEvents, fetchWorldEvents } from "@/services/ingv/client";
+import { insertIfNew as insertHistory } from "@/db/repositories/history";
+import { setState } from "@/db/repositories/system-state";
+import { findRecipients } from "@/notify/match";
+import { deliverFirstWave } from "@/notify/deliver";
+import { notifyEventSummary } from "@/notify/admin";
+import type { Db } from "@/db/types";
 import type { Bot } from "grammy";
 
 const log = createLogger("poll");

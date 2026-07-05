@@ -2,13 +2,13 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { sql } from "drizzle-orm";
-import * as schema from "../../src/db/schema";
+import * as schema from "@/db/schema";
 import {
   touchChat,
   upsertActiveChat,
   getChat,
   setChatStatus,
-} from "../../src/db/repositories/chats";
+} from "@/db/repositories/chats";
 
 const DDL = `
 CREATE TABLE chats (

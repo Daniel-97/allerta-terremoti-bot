@@ -1,16 +1,16 @@
 import { Keyboard } from "grammy";
 import type { Context } from "grammy";
-import type { RuntimeConfig } from "../config";
-import type { Db } from "../db/types";
-import { isAllowedArea } from "../util/geo-bbox";
-import { reverseGeocode } from "../geocoding/geonames";
+import type { RuntimeConfig } from "@/config";
+import type { Db } from "@/db/types";
+import { isAllowedArea } from "@/util/geo-bbox";
+import { reverseGeocode } from "@/services/geonames";
 import {
   addLocation,
   countLocations,
   findByName,
-} from "../db/repositories/locations";
-import { STRINGS } from "../i18n/strings";
-import { createLogger } from "../util/log";
+} from "@/db/repositories/locations";
+import { STRINGS } from "@/i18n/strings";
+import { createLogger } from "@/util/log";
 
 const log = createLogger("bot");
 

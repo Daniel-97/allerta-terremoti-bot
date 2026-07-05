@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { selectZone, latLonToPixel, buildOverlaySvg, buildFrame, generateEarthquakeImage } from "../src/map-renderer";
-import { zones } from "../src/config";
-import { getBaseImage } from "../src/images";
-import { getFonts } from "../src/fonts";
-import type { ParsedEvent } from "../src/ingv/types";
+import { selectZone, latLonToPixel, buildOverlaySvg, buildFrame, generateEarthquakeImage } from "@/rendering/map-renderer";
+import { zones } from "@/config";
+import { getBaseImage } from "@/rendering/images";
+import { getFonts } from "@/rendering/fonts";
+import type { ParsedEvent } from "@/services/ingv/types";
 
 describe("selectZone", () => {
   it("selects centro for Roma (41.9, 12.5)", () => {

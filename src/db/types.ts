@@ -1,3 +1,3 @@
-import type { DbClient } from "./client";
+import type { DbClient } from "@/db/client";
 
 export type Db = DbClient["db"];

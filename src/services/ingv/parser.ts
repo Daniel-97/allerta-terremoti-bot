@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ParsedEvent } from "./types";
+import type { ParsedEvent } from "@/services/ingv/types";
 
 const KNOWN_HEADER_COLUMNS = [
   "#eventid", "time", "latitude", "longitude", "depth/km",

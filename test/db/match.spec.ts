@@ -2,10 +2,10 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { sql } from "drizzle-orm";
-import * as schema from "../../src/db/schema";
-import { upsertActiveChat } from "../../src/db/repositories/chats";
-import { addLocation } from "../../src/db/repositories/locations";
-import { findRecipients } from "../../src/notify/match";
+import * as schema from "@/db/schema";
+import { upsertActiveChat } from "@/db/repositories/chats";
+import { addLocation } from "@/db/repositories/locations";
+import { findRecipients } from "@/notify/match";
 
 const DDL = `
 CREATE TABLE IF NOT EXISTS chats (id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, username TEXT, status TEXT NOT NULL DEFAULT 'active', italy_alerts INTEGER NOT NULL DEFAULT 1, world_alerts INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, last_seen_at TEXT NOT NULL, updated_at TEXT NOT NULL);

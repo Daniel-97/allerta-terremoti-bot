@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { sql } from "drizzle-orm";
-import * as schema from "../../src/db/schema";
+import * as schema from "@/db/schema";
 import {
   addLocation,
   listLocations,
@@ -12,8 +12,8 @@ import {
   updateRadius,
   updateMagnitude,
   deleteLocation,
-} from "../../src/db/repositories/locations";
-import { upsertActiveChat } from "../../src/db/repositories/chats";
+} from "@/db/repositories/locations";
+import { upsertActiveChat } from "@/db/repositories/chats";
 
 const DDL = `
 CREATE TABLE IF NOT EXISTS chats (

@@ -1,4 +1,4 @@
-import type { Logger } from "./log";
+import type { Logger } from "@/util/log";
 
 function extractErrorInfo(err: unknown): { name: string; message: string; stack: string | undefined } {
   if (err instanceof Error) {

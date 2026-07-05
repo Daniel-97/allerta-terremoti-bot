@@ -1,12 +1,12 @@
 import { webhookCallback, Bot } from "grammy";
-import { loadConfig } from "./config";
-import { verifySecretToken } from "./webhook";
-import { createBot } from "./bot/bot";
-import { createDb } from "./db/client";
-import { createLogger } from "./util/log";
-import { runMainCron } from "./jobs/poll";
-import { runRetryCron } from "./jobs/retry";
-import { runCleanupCron } from "./jobs/cleanup";
+import { loadConfig } from "@/config";
+import { verifySecretToken } from "@/webhook";
+import { createBot } from "@/bot/bot";
+import { createDb } from "@/db/client";
+import { createLogger } from "@/util/log";
+import { runMainCron } from "@/jobs/poll";
+import { runRetryCron } from "@/jobs/retry";
+import { runCleanupCron } from "@/jobs/cleanup";
 
 const log = createLogger("worker");
 

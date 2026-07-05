@@ -23,7 +23,7 @@ import {
   encodeEventMap,
   decodeEvMap,
   decode,
-} from "../../src/util/callback-data";
+} from "@/util/callback-data";
 
 describe("callback-data radius", () => {
   it("round-trips", () => {

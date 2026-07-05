@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Bot } from "grammy";
-import type { Db } from "../../src/db/types";
+import type { Db } from "@/db/types";
 
-vi.mock("../../src/ingv/client", () => ({
+vi.mock("@/services/ingv/client", () => ({
   fetchItalyEvents: vi.fn(),
   fetchWorldEvents: vi.fn(),
 }));
 
-import { fetchItalyEvents, fetchWorldEvents } from "../../src/ingv/client";
-import { runMainCron } from "../../src/jobs/poll";
+import { fetchItalyEvents, fetchWorldEvents } from "@/services/ingv/client";
+import { runMainCron } from "@/jobs/poll";
 
 function fakeBot() {
   return {

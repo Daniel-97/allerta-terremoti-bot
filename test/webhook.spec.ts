@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { verifySecretToken } from "../src/webhook";
+import { verifySecretToken } from "@/webhook";
 
 describe("verifySecretToken", () => {
   const req = (token: string | null) =>

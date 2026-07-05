@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { haversineKm } from "../../src/geo/haversine";
+import { haversineKm } from "@/services/haversine";
 
 describe("haversineKm", () => {
   it("zero distance for same point", () => {

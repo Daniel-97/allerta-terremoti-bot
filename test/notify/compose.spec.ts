@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { composeProximity, composeNational, composeWorld, formatTime, formatTitle } from "../../src/notify/compose";
-import type { ParsedEvent } from "../../src/ingv/types";
+import { composeProximity, composeNational, composeWorld, formatTime, formatTitle } from "@/notify/compose";
+import type { ParsedEvent } from "@/services/ingv/types";
 
 const EVENT: ParsedEvent = {
   eventId: "ev1", zone: "Roma", time: "2026-06-30T12:00:00",

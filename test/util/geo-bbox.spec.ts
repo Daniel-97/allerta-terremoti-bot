@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isAllowedArea } from "../../src/util/geo-bbox";
+import { isAllowedArea } from "@/util/geo-bbox";
 
 describe("isAllowedArea", () => {
   it("Roma inside", () => expect(isAllowedArea(41.9, 12.5)).toBe(true));

@@ -1,16 +1,16 @@
 import { InputFile } from "grammy";
-import { createLogger } from "../util/log";
-import { captureError, captureWarning } from "../util/error-handler";
-import { classifyTelegramError } from "./errors";
-import { insertIfNew as insertDelivery, updateStatus, getDelivery } from "../db/repositories/deliveries";
-import { setChatStatus } from "../db/repositories/chats";
-import { composeMessage } from "./compose";
-import { generateEarthquakeImage } from "../map-renderer";
-import { getBaseImage } from "../images";
-import { getFonts } from "../fonts";
-import type { Recipient } from "./match";
-import type { ParsedEvent } from "../ingv/types";
-import type { Db } from "../db/types";
+import { createLogger } from "@/util/log";
+import { captureError, captureWarning } from "@/util/error-handler";
+import { classifyTelegramError } from "@/notify/errors";
+import { insertIfNew as insertDelivery, updateStatus, getDelivery } from "@/db/repositories/deliveries";
+import { setChatStatus } from "@/db/repositories/chats";
+import { composeMessage } from "@/notify/compose";
+import { generateEarthquakeImage } from "@/rendering/map-renderer";
+import { getBaseImage } from "@/rendering/images";
+import { getFonts } from "@/rendering/fonts";
+import type { Recipient } from "@/notify/match";
+import type { ParsedEvent } from "@/services/ingv/types";
+import type { Db } from "@/db/types";
 import type { Bot } from "grammy";
 
 const log = createLogger("deliver");

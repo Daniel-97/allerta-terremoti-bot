@@ -1,8 +1,8 @@
-import { createLogger } from "../util/log";
-import { captureWarning } from "../util/error-handler";
-import { ITALY_BBOX } from "../util/geo-bbox";
-import { parseFdsnText } from "./parser";
-import type { ParsedEvent } from "./types";
+import { createLogger } from "@/util/log";
+import { captureWarning } from "@/util/error-handler";
+import { ITALY_BBOX } from "@/util/geo-bbox";
+import { parseFdsnText } from "@/services/ingv/parser";
+import type { ParsedEvent } from "@/services/ingv/types";
 
 const log = createLogger("ingv");
 const ENDPOINT = "https://webservices.ingv.it/fdsnws/event/1/query";

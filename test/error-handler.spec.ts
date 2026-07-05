@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { createLogger } from "../src/util/log";
-import { captureError, captureWarning } from "../src/util/error-handler";
+import { createLogger } from "@/util/log";
+import { captureError, captureWarning } from "@/util/error-handler";
 
 describe("error-handler", () => {
   let logs: Record<string, unknown>[];

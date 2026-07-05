@@ -1,8 +1,8 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { sql } from "drizzle-orm";
-import * as schema from "./schema";
-import type { AppConfig } from "../config";
+import * as schema from "@/db/schema";
+import type { AppConfig } from "@/config";
 
 export function createDb(config: AppConfig) {
   const client = createClient({

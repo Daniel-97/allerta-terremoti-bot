@@ -1,6 +1,6 @@
 import { InlineKeyboard } from "grammy";
-import * as cb from "../../util/callback-data";
-import { STRINGS } from "../../i18n/strings";
+import * as cb from "@/util/callback-data";
+import { STRINGS } from "@/i18n/strings";
 
 export function locationsListKeyboard(
   locs: { id: number; name: string }[],

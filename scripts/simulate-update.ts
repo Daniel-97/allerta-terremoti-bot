@@ -1,5 +1,5 @@
-import { loadConfig } from "../src/config";
-import { createLogger } from "../src/util/log";
+import { loadConfig } from "@/config";
+import { createLogger } from "@/util/log";
 
 const log = createLogger("simulate-update");
 

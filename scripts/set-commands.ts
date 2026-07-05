@@ -1,5 +1,5 @@
 import { Bot } from "grammy";
-import { createLogger } from "../src/util/log";
+import { createLogger } from "@/util/log";
 
 const log = createLogger("set-commands");
 

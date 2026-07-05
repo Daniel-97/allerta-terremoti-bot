@@ -1,9 +1,9 @@
 import { InlineKeyboard } from "grammy";
-import { encodeEventMap } from "../util/callback-data";
-import type { ParsedEvent } from "../ingv/types";
-import type { Recipient } from "./match";
-import { getLocation } from "../db/repositories/locations";
-import type { Db } from "../db/types";
+import { encodeEventMap } from "@/util/callback-data";
+import type { ParsedEvent } from "@/services/ingv/types";
+import type { Recipient } from "@/notify/match";
+import { getLocation } from "@/db/repositories/locations";
+import type { Db } from "@/db/types";
 
 const INGV_SOURCE_URL_PREFIX = "https://terremoti.ingv.it/event/";
 

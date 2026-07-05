@@ -1,7 +1,7 @@
 import { eq, sql } from "drizzle-orm";
-import { chats } from "../schema";
-import { nowIso } from "../../util/time";
-import type { Db } from "../types";
+import { chats } from "@/db/schema";
+import { nowIso } from "@/util/time";
+import type { Db } from "@/db/types";
 
 export type ChatStatus = "active" | "blocked" | "stopped" | "deleted";
 

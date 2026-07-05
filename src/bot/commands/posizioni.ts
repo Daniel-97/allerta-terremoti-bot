@@ -1,9 +1,9 @@
 import type { Context } from "grammy";
-import type { Logger } from "../../util/log";
-import * as panels from "../inline/panels";
-import { listLocations } from "../../db/repositories/locations";
-import { requestLocationKeyboard } from "../location-intake";
-import type { Db } from "../../db/types";
+import type { Logger } from "@/util/log";
+import * as panels from "@/bot/inline/panels";
+import { listLocations } from "@/db/repositories/locations";
+import { requestLocationKeyboard } from "@/bot/location-intake";
+import type { Db } from "@/db/types";
 
 export async function handle(ctx: Context, db: Db, log: Logger): Promise<void> {
   const chatId = ctx.chat!.id;

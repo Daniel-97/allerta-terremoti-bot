@@ -2,12 +2,12 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { sql } from "drizzle-orm";
-import * as schema from "../../src/db/schema";
+import * as schema from "@/db/schema";
 import {
   upsertActiveChat,
   setAlertFlags,
   getChat,
-} from "../../src/db/repositories/chats";
+} from "@/db/repositories/chats";
 
 const DDL = `
 CREATE TABLE IF NOT EXISTS chats (

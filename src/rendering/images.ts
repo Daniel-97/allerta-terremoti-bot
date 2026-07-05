@@ -1,10 +1,10 @@
-import worldPng from "./img/world.png";
-import italyFullPng from "./img/italy_full.png";
-import italyNordPng from "./img/italy_nord.png";
-import italyCenterPng from "./img/italy_center.png";
-import italySudPng from "./img/italy_sud.png";
-import italySicilyPng from "./img/italy_sicily.png";
-import italySardiniaPng from "./img/italy_sardinia.png";
+import worldPng from "@/rendering/img/world.png";
+import italyFullPng from "@/rendering/img/italy_full.png";
+import italyNordPng from "@/rendering/img/italy_nord.png";
+import italyCenterPng from "@/rendering/img/italy_center.png";
+import italySudPng from "@/rendering/img/italy_sud.png";
+import italySicilyPng from "@/rendering/img/italy_sicily.png";
+import italySardiniaPng from "@/rendering/img/italy_sardinia.png";
 
 const imageMap: Record<string, ArrayBuffer> = {
   "world.png": worldPng,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { loadConfig } from "../src/config";
+import { loadConfig } from "@/config";
 
 const valid = {
   BOT_TOKEN: "123:abc",

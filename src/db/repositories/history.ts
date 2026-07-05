@@ -1,6 +1,6 @@
 import { eq, lt, and, notExists, sql } from "drizzle-orm";
-import { history, deliveries } from "../schema";
-import type { Db } from "../types";
+import { history, deliveries } from "@/db/schema";
+import type { Db } from "@/db/types";
 
 export async function insertIfNew(db: Db, event: {
   id: string;

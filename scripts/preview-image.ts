@@ -2,12 +2,12 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { Resvg } from "@cf-wasm/resvg/node";
 import { PhotonImage, Rgba, padding_top, watermark } from "@cf-wasm/photon/node";
-import { selectZone, latLonToPixel, buildOverlaySvg, buildFrame } from "../src/map-renderer";
-import { buildBannerFragment, BANNER_HEIGHT } from "../src/banner";
-import { formatTime, depthLabel } from "../src/notify/compose";
-import { createLogger } from "../src/util/log";
-import type { ParsedEvent } from "../src/ingv/types";
-import type { Fonts } from "../src/fonts";
+import { selectZone, latLonToPixel, buildOverlaySvg, buildFrame } from "@/rendering/map-renderer";
+import { buildBannerFragment, BANNER_HEIGHT } from "@/rendering/banner";
+import { formatTime, depthLabel } from "@/notify/compose";
+import { createLogger } from "@/util/log";
+import type { ParsedEvent } from "@/services/ingv/types";
+import type { Fonts } from "@/rendering/fonts";
 
 const log = createLogger("preview-image");
 

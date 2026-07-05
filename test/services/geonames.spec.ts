@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { reverseGeocode } from "../../src/geocoding/geonames";
+import { reverseGeocode } from "@/services/geonames";
 
 function mockFetchOnce(body: unknown, status = 200) {
   return vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(

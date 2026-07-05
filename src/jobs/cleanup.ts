@@ -1,7 +1,7 @@
-import { createLogger } from "../util/log";
-import { deleteOlderThan as deleteDeliveriesOlderThan } from "../db/repositories/deliveries";
-import { deleteOlderThan as deleteHistoryOlderThan, deleteOrphansOlderThan } from "../db/repositories/history";
-import type { Db } from "../db/types";
+import { createLogger } from "@/util/log";
+import { deleteOlderThan as deleteDeliveriesOlderThan } from "@/db/repositories/deliveries";
+import { deleteOlderThan as deleteHistoryOlderThan, deleteOrphansOlderThan } from "@/db/repositories/history";
+import type { Db } from "@/db/types";
 
 const log = createLogger("cleanup");
 

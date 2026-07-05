@@ -2,11 +2,11 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { sql } from "drizzle-orm";
-import * as schema from "../../src/db/schema";
-import { insertIfNew as historyInsert, getEvent } from "../../src/db/repositories/history";
-import { insertIfNew as deliveryInsert, updateStatus, getDelivery } from "../../src/db/repositories/deliveries";
-import { getState, setState, incrementState } from "../../src/db/repositories/system-state";
-import { upsertActiveChat } from "../../src/db/repositories/chats";
+import * as schema from "@/db/schema";
+import { insertIfNew as historyInsert, getEvent } from "@/db/repositories/history";
+import { insertIfNew as deliveryInsert, updateStatus, getDelivery } from "@/db/repositories/deliveries";
+import { getState, setState, incrementState } from "@/db/repositories/system-state";
+import { upsertActiveChat } from "@/db/repositories/chats";
 
 const DDL = `
 CREATE TABLE IF NOT EXISTS chats (id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, username TEXT, status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','blocked','stopped','deleted')), italy_alerts INTEGER NOT NULL DEFAULT 1 CHECK (italy_alerts IN (0,1)), world_alerts INTEGER NOT NULL DEFAULT 0 CHECK (world_alerts IN (0,1)), created_at TEXT NOT NULL, last_seen_at TEXT NOT NULL, updated_at TEXT NOT NULL);

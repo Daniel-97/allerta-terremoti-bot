@@ -1,9 +1,9 @@
 import type { Context } from "grammy";
 import type { InlineKeyboard } from "grammy";
-import { STRINGS } from "../../i18n/strings";
-import * as kb from "./keyboards";
-import { captureWarning } from "../../util/error-handler";
-import { createLogger } from "../../util/log";
+import { STRINGS } from "@/i18n/strings";
+import * as kb from "@/bot/inline/keyboards";
+import { captureWarning } from "@/util/error-handler";
+import { createLogger } from "@/util/log";
 
 const log = createLogger("panels");
 

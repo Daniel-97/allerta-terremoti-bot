@@ -1,8 +1,8 @@
-import { createLogger } from "../util/log";
-import { captureWarning } from "../util/error-handler";
+import { createLogger } from "@/util/log";
+import { captureWarning } from "@/util/error-handler";
 import type { Bot } from "grammy";
-import type { ParsedEvent } from "../ingv/types";
-import type { DeliveryOutcome } from "./deliver";
+import type { ParsedEvent } from "@/services/ingv/types";
+import type { DeliveryOutcome } from "@/notify/deliver";
 
 const log = createLogger("admin");
 

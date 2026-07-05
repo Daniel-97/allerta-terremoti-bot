@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { sql } from "drizzle-orm";
-import * as schema from "../../src/db/schema";
+import * as schema from "@/db/schema";
 
 describe("db client", () => {
   it("enables foreign_keys pragma", async () => {

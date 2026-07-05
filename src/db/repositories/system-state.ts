@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
-import { systemState } from "../schema";
-import { nowIso } from "../../util/time";
-import type { Db } from "../types";
+import { systemState } from "@/db/schema";
+import { nowIso } from "@/util/time";
+import type { Db } from "@/db/types";
 
 export async function getState(db: Db, key: string): Promise<string | null> {
   const rows = await db

@@ -1,8 +1,8 @@
 import type { Context } from "grammy";
-import type { Logger } from "../../util/log";
-import { STRINGS } from "../../i18n/strings";
-import { setChatStatus } from "../../db/repositories/chats";
-import type { Db } from "../../db/types";
+import type { Logger } from "@/util/log";
+import { STRINGS } from "@/i18n/strings";
+import { setChatStatus } from "@/db/repositories/chats";
+import type { Db } from "@/db/types";
 
 export async function handle(ctx: Context, db: Db, log: Logger): Promise<void> {
   const chatId = ctx.chat!.id;

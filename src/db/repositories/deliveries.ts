@@ -1,7 +1,7 @@
 import { eq, and, lt, lte } from "drizzle-orm";
-import { deliveries } from "../schema";
-import { nowIso } from "../../util/time";
-import type { Db } from "../types";
+import { deliveries } from "@/db/schema";
+import { nowIso } from "@/util/time";
+import type { Db } from "@/db/types";
 
 export type DeliveryStatus = "pending" | "sent" | "failed_transient" | "failed_permanent";
 

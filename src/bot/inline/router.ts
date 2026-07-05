@@ -1,19 +1,19 @@
 import type { Context } from "grammy";
-import { decode } from "../../util/callback-data";
-import { createLogger } from "../../util/log";
+import { decode } from "@/util/callback-data";
+import { createLogger } from "@/util/log";
 import {
   listLocations,
   getLocation,
   updateRadius,
   updateMagnitude,
   deleteLocation,
-} from "../../db/repositories/locations";
-import { getChat, setAlertFlags } from "../../db/repositories/chats";
-import { getEvent } from "../../db/repositories/history";
-import { formatTitle, depthLabel, formatTime } from "../../notify/compose";
-import { STRINGS } from "../../i18n/strings";
-import * as panels from "./panels";
-import type { Db } from "../../db/types";
+} from "@/db/repositories/locations";
+import { getChat, setAlertFlags } from "@/db/repositories/chats";
+import { getEvent } from "@/db/repositories/history";
+import { formatTitle, depthLabel, formatTime } from "@/notify/compose";
+import { STRINGS } from "@/i18n/strings";
+import * as panels from "@/bot/inline/panels";
+import type { Db } from "@/db/types";
 
 const log = createLogger("bot");
 

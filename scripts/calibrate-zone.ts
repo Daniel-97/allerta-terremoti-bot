@@ -2,8 +2,8 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { Resvg } from "@cf-wasm/resvg/node";
 import { PhotonImage, watermark } from "@cf-wasm/photon/node";
-import { zones } from "../src/config";
-import { latLonToPixel } from "../src/map-renderer";
+import { zones } from "@/config";
+import { latLonToPixel } from "@/rendering/map-renderer";
 
 const IMG_DIR = join(import.meta.dirname, "..", "src", "img");
 

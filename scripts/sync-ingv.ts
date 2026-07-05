@@ -1,8 +1,8 @@
-import { loadConfig } from "../src/config";
-import { createDb } from "../src/db/client";
-import { fetchItalyEvents, fetchWorldEvents } from "../src/ingv/client";
-import { insertIfNew } from "../src/db/repositories/history";
-import { createLogger } from "../src/util/log";
+import { loadConfig } from "@/config";
+import { createDb } from "@/db/client";
+import { fetchItalyEvents, fetchWorldEvents } from "@/services/ingv/client";
+import { insertIfNew } from "@/db/repositories/history";
+import { createLogger } from "@/util/log";
 
 const log = createLogger("sync-ingv");
 

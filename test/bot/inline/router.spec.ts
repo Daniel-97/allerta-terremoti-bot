@@ -1,16 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Context } from "grammy";
-import { handleCallbackQuery } from "../../../src/bot/inline/router";
-import { encodeEventMap } from "../../../src/util/callback-data";
-import { STRINGS } from "../../../src/i18n/strings";
-import { formatTime } from "../../../src/notify/compose";
-import type { Db } from "../../../src/db/types";
+import { handleCallbackQuery } from "@/bot/inline/router";
+import { encodeEventMap } from "@/util/callback-data";
+import { STRINGS } from "@/i18n/strings";
+import { formatTime } from "@/notify/compose";
+import type { Db } from "@/db/types";
 
-vi.mock("../../../src/db/repositories/history", () => ({
+vi.mock("@/db/repositories/history", () => ({
   getEvent: vi.fn(),
 }));
 
-import { getEvent } from "../../../src/db/repositories/history";
+import { getEvent } from "@/db/repositories/history";
 
 function fakeCtx(data: string) {
   return {

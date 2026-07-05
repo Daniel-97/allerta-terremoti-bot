@@ -1,10 +1,10 @@
-import { haversineKm } from "../geo/haversine";
-import { inBbox, ITALY_BBOX } from "../util/geo-bbox";
-import type { ParsedEvent } from "../ingv/types";
-import type { Db } from "../db/types";
-import { chats as chatsTable } from "../db/schema";
-import { listLocations } from "../db/repositories/locations";
-import { getChat } from "../db/repositories/chats";
+import { haversineKm } from "@/services/haversine";
+import { inBbox, ITALY_BBOX } from "@/util/geo-bbox";
+import type { ParsedEvent } from "@/services/ingv/types";
+import type { Db } from "@/db/types";
+import { chats as chatsTable } from "@/db/schema";
+import { listLocations } from "@/db/repositories/locations";
+import { getChat } from "@/db/repositories/chats";
 
 export interface Recipient {
   chatId: number;

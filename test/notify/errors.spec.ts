@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { classifyTelegramError } from "../../src/notify/errors";
+import { classifyTelegramError } from "@/notify/errors";
 
 describe("classifyTelegramError", () => {
   it("returns permanent for bot blocked", () => {

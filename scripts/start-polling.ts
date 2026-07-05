@@ -1,7 +1,7 @@
-import { loadConfig } from "../src/config";
-import { createDb } from "../src/db/client";
-import { createBot } from "../src/bot/bot";
-import { createLogger } from "../src/util/log";
+import { loadConfig } from "@/config";
+import { createDb } from "@/db/client";
+import { createBot } from "@/bot/bot";
+import { createLogger } from "@/util/log";
 
 const log = createLogger("start-polling");
 

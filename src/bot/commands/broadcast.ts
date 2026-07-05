@@ -1,9 +1,9 @@
 import type { Context } from "grammy";
-import type { Logger } from "../../util/log";
-import { ADMIN } from "../../i18n/strings";
-import { captureError } from "../../util/error-handler";
-import { setChatStatus } from "../../db/repositories/chats";
-import type { Db } from "../../db/types";
+import type { Logger } from "@/util/log";
+import { ADMIN } from "@/i18n/strings";
+import { captureError } from "@/util/error-handler";
+import { setChatStatus } from "@/db/repositories/chats";
+import type { Db } from "@/db/types";
 
 const MAX_LENGTH = 4096;
 

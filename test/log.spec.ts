@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { createLogger } from "../src/util/log";
+import { createLogger } from "@/util/log";
 
 describe("createLogger", () => {
   let logs: unknown[];

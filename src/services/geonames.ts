@@ -1,4 +1,4 @@
-import { createLogger } from "../util/log";
+import { createLogger } from "@/util/log";
 
 const log = createLogger("geonames");
 const ENDPOINT = "https://secure.geonames.org/findNearbyPlaceNameJSON";

@@ -1,8 +1,8 @@
 import type { Context } from "grammy";
-import type { Logger } from "../../util/log";
-import { ADMIN } from "../../i18n/strings";
-import { listByEvent } from "../../db/repositories/deliveries";
-import type { Db } from "../../db/types";
+import type { Logger } from "@/util/log";
+import { ADMIN } from "@/i18n/strings";
+import { listByEvent } from "@/db/repositories/deliveries";
+import type { Db } from "@/db/types";
 
 export async function handle(
   ctx: Context,

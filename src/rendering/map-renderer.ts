@@ -1,9 +1,9 @@
-import { zones } from "./config";
-import type { Zone } from "./config";
-import type { ParsedEvent } from "./ingv/types";
-import { formatTime, depthLabel } from "./notify/compose";
-import { buildBannerFragment, BANNER_HEIGHT } from "./banner";
-import type { Fonts } from "./fonts";
+import { zones } from "@/config";
+import type { Zone } from "@/config";
+import type { ParsedEvent } from "@/services/ingv/types";
+import { formatTime, depthLabel } from "@/notify/compose";
+import { buildBannerFragment, BANNER_HEIGHT } from "@/rendering/banner";
+import type { Fonts } from "@/rendering/fonts";
 
 // Check smaller/more specific zones first (order matters: sicilia/sardegna before sud due to overlaps)
 const SUB_ZONE_ORDER = ["sicilia", "sardegna", "nord", "centro", "sud"];

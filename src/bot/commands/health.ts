@@ -1,11 +1,11 @@
 import type { Context } from "grammy";
 import type { Bot } from "grammy";
-import type { Logger } from "../../util/log";
-import { createLogger } from "../../util/log";
-import { ADMIN } from "../../i18n/strings";
+import type { Logger } from "@/util/log";
+import { createLogger } from "@/util/log";
+import { ADMIN } from "@/i18n/strings";
 import { sql } from "drizzle-orm";
-import type { Db } from "../../db/types";
-import type { RuntimeConfig } from "../../config";
+import type { Db } from "@/db/types";
+import type { RuntimeConfig } from "@/config";
 
 const log = createLogger("health");
 
