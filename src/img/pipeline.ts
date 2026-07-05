@@ -66,7 +66,7 @@ export function buildOverlaySvg(zone: Zone, x: number, y: number, magnitude: num
 
 export async function renderOverlayToPng(svg: string): Promise<Uint8Array> {
   const { Resvg } = await import("@cf-wasm/resvg/workerd");
-  const resvg = new Resvg(svg);
+  const resvg = await Resvg.async(svg);
   const rendered = resvg.render();
   const pngBytes = rendered.asPng();
   return pngBytes;
