@@ -4,7 +4,7 @@ import { insertIfNew as insertHistory } from "../db/repositories/history";
 import { setState } from "../db/repositories/system-state";
 import { findRecipients } from "../notify/match";
 import { deliverFirstWave } from "../notify/deliver";
-import { notifyIngvFailure, notifyEventSummary } from "../notify/admin";
+import { notifyEventSummary } from "../notify/admin";
 import type { Db } from "../db/types";
 import type { Bot } from "grammy";
 
@@ -32,8 +32,7 @@ export async function runMainCron(
       log.info({ italy: italy.length, world: world.length, total: allEvents.length }, "events fetched");
     }
   } catch (err) {
-    log.warn({ err: String(err) }, "ingv fetch failed, notifying admin");
-    await notifyIngvFailure(bot, config.adminChatIds, err, "fetch");
+    log.warn({ err: String(err) }, "ingv fetch failed");
     return;
   }
 

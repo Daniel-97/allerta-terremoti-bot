@@ -101,7 +101,7 @@ CREATE INDEX IF NOT EXISTS idx_deliveries_updated_at ON deliveries (updated_at);
 
 -- ---------------------------------------------------------------------------
 -- system_state — small key/value store for the watchdog and optional overlap lock
--- Keys in use: 'ingv_consecutive_failures', 'ingv_alerted', 'last_successful_sync_at'.
+-- Keys in use: 'last_successful_sync_at'.
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS system_state (
     key        TEXT PRIMARY KEY,

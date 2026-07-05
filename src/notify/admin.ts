@@ -67,23 +67,3 @@ export async function notifyUserStop(
     }
   }
 }
-
-export async function notifyIngvFailure(
-  bot: Bot,
-  adminChatIds: number[],
-  err: unknown,
-  scope: string,
-): Promise<void> {
-  const msg = err instanceof Error ? err.message : String(err);
-  for (const id of adminChatIds) {
-    try {
-      await bot.api.sendMessage(
-        id,
-        `⚠️ *INGV unreachable* (${scope})\n${msg}\nTime: ${formatTime()}`,
-        { parse_mode: "Markdown" },
-      );
-    } catch (notifyErr) {
-      captureWarning(log, notifyErr, { adminChatId: id, action: "ingv-failure notification" });
-    }
-  }
-}
