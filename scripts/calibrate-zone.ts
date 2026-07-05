@@ -5,7 +5,7 @@ import { PhotonImage, watermark } from "@cf-wasm/photon/node";
 import { zones } from "@/config";
 import { latLonToPixel } from "@/rendering/map-renderer";
 
-const IMG_DIR = join(import.meta.dirname, "..", "src", "img");
+const IMG_DIR = join(import.meta.dirname, "..", "src", "rendering", "img");
 
 // Known reference cities (real-world coordinates) to check against the "centro" base map.
 const REFERENCES: { name: string; lat: number; lon: number; color: string }[] = [

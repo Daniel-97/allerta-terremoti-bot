@@ -11,8 +11,8 @@ import type { Fonts } from "@/rendering/fonts";
 
 const log = createLogger("preview-image");
 
-const IMG_DIR = join(import.meta.dirname, "..", "src", "img");
-const FONTS_DIR = join(import.meta.dirname, "..", "src", "fonts");
+const IMG_DIR = join(import.meta.dirname, "..", "src", "rendering", "img");
+const FONTS_DIR = join(import.meta.dirname, "..", "src", "rendering", "fonts");
 
 function getBaseImage(imageName: string): Uint8Array {
   return readFileSync(join(IMG_DIR, imageName));
