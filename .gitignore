@@ -4,3 +4,4 @@ node_modules/
 docs/superpowers/
 worker-configuration.d.ts
 .opencode
+scripts/output/
