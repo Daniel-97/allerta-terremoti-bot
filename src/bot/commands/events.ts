@@ -1,6 +1,6 @@
 import type { Context } from "grammy";
 import type { Logger } from "../../util/log";
-import { ADMIN } from "../../i18n/admin-strings";
+import { ADMIN } from "../../i18n/strings";
 import { sql } from "drizzle-orm";
 import type { Db } from "../../db/types";
 

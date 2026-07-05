@@ -1,6 +1,6 @@
 import type { Context } from "grammy";
 import type { Logger } from "../../util/log";
-import { ADMIN } from "../../i18n/admin-strings";
+import { ADMIN } from "../../i18n/strings";
 
 export async function handle(ctx: Context, log: Logger): Promise<void> {
   log.info({

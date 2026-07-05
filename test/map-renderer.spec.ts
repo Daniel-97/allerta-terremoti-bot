@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { selectZone, latLonToPixel, buildOverlaySvg } from "../../src/img/pipeline";
-import { zones } from "../../src/config";
+import { selectZone, latLonToPixel, buildOverlaySvg, buildFrame, generateEarthquakeImage } from "../src/map-renderer";
+import { zones } from "../src/config";
+import { getBaseImage } from "../src/images";
+import { getFonts } from "../src/fonts";
+import type { ParsedEvent } from "../src/ingv/types";
 
 describe("selectZone", () => {
   it("selects centro for Roma (41.9, 12.5)", () => {
@@ -92,5 +95,50 @@ describe("buildOverlaySvg", () => {
     expect(svg).toContain("#FF4444");
     expect(svg).not.toContain("#FFD700");
     expect(svg).not.toContain("#FF8C00");
+  });
+});
+
+describe("buildFrame", () => {
+  it("includes a stroked rect inset by half the stroke width", () => {
+    const frame = buildFrame(600, 724);
+    expect(frame).toContain("<rect");
+    expect(frame).toContain('x="1.5"');
+    expect(frame).toContain('y="1.5"');
+    expect(frame).toContain('width="597"');
+    expect(frame).toContain('height="721"');
+  });
+});
+
+describe("generateEarthquakeImage", () => {
+  const baseEvent: ParsedEvent = {
+    eventId: "test-event",
+    time: "2026-01-15T10:30:00Z",
+    lat: 41.9028,
+    lon: 12.4964,
+    depth: 8.4,
+    author: "test",
+    catalog: "test",
+    contributor: "test",
+    contributorId: "test",
+    magType: "ML",
+    magnitude: 4.2,
+    magAuthor: "test",
+    zone: "Test Zone",
+  };
+
+  it("renders a valid PNG with banner, map and marker composited together", async () => {
+    const result = await generateEarthquakeImage(baseEvent, getBaseImage, getFonts);
+
+    expect(result).toBeInstanceOf(Uint8Array);
+    // PNG magic bytes
+    expect(Array.from(result.slice(0, 8))).toEqual([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    expect(result.length).toBeGreaterThan(1000);
+  });
+
+  it("rejects invalid coordinates", async () => {
+    const invalidEvent = { ...baseEvent, lat: 999 };
+    await expect(generateEarthquakeImage(invalidEvent, getBaseImage, getFonts)).rejects.toThrow(
+      "Invalid coordinates",
+    );
   });
 });

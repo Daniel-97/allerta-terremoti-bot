@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { Resvg } from "@cf-wasm/resvg/node";
 import { PhotonImage, watermark } from "@cf-wasm/photon/node";
 import { zones } from "../src/config";
-import { latLonToPixel } from "../src/img/pipeline";
+import { latLonToPixel } from "../src/map-renderer";
 
 const IMG_DIR = join(import.meta.dirname, "..", "src", "img");
 

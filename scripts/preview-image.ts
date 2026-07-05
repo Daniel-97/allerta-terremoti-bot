@@ -1,53 +1,105 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { Resvg } from "@cf-wasm/resvg/node";
-import { PhotonImage, watermark } from "@cf-wasm/photon/node";
-import { selectZone, latLonToPixel, buildOverlaySvg } from "../src/img/pipeline";
+import { PhotonImage, Rgba, padding_top, watermark } from "@cf-wasm/photon/node";
+import { selectZone, latLonToPixel, buildOverlaySvg, buildFrame } from "../src/map-renderer";
+import { buildBannerFragment, BANNER_HEIGHT } from "../src/banner";
+import { formatTime, depthLabel } from "../src/notify/compose";
 import { createLogger } from "../src/util/log";
+import type { ParsedEvent } from "../src/ingv/types";
+import type { Fonts } from "../src/fonts";
 
 const log = createLogger("preview-image");
 
 const IMG_DIR = join(import.meta.dirname, "..", "src", "img");
+const FONTS_DIR = join(import.meta.dirname, "..", "src", "fonts");
 
 function getBaseImage(imageName: string): Uint8Array {
   return readFileSync(join(IMG_DIR, imageName));
 }
 
-async function renderOverlayToPng(svg: string): Promise<Uint8Array> {
-  const resvg = await Resvg.async(svg);
+function getFonts(): Fonts {
+  return {
+    regular: readFileSync(join(FONTS_DIR, "LiberationSans-Regular.ttf")),
+    bold: readFileSync(join(FONTS_DIR, "LiberationSans-Bold.ttf")),
+  };
+}
+
+async function renderOverlayToPng(svg: string, fonts: Fonts): Promise<Uint8Array> {
+  const resvg = await Resvg.async(svg, {
+    font: {
+      fontBuffers: [fonts.regular, fonts.bold],
+      defaultFontFamily: "Liberation Sans",
+      sansSerifFamily: "Liberation Sans",
+    },
+  });
   return resvg.render().asPng();
 }
 
-function compositeImages(baseBytes: Uint8Array, overlayBytes: Uint8Array): Uint8Array {
+function compositeImages(baseBytes: Uint8Array, overlayBytes: Uint8Array, topPadding: number): Uint8Array {
   const base = PhotonImage.new_from_byteslice(baseBytes);
   const overlay = PhotonImage.new_from_byteslice(overlayBytes);
+  const padded = padding_top(base, topPadding, new Rgba(255, 255, 255, 255));
   try {
-    watermark(base, overlay, BigInt(0), BigInt(0));
-    return base.get_bytes();
+    watermark(padded, overlay, BigInt(0), BigInt(0));
+    return padded.get_bytes();
   } finally {
     base.free();
     overlay.free();
+    padded.free();
   }
 }
 
 async function main(): Promise<void> {
-  const [latArg, lonArg, outArg] = process.argv.slice(2);
+  const [latArg, lonArg, magArg, outArg] = process.argv.slice(2);
   const lat = latArg ? Number(latArg) : 41.9028; // default: Roma
   const lon = lonArg ? Number(lonArg) : 12.4964;
+  const magnitude = magArg ? Number(magArg) : 4.2;
   const outputPath = outArg ?? join(import.meta.dirname, "output", "preview.png");
 
-  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    throw new Error("Coordinate non valide. Uso: tsx scripts/preview-image.ts <lat> <lon> [outputPath]");
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || !Number.isFinite(magnitude)) {
+    throw new Error("Parametri non validi. Uso: tsx scripts/preview-image.ts <lat> <lon> [magnitudo] [outputPath]");
   }
 
-  const zone = selectZone(lat, lon);
-  const { x, y } = latLonToPixel(lat, lon, zone);
-  log.info({ lat, lon, zone: zone.id, x, y }, "zona selezionata");
+  const event: ParsedEvent = {
+    eventId: "preview",
+    time: new Date().toISOString(),
+    lat,
+    lon,
+    depth: 8.4,
+    author: "preview",
+    catalog: "preview",
+    contributor: "preview",
+    contributorId: "preview",
+    magType: "ML",
+    magnitude,
+    magAuthor: "preview",
+    zone: "Zona di prova",
+  };
 
+  log.info({ lat, lon, magnitude }, "generazione immagine di anteprima");
+
+  const zone = selectZone(event.lat, event.lon);
+  const { x, y } = latLonToPixel(event.lat, event.lon, zone);
   const baseBytes = getBaseImage(zone.image);
-  const svg = buildOverlaySvg(zone, x, y);
-  const overlayBytes = await renderOverlayToPng(svg);
-  const result = compositeImages(baseBytes, overlayBytes);
+
+  const banner = buildBannerFragment({
+    location: event.zone,
+    depthLabel: depthLabel(event.depth),
+    dateTime: formatTime(event.time),
+    magnitudeLabel: `M${event.magnitude.toFixed(1)}`,
+  });
+  const markerSvg = buildOverlaySvg(zone, x, y);
+  const totalHeight = zone.height + BANNER_HEIGHT;
+
+  const svg = `<svg width="${zone.width}" height="${totalHeight}" xmlns="http://www.w3.org/2000/svg">
+${banner}
+<g transform="translate(0, ${BANNER_HEIGHT})">${markerSvg}</g>
+${buildFrame(zone.width, totalHeight)}
+</svg>`;
+
+  const overlayBytes = await renderOverlayToPng(svg, getFonts());
+  const result = compositeImages(baseBytes, overlayBytes, BANNER_HEIGHT);
 
   mkdirSync(dirname(outputPath), { recursive: true });
   writeFileSync(outputPath, result);

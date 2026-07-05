@@ -5,8 +5,9 @@ import { classifyTelegramError } from "./errors";
 import { insertIfNew as insertDelivery, updateStatus, getDelivery } from "../db/repositories/deliveries";
 import { setChatStatus } from "../db/repositories/chats";
 import { composeMessage } from "./compose";
-import { generateEarthquakeImage } from "../img/pipeline";
-import { getBaseImage } from "../img/images";
+import { generateEarthquakeImage } from "../map-renderer";
+import { getBaseImage } from "../images";
+import { getFonts } from "../fonts";
 import type { Recipient } from "./match";
 import type { ParsedEvent } from "../ingv/types";
 import type { Db } from "../db/types";
@@ -51,7 +52,7 @@ export async function deliverFirstWave(
 
     let imageBytes: Uint8Array | null = null;
     try {
-      imageBytes = await generateEarthquakeImage(event.lat, event.lon, getBaseImage);
+      imageBytes = await generateEarthquakeImage(event, getBaseImage, getFonts);
     } catch (imgErr) {
       captureWarning(log, imgErr, { chatId: rec.chatId, eventId: event.eventId, action: "image generation fallback" });
     }

@@ -6,8 +6,9 @@ import { setChatStatus } from "../db/repositories/chats";
 import { composeMessage } from "../notify/compose";
 import { matchChat } from "../notify/match";
 import { classifyTelegramError } from "../notify/errors";
-import { generateEarthquakeImage } from "../img/pipeline";
-import { getBaseImage } from "../img/images";
+import { generateEarthquakeImage } from "../map-renderer";
+import { getBaseImage } from "../images";
+import { getFonts } from "../fonts";
 import type { Db } from "../db/types";
 import type { Bot } from "grammy";
 
@@ -68,7 +69,7 @@ export async function runRetryCron(
 
     let imageBytes: Uint8Array | null = null;
     try {
-      imageBytes = await generateEarthquakeImage(parsedEvent.lat, parsedEvent.lon, getBaseImage);
+      imageBytes = await generateEarthquakeImage(parsedEvent, getBaseImage, getFonts);
     } catch (imgErr) {
       log.warn({ chatId: delivery.chat, eventId: delivery.event_id, err: String(imgErr) }, "image generation fallback");
     }
