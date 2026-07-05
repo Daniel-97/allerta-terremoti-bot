@@ -16,16 +16,15 @@ function buttonCount(kb: { inline_keyboard: unknown[][] }): number {
 describe("composeProximity", () => {
   const msg = composeProximity(EVENT, 15, "Roma");
 
-  it("includes magnitude with alert emoji", () => {
-    expect(msg.text).toContain("⚠️ *M 4.2*");
+  it("includes magnitude and zone in a single title line", () => {
+    expect(msg.text).toContain("⚠️ Terremoto *M4.2* - Roma");
   });
 
   it("includes location name and distance", () => {
     expect(msg.text).toContain("📍 *Roma* — 15 km");
   });
 
-  it("includes zone, depth and time", () => {
-    expect(msg.text).toContain("📌 Roma");
+  it("includes depth and time", () => {
     expect(msg.text).toContain("📏 Profondità: 10.0 km");
     expect(msg.text).toContain(formatTime(EVENT.time));
   });
@@ -48,25 +47,25 @@ describe("composeNational", () => {
   it("falls back to event.zone when no location", () => {
     const msg = composeNational(EVENT, null, null);
     expect(msg.text).not.toContain("📍");
-    expect(msg.text).toContain("📌 Roma");
+    expect(msg.text).toContain("⚠️ Terremoto *M4.2* - Roma");
   });
 
-  it("includes alert emoji", () => {
+  it("includes magnitude and zone in a single title line", () => {
     const msg = composeNational(EVENT, 200, "Milano");
-    expect(msg.text).toContain("⚠️");
+    expect(msg.text).toContain("⚠️ Terremoto *M4.2* - Roma");
   });
 });
 
 describe("composeWorld", () => {
   it("uses event.zone with no location line", () => {
     const msg = composeWorld(EVENT);
-    expect(msg.text).toContain("📌 Roma");
+    expect(msg.text).toContain("⚠️ Terremoto *M4.2* - Roma");
     expect(msg.text).not.toContain("📍");
   });
 
-  it("includes alert emoji", () => {
+  it("includes magnitude and zone in a single title line", () => {
     const msg = composeWorld(EVENT);
-    expect(msg.text).toContain("⚠️");
+    expect(msg.text).toContain("⚠️ Terremoto *M4.2* - Roma");
   });
 });
 

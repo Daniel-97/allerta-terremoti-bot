@@ -42,11 +42,14 @@ function buildKeyboard(event: ParsedEvent): InlineKeyboard {
   return kb;
 }
 
+function buildTitleLine(event: ParsedEvent): string {
+  return `⚠️ Terremoto *M${event.magnitude.toFixed(1)}* - ${event.zone}`;
+}
+
 export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string): ComposedMessage {
   const text =
-    `⚠️ *M ${event.magnitude.toFixed(1)}*\n` +
+    `${buildTitleLine(event)}\n` +
     `${buildLocationLine(distanceKm, locName)}\n` +
-    `📌 ${event.zone}\n` +
     `📏 Profondità: ${depthLabel(event.depth)}\n` +
     `🕐 ${formatTime(event.time)}\n` +
     `_Fonte: INGV_`;
@@ -56,9 +59,8 @@ export function composeProximity(event: ParsedEvent, distanceKm: number, locName
 export function composeNational(event: ParsedEvent, distanceKm: number | null, locName: string | null): ComposedMessage {
   const locLine = locName && distanceKm != null ? `${buildLocationLine(distanceKm, locName)}\n` : "";
   const text =
-    `⚠️ *M ${event.magnitude.toFixed(1)}*\n` +
+    `${buildTitleLine(event)}\n` +
     locLine +
-    `📌 ${event.zone}\n` +
     `📏 Profondità: ${depthLabel(event.depth)}\n` +
     `🕐 ${formatTime(event.time)}\n` +
     `_Fonte: INGV_`;
@@ -67,8 +69,7 @@ export function composeNational(event: ParsedEvent, distanceKm: number | null, l
 
 export function composeWorld(event: ParsedEvent): ComposedMessage {
   const text =
-    `⚠️ *M ${event.magnitude.toFixed(1)}*\n` +
-    `📌 ${event.zone}\n` +
+    `${buildTitleLine(event)}\n` +
     `📏 Profondità: ${depthLabel(event.depth)}\n` +
     `🕐 ${formatTime(event.time)}\n` +
     `_Fonte: INGV_`;
