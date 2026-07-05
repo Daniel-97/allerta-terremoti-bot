@@ -32,6 +32,8 @@
   },
   "homepage": "https://github.com/Daniel-97/allerta-terremoti-bot#readme",
   "dependencies": {
+    "@cf-wasm/photon": "^0.3.6",
+    "@cf-wasm/resvg": "^0.3.4",
     "@libsql/client": "^0.17.4",
     "drizzle-orm": "^0.45.2",
     "grammy": "^1.44.0",

@@ -1,3 +1,4 @@
+import { InputFile } from "grammy";
 import { createLogger } from "../util/log";
 import { listPendingForRetry, updateStatus } from "../db/repositories/deliveries";
 import { getEvent } from "../db/repositories/history";
@@ -5,6 +6,8 @@ import { setChatStatus } from "../db/repositories/chats";
 import { composeMessage } from "../notify/compose";
 import { matchChat } from "../notify/match";
 import { classifyTelegramError } from "../notify/errors";
+import { generateEarthquakeImage } from "../img/pipeline";
+import { getBaseImage } from "../img/images";
 import type { Db } from "../db/types";
 import type { Bot } from "grammy";
 
@@ -63,11 +66,26 @@ export async function runRetryCron(
 
     const { text, keyboard } = await composeMessage(parsedEvent, recipient, db);
 
+    let imageBytes: Uint8Array | null = null;
     try {
-      await bot.api.sendMessage(delivery.chat, text, {
-        reply_markup: keyboard,
-        parse_mode: "Markdown",
-      });
+      imageBytes = await generateEarthquakeImage(parsedEvent.lat, parsedEvent.lon, parsedEvent.magnitude, getBaseImage);
+    } catch {
+      log.warn({ chatId: delivery.chat, eventId: delivery.event_id }, "image generation fallback");
+    }
+
+    try {
+      if (imageBytes) {
+        await bot.api.sendPhoto(delivery.chat, new InputFile(imageBytes, "earthquake.png"), {
+          caption: text,
+          parse_mode: "Markdown",
+          reply_markup: keyboard,
+        });
+      } else {
+        await bot.api.sendMessage(delivery.chat, text, {
+          reply_markup: keyboard,
+          parse_mode: "Markdown",
+        });
+      }
       await updateStatus(db, delivery.id, "sent", delivery.attempts + 1);
       sent++;
     } catch (err) {

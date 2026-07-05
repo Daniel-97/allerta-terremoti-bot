@@ -66,3 +66,95 @@ export function loadConfig(env: unknown): RuntimeConfig {
     eventsRetentionDays: raw.EVENTS_RETENTION_DAYS,
   };
 }
+
+export interface Zone {
+  id: string;
+  name: string;
+  image: string;
+  width: number;
+  height: number;
+  minLongitude: number;
+  maxLongitude: number;
+  minLatitude: number;
+  maxLatitude: number;
+}
+
+export const zones: Zone[] = [
+  {
+    id: "world",
+    name: "Mondo intero",
+    image: "world.png",
+    width: 600,
+    height: 600,
+    minLongitude: -180,
+    maxLongitude: 180,
+    minLatitude: -85,
+    maxLatitude: 85,
+  },
+  {
+    id: "italia",
+    name: "Italia intera",
+    image: "italy_full.png",
+    width: 600,
+    height: 600,
+    minLongitude: 6.6,
+    maxLongitude: 18.8,
+    minLatitude: 35.3,
+    maxLatitude: 47.1,
+  },
+  {
+    id: "nord",
+    name: "Nord Italia",
+    image: "italy_nord.png",
+    width: 600,
+    height: 600,
+    minLongitude: 6.6,
+    maxLongitude: 14.0,
+    minLatitude: 44.0,
+    maxLatitude: 47.1,
+  },
+  {
+    id: "centro",
+    name: "Centro Italia",
+    image: "italy_center.png",
+    width: 600,
+    height: 600,
+    minLongitude: 9.5,
+    maxLongitude: 15.0,
+    minLatitude: 41.0,
+    maxLatitude: 44.2,
+  },
+  {
+    id: "sud",
+    name: "Sud Italia (penisola)",
+    image: "italy_sud.png",
+    width: 600,
+    height: 600,
+    minLongitude: 13.0,
+    maxLongitude: 18.6,
+    minLatitude: 37.9,
+    maxLatitude: 42.1,
+  },
+  {
+    id: "sicilia",
+    name: "Sicilia",
+    image: "italy_sicily.png",
+    width: 600,
+    height: 600,
+    minLongitude: 11.9,
+    maxLongitude: 15.7,
+    minLatitude: 36.5,
+    maxLatitude: 38.35,
+  },
+  {
+    id: "sardegna",
+    name: "Sardegna",
+    image: "italy_sardinia.png",
+    width: 600,
+    height: 600,
+    minLongitude: 8.1,
+    maxLongitude: 9.9,
+    minLatitude: 38.85,
+    maxLatitude: 41.3,
+  },
+];
