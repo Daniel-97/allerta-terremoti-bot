@@ -45,7 +45,6 @@ async function main(): Promise<void> {
     existing: allEvents.length - newCount,
   }, "sync complete");
 
-  // @ts-expect-error drizzle client has an underlying libsql client with close()
   await db.$client?.close?.();
 }
 
