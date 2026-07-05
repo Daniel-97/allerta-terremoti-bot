@@ -41,7 +41,7 @@ describe("handleCallbackQuery evMap", () => {
 
     expect(ctx.replyWithVenue).toHaveBeenCalledWith(
       41.9, 12.5,
-      "⚠️ Terremoto M4.2 - Roma",
+      "⚠️ M4.2 - Roma",
       `prof. 10.0 km, ${formatTime("2026-06-30T12:00:00Z")}`,
     );
     expect(ctx.answerCallbackQuery).toHaveBeenCalled();

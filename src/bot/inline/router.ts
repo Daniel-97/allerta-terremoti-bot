@@ -138,7 +138,7 @@ export async function handleCallbackQuery(
           await ctx.answerCallbackQuery({ text: STRINGS.eventMap.notAvailable });
           return;
         }
-        const title = formatTitle(ev.magnitude_value, ev.zone, false);
+        const title = formatTitle(ev.magnitude_value, ev.zone, false, false);
         const address = `prof. ${depthLabel(ev.depth)}, ${formatTime(ev.date)}`;
         await ctx.replyWithVenue(ev.lat, ev.lon, title, address);
         break;

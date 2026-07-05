@@ -90,6 +90,10 @@ describe("formatTitle", () => {
   it("omits markdown when markdown is false", () => {
     expect(formatTitle(4.2, "Roma", false)).toBe("⚠️ Terremoto M4.2 - Roma");
   });
+
+  it("omits the 'Terremoto' label when includeLabel is false", () => {
+    expect(formatTitle(4.2, "Roma", false, false)).toBe("⚠️ M4.2 - Roma");
+  });
 });
 
 describe("formatTime", () => {

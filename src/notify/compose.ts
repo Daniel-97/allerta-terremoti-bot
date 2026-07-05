@@ -28,9 +28,11 @@ export function depthLabel(depth: number | null): string {
   return depth != null ? `${depth.toFixed(1)} km` : "N/D";
 }
 
-export function formatTitle(magnitude: number, zone: string, markdown = true): string {
+export function formatTitle(magnitude: number, zone: string, markdown = true, includeLabel = true): string {
   const mag = `M${magnitude.toFixed(1)}`;
-  return `⚠️ Terremoto ${markdown ? `*${mag}*` : mag} - ${zone}`;
+  const magPart = markdown ? `*${mag}*` : mag;
+  const label = includeLabel ? "Terremoto " : "";
+  return `⚠️ ${label}${magPart} - ${zone}`;
 }
 
 function buildLocationLine(distanceKm: number, locName: string): string {
