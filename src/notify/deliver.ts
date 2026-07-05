@@ -51,7 +51,7 @@ export async function deliverFirstWave(
 
     let imageBytes: Uint8Array | null = null;
     try {
-      imageBytes = await generateEarthquakeImage(event.lat, event.lon, event.magnitude, getBaseImage);
+      imageBytes = await generateEarthquakeImage(event.lat, event.lon, getBaseImage);
     } catch (imgErr) {
       captureWarning(log, imgErr, { chatId: rec.chatId, eventId: event.eventId, action: "image generation fallback" });
     }

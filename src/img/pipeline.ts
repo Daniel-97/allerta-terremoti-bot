@@ -49,18 +49,14 @@ export function latLonToPixel(lat: number, lon: number, zone: Zone): { x: number
   };
 }
 
-function magnitudeColor(magnitude: number): string {
-  if (magnitude < 3) return "#FFD700";
-  if (magnitude < 5) return "#FF8C00";
-  return "#FF4444";
-}
+const MARKER_COLOR = "#FF4444";
 
-export function buildOverlaySvg(zone: Zone, x: number, y: number, magnitude: number): string {
-  const color = magnitudeColor(magnitude);
-  const magLabel = `M${magnitude.toFixed(1)}`;
+export function buildOverlaySvg(zone: Zone, x: number, y: number): string {
   return `<svg width="${zone.width}" height="${zone.height}" xmlns="http://www.w3.org/2000/svg">
-<circle cx="${x}" cy="${y}" r="6" fill="${color}" stroke="white" stroke-width="2"/>
-<text x="${x}" y="${y + 16}" fill="white" font-size="11" text-anchor="middle" font-weight="bold" stroke="rgba(0,0,0,0.5)" stroke-width="0.5">${magLabel}</text>
+<circle cx="${x}" cy="${y}" r="12" fill="${MARKER_COLOR}" stroke="white" stroke-width="2"/>
+<circle cx="${x}" cy="${y}" r="20" fill="none" stroke="${MARKER_COLOR}" stroke-width="3"/>
+<circle cx="${x}" cy="${y}" r="28" fill="none" stroke="${MARKER_COLOR}" stroke-width="2"/>
+<circle cx="${x}" cy="${y}" r="36" fill="none" stroke="${MARKER_COLOR}" stroke-width="1"/>
 </svg>`;
 }
 
@@ -94,7 +90,6 @@ export type GetBaseImageFn = (imageName: string) => Uint8Array;
 export async function generateEarthquakeImage(
   lat: number,
   lon: number,
-  magnitude: number,
   getBaseImage: GetBaseImageFn,
 ): Promise<Uint8Array> {
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
@@ -109,7 +104,7 @@ export async function generateEarthquakeImage(
     throw new Error(`Empty base image: ${zone.image}`);
   }
 
-  const svg = buildOverlaySvg(zone, x, y, magnitude);
+  const svg = buildOverlaySvg(zone, x, y);
   const overlayBytes = await renderOverlayToPng(svg);
 
   const result = await compositeImages(baseBytes, overlayBytes);

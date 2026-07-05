@@ -72,33 +72,25 @@ describe("buildOverlaySvg", () => {
   const italia = zones.find((z) => z.id === "italia")!;
 
   it("includes viewBox dimensions matching zone", () => {
-    const svg = buildOverlaySvg(italia, 300, 300, 4.5);
+    const svg = buildOverlaySvg(italia, 300, 300);
     expect(svg).toContain(`width="${italia.width}"`);
     expect(svg).toContain(`height="${italia.height}"`);
   });
 
-  it("includes a circle element", () => {
-    const svg = buildOverlaySvg(italia, 300, 300, 4.5);
-    expect(svg).toContain("<circle");
+  it("includes four concentric circles", () => {
+    const svg = buildOverlaySvg(italia, 300, 300);
+    expect(svg.match(/<circle/g)).toHaveLength(4);
   });
 
-  it("includes a text element with magnitude", () => {
-    const svg = buildOverlaySvg(italia, 300, 300, 4.5);
-    expect(svg).toContain("M4.5");
+  it("does not include a text element", () => {
+    const svg = buildOverlaySvg(italia, 300, 300);
+    expect(svg).not.toContain("<text");
   });
 
-  it("uses yellow for magnitude < 3", () => {
-    const svg = buildOverlaySvg(italia, 300, 300, 2.5);
-    expect(svg).toContain("#FFD700");
-  });
-
-  it("uses orange for magnitude 3-5", () => {
-    const svg = buildOverlaySvg(italia, 300, 300, 4.0);
-    expect(svg).toContain("#FF8C00");
-  });
-
-  it("uses red for magnitude >= 5", () => {
-    const svg = buildOverlaySvg(italia, 300, 300, 5.5);
+  it("always uses red, regardless of magnitude context", () => {
+    const svg = buildOverlaySvg(italia, 300, 300);
     expect(svg).toContain("#FF4444");
+    expect(svg).not.toContain("#FFD700");
+    expect(svg).not.toContain("#FF8C00");
   });
 });
