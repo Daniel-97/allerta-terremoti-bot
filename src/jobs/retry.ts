@@ -69,8 +69,8 @@ export async function runRetryCron(
     let imageBytes: Uint8Array | null = null;
     try {
       imageBytes = await generateEarthquakeImage(parsedEvent.lat, parsedEvent.lon, parsedEvent.magnitude, getBaseImage);
-    } catch {
-      log.warn({ chatId: delivery.chat, eventId: delivery.event_id }, "image generation fallback");
+    } catch (imgErr) {
+      log.warn({ chatId: delivery.chat, eventId: delivery.event_id, err: String(imgErr) }, "image generation fallback");
     }
 
     try {
