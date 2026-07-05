@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { composeProximity, composeNational, composeWorld, formatTime } from "../../src/notify/compose";
+import { composeProximity, composeNational, composeWorld, formatTime, formatTitle } from "../../src/notify/compose";
 import type { ParsedEvent } from "../../src/ingv/types";
 
 const EVENT: ParsedEvent = {
@@ -79,6 +79,16 @@ describe("keyboard eventId guard", () => {
   it("includes both buttons when eventId is present", () => {
     const msg = composeWorld(EVENT);
     expect(buttonCount(msg.keyboard)).toBe(2);
+  });
+});
+
+describe("formatTitle", () => {
+  it("wraps the magnitude in markdown bold by default", () => {
+    expect(formatTitle(4.2, "Roma")).toBe("⚠️ Terremoto *M4.2* - Roma");
+  });
+
+  it("omits markdown when markdown is false", () => {
+    expect(formatTitle(4.2, "Roma", false)).toBe("⚠️ Terremoto M4.2 - Roma");
   });
 });
 

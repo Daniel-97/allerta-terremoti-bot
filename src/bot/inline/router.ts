@@ -10,6 +10,7 @@ import {
 } from "../../db/repositories/locations";
 import { getChat, setAlertFlags } from "../../db/repositories/chats";
 import { getEvent } from "../../db/repositories/history";
+import { formatTitle, depthLabel, formatTime } from "../../notify/compose";
 import { STRINGS } from "../../i18n/strings";
 import * as panels from "./panels";
 import type { Db } from "../../db/types";
@@ -137,7 +138,9 @@ export async function handleCallbackQuery(
           await ctx.answerCallbackQuery({ text: STRINGS.eventMap.notAvailable });
           return;
         }
-        await ctx.replyWithLocation(ev.lat, ev.lon);
+        const title = formatTitle(ev.magnitude_value, ev.zone, false);
+        const address = `prof. ${depthLabel(ev.depth)}, ${formatTime(ev.date)}`;
+        await ctx.replyWithVenue(ev.lat, ev.lon, title, address);
         break;
       }
       case "nav": {

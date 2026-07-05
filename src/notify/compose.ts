@@ -24,8 +24,13 @@ export function formatTime(dateStr: string): string {
   });
 }
 
-function depthLabel(depth: number | null): string {
+export function depthLabel(depth: number | null): string {
   return depth != null ? `${depth.toFixed(1)} km` : "N/D";
+}
+
+export function formatTitle(magnitude: number, zone: string, markdown = true): string {
+  const mag = `M${magnitude.toFixed(1)}`;
+  return `⚠️ Terremoto ${markdown ? `*${mag}*` : mag} - ${zone}`;
 }
 
 function buildLocationLine(distanceKm: number, locName: string): string {
@@ -43,7 +48,7 @@ function buildKeyboard(event: ParsedEvent): InlineKeyboard {
 }
 
 function buildTitleLine(event: ParsedEvent): string {
-  return `⚠️ Terremoto *M${event.magnitude.toFixed(1)}* - ${event.zone}`;
+  return formatTitle(event.magnitude, event.zone);
 }
 
 export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string): ComposedMessage {

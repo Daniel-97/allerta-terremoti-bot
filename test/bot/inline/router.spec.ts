@@ -3,6 +3,7 @@ import type { Context } from "grammy";
 import { handleCallbackQuery } from "../../../src/bot/inline/router";
 import { encodeEventMap } from "../../../src/util/callback-data";
 import { STRINGS } from "../../../src/i18n/strings";
+import { formatTime } from "../../../src/notify/compose";
 import type { Db } from "../../../src/db/types";
 
 vi.mock("../../../src/db/repositories/history", () => ({
@@ -19,7 +20,7 @@ function fakeCtx(data: string) {
       from: { id: 1, first_name: "U", username: "u" },
     },
     answerCallbackQuery: vi.fn(),
-    replyWithLocation: vi.fn(),
+    replyWithVenue: vi.fn(),
   } as unknown as Context;
 }
 
@@ -28,7 +29,7 @@ describe("handleCallbackQuery evMap", () => {
     vi.mocked(getEvent).mockReset();
   });
 
-  it("replies with the event location when the event exists", async () => {
+  it("replies with a venue including title and address when the event exists", async () => {
     vi.mocked(getEvent).mockResolvedValue({
       id: "ev1", zone: "Roma", date: "2026-06-30T12:00:00Z",
       lat: 41.9, lon: 12.5, depth: 10, stations_count: 5,
@@ -38,7 +39,11 @@ describe("handleCallbackQuery evMap", () => {
     const ctx = fakeCtx(encodeEventMap("ev1"));
     await handleCallbackQuery(ctx, {} as Db);
 
-    expect(ctx.replyWithLocation).toHaveBeenCalledWith(41.9, 12.5);
+    expect(ctx.replyWithVenue).toHaveBeenCalledWith(
+      41.9, 12.5,
+      "⚠️ Terremoto M4.2 - Roma",
+      `prof. 10.0 km, ${formatTime("2026-06-30T12:00:00Z")}`,
+    );
     expect(ctx.answerCallbackQuery).toHaveBeenCalled();
   });
 
@@ -48,7 +53,7 @@ describe("handleCallbackQuery evMap", () => {
     const ctx = fakeCtx(encodeEventMap("missing"));
     await handleCallbackQuery(ctx, {} as Db);
 
-    expect(ctx.replyWithLocation).not.toHaveBeenCalled();
+    expect(ctx.replyWithVenue).not.toHaveBeenCalled();
     expect(ctx.answerCallbackQuery).toHaveBeenCalledWith({ text: STRINGS.eventMap.notAvailable });
   });
 });
