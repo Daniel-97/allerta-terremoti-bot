@@ -6,7 +6,7 @@ import italySudPng from "./italy_sud.png";
 import italySicilyPng from "./italy_sicily.png";
 import italySardiniaPng from "./italy_sardinia.png";
 
-const imageMap: Record<string, string> = {
+const imageMap: Record<string, ArrayBuffer> = {
   "world.png": worldPng,
   "italy_full.png": italyFullPng,
   "italy_nord.png": italyNordPng,
@@ -16,19 +16,8 @@ const imageMap: Record<string, string> = {
   "italy_sardinia.png": italySardiniaPng,
 };
 
-function dataUrlToBytes(dataUrl: string): Uint8Array {
-  const base64 = dataUrl.split(",")[1];
-  if (!base64) throw new Error("Invalid data URL");
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes;
-}
-
 export function getBaseImage(imageName: string): Uint8Array {
-  const dataUrl = imageMap[imageName];
-  if (!dataUrl) throw new Error(`Image not found: ${imageName}`);
-  return dataUrlToBytes(dataUrl);
+  const buffer = imageMap[imageName];
+  if (!buffer) throw new Error(`Image not found: ${imageName}`);
+  return new Uint8Array(buffer);
 }
