@@ -25,6 +25,9 @@ Turso (libSQL). Seismic data is from INGV; GeoNames is used only to name user lo
 - Prefer `async/await`; handle errors explicitly (no silent catches).
 - Keep functions small and pure where possible; isolate side effects (network, DB) behind
   the modules listed below.
+- **Imports are always absolute, never relative.** Use the `@/*` path alias (mapped to
+  `./src/*` in `tsconfig.json`), e.g. `import { getEvent } from "@/db/repositories/history"`.
+  Never use `./` or `../` import paths.
 
 ---
 
