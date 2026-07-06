@@ -33,8 +33,8 @@ describe("composeProximity", () => {
     expect(msg.text).toContain("_Fonte: INGV_");
   });
 
-  it("has inline keyboard with INGV and Mappa buttons", () => {
-    expect(buttonCount(msg.keyboard)).toBe(2);
+  it("has inline keyboard with only the INGV button", () => {
+    expect(buttonCount(msg.keyboard)).toBe(1);
   });
 });
 
@@ -70,15 +70,15 @@ describe("composeWorld", () => {
 });
 
 describe("keyboard eventId guard", () => {
-  it("omits both buttons when eventId is empty", () => {
+  it("omits the button when eventId is empty", () => {
     const noIdEvent = { ...EVENT, eventId: "" };
     const msg = composeWorld(noIdEvent);
     expect(buttonCount(msg.keyboard)).toBe(0);
   });
 
-  it("includes both buttons when eventId is present", () => {
+  it("includes the button when eventId is present", () => {
     const msg = composeWorld(EVENT);
-    expect(buttonCount(msg.keyboard)).toBe(2);
+    expect(buttonCount(msg.keyboard)).toBe(1);
   });
 });
 

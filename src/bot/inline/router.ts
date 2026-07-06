@@ -10,7 +10,6 @@ import {
 } from "@/db/repositories/locations";
 import { getChat, setAlertFlags } from "@/db/repositories/chats";
 import { getEvent } from "@/db/repositories/history";
-import { formatTitle, depthLabel, formatTime } from "@/notify/compose";
 import { STRINGS } from "@/i18n/strings";
 import * as panels from "@/bot/inline/panels";
 import type { Db } from "@/db/types";
@@ -130,17 +129,6 @@ export async function handleCallbackQuery(
           `🕐 ${ev.date}`,
         ].filter(Boolean).join("\n");
         await ctx.reply(`${STRINGS.eventDetail.title}\n\n${lines}\n\n${STRINGS.eventDetail.source}`, { parse_mode: "Markdown" });
-        break;
-      }
-      case "evMap": {
-        const ev = await getEvent(db, cb.eventId);
-        if (!ev) {
-          await ctx.answerCallbackQuery({ text: STRINGS.eventMap.notAvailable });
-          return;
-        }
-        const title = formatTitle(ev.magnitude_value, ev.zone, false, false);
-        const address = `prof. ${depthLabel(ev.depth)}, ${formatTime(ev.date)}`;
-        await ctx.replyWithVenue(ev.lat, ev.lon, title, address);
         break;
       }
       case "nav": {

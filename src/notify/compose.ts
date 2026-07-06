@@ -1,5 +1,4 @@
 import { InlineKeyboard } from "grammy";
-import { encodeEventMap } from "@/util/callback-data";
 import type { ParsedEvent } from "@/services/ingv/types";
 import type { Recipient } from "@/notify/match";
 import { getLocation } from "@/db/repositories/locations";
@@ -44,7 +43,6 @@ function buildKeyboard(event: ParsedEvent): InlineKeyboard {
   const id = event.eventId?.trim();
   if (id) {
     kb.url("📡 INGV", `${INGV_SOURCE_URL_PREFIX}${encodeURIComponent(id)}`);
-    kb.text("🗺️ Mappa", encodeEventMap(id));
   }
   return kb;
 }
