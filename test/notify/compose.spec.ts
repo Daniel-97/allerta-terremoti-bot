@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { composeProximity, composeNational, composeWorld, formatTime, formatTitle } from "@/notify/compose";
+import { composeProximity, composeNational, composeWorld, formatTime, formatTitle, formatMagType } from "@/notify/compose";
 import type { ParsedEvent } from "@/services/ingv/types";
 
 const EVENT: ParsedEvent = {
@@ -17,7 +17,7 @@ describe("composeProximity", () => {
   const msg = composeProximity(EVENT, 15, "Roma");
 
   it("includes magnitude and zone in a single title line", () => {
-    expect(msg.text).toContain("⚠️ Terremoto *M4.2* - Roma");
+    expect(msg.text).toContain("⚠️ Terremoto *M4.2* (ML) - Roma");
   });
 
   it("includes location name and distance", () => {
@@ -47,25 +47,25 @@ describe("composeNational", () => {
   it("falls back to event.zone when no location", () => {
     const msg = composeNational(EVENT, null, null);
     expect(msg.text).not.toContain("📍");
-    expect(msg.text).toContain("⚠️ Terremoto *M4.2* - Roma");
+    expect(msg.text).toContain("⚠️ Terremoto *M4.2* (ML) - Roma");
   });
 
   it("includes magnitude and zone in a single title line", () => {
     const msg = composeNational(EVENT, 200, "Milano");
-    expect(msg.text).toContain("⚠️ Terremoto *M4.2* - Roma");
+    expect(msg.text).toContain("⚠️ Terremoto *M4.2* (ML) - Roma");
   });
 });
 
 describe("composeWorld", () => {
   it("uses event.zone with no location line", () => {
     const msg = composeWorld(EVENT);
-    expect(msg.text).toContain("⚠️ Terremoto *M4.2* - Roma");
+    expect(msg.text).toContain("⚠️ Terremoto *M4.2* (ML) - Roma");
     expect(msg.text).not.toContain("📍");
   });
 
   it("includes magnitude and zone in a single title line", () => {
     const msg = composeWorld(EVENT);
-    expect(msg.text).toContain("⚠️ Terremoto *M4.2* - Roma");
+    expect(msg.text).toContain("⚠️ Terremoto *M4.2* (ML) - Roma");
   });
 });
 
@@ -93,6 +93,24 @@ describe("formatTitle", () => {
 
   it("omits the 'Terremoto' label when includeLabel is false", () => {
     expect(formatTitle(4.2, "Roma", false, false)).toBe("⚠️ M4.2 - Roma");
+  });
+
+  it("appends magType outside the bold markers when provided", () => {
+    expect(formatTitle(4.2, "Roma", true, true, "ML")).toBe("⚠️ Terremoto *M4.2* (ML) - Roma");
+  });
+
+  it("omits the parenthesized magType when magType is empty", () => {
+    expect(formatTitle(4.2, "Roma", true, true, "")).toBe("⚠️ Terremoto *M4.2* - Roma");
+  });
+});
+
+describe("formatMagType", () => {
+  it("wraps a non-empty magType in parentheses with a leading space", () => {
+    expect(formatMagType("ML")).toBe(" (ML)");
+  });
+
+  it("returns an empty string when magType is empty", () => {
+    expect(formatMagType("")).toBe("");
   });
 });
 

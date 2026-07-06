@@ -27,11 +27,15 @@ export function depthLabel(depth: number | null): string {
   return depth != null ? `${depth.toFixed(1)} km` : "N/D";
 }
 
-export function formatTitle(magnitude: number, zone: string, markdown = true, includeLabel = true): string {
+export function formatMagType(magType: string): string {
+  return magType ? ` (${magType})` : "";
+}
+
+export function formatTitle(magnitude: number, zone: string, markdown = true, includeLabel = true, magType = ""): string {
   const mag = `M${magnitude.toFixed(1)}`;
   const magPart = markdown ? `*${mag}*` : mag;
   const label = includeLabel ? "Terremoto " : "";
-  return `⚠️ ${label}${magPart} - ${zone}`;
+  return `⚠️ ${label}${magPart}${formatMagType(magType)} - ${zone}`;
 }
 
 function buildLocationLine(distanceKm: number, locName: string): string {
@@ -48,7 +52,7 @@ function buildKeyboard(event: ParsedEvent): InlineKeyboard {
 }
 
 function buildTitleLine(event: ParsedEvent): string {
-  return formatTitle(event.magnitude, event.zone);
+  return formatTitle(event.magnitude, event.zone, true, true, event.magType);
 }
 
 export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string): ComposedMessage {

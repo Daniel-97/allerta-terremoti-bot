@@ -3,6 +3,7 @@ import { captureWarning } from "@/util/error-handler";
 import type { Bot } from "grammy";
 import type { ParsedEvent } from "@/services/ingv/types";
 import type { DeliveryOutcome } from "@/notify/deliver";
+import { formatMagType } from "@/notify/compose";
 
 const log = createLogger("admin");
 
@@ -41,7 +42,7 @@ export async function notifyEventSummary(
     try {
       await bot.api.sendMessage(
         id,
-        `📢 *Event summary*\nM ${event.magnitude.toFixed(1)} — ${event.zone}\n\`${event.eventId}\`\nRecipients: ${recipientCount}\n✅ ${outcome.sent}  ⚠️ ${outcome.failedTransient}  ❌ ${outcome.failedPermanent}`,
+        `📢 *Event summary*\nM ${event.magnitude.toFixed(1)}${formatMagType(event.magType)} — ${event.zone}\n\`${event.eventId}\`\nRecipients: ${recipientCount}\n✅ ${outcome.sent}  ⚠️ ${outcome.failedTransient}  ❌ ${outcome.failedPermanent}`,
         { parse_mode: "Markdown" },
       );
     } catch (err) {

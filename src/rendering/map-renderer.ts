@@ -118,7 +118,7 @@ export async function generateEarthquakeImage(
   getBaseImage: GetBaseImageFn,
   getFonts: GetFontsFn,
 ): Promise<Uint8Array> {
-  const { lat, lon, magnitude, depth, time, zone: zoneName } = event;
+  const { lat, lon, magnitude, depth, time, zone: zoneName, magType } = event;
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
     throw new Error("Invalid coordinates");
   }
@@ -136,6 +136,7 @@ export async function generateEarthquakeImage(
     depthLabel: depthLabel(depth),
     dateTime: formatTime(time),
     magnitudeLabel: `M${magnitude.toFixed(1)}`,
+    magType,
   });
 
   // The map is sized so BANNER_HEIGHT + zone.height is exactly zone.width — no

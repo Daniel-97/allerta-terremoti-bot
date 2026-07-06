@@ -87,6 +87,7 @@ async function main(): Promise<void> {
     depthLabel: depthLabel(event.depth),
     dateTime: formatTime(event.time),
     magnitudeLabel: `M${event.magnitude.toFixed(1)}`,
+    magType: event.magType,
   });
   const markerSvg = buildOverlaySvg(zone, x, y);
   const totalHeight = zone.height + BANNER_HEIGHT;
