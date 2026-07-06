@@ -67,6 +67,27 @@ Do not finish with failing checks, type errors, or lint errors.
 
 ---
 
+## Bundle size (Cloudflare Workers limit)
+
+- The Free plan enforces a **3 MB gzip-compressed** limit on the deployed Worker script —
+  code plus every bundled binary asset (wasm engines, fonts, images). `npm run build`
+  (`wrangler deploy --dry-run`) prints `Total Upload: ... / gzip: ...`; the gzip figure
+  must stay comfortably under 3 MB, with headroom for future growth — do not treat a
+  build that barely squeaks under the limit as done.
+- Static assets under `src/rendering/img/` and `src/rendering/fonts/` are bundled in full
+  via the `Data` rule in `wrangler.jsonc` (`**/*.png`, `**/*.jpg`, `**/*.ttf`) — nothing
+  under those globs is lazy-loaded, so every byte added there counts directly against the
+  limit.
+- Prefer **lossy JPEG** over PNG for opaque photographic/map imagery (no alpha channel
+  needed) — PNG is much larger for this kind of content. Only use PNG (or another
+  lossless format) when transparency is actually required.
+- When adding or replacing an image asset, test the quality/size trade-off first (e.g.
+  `magick <file> -quality N -sampling-factor 4:2:0 -strip out.jpg` at a few quality
+  levels) and re-run `npm run build` to confirm the resulting gzip total — don't guess a
+  quality setting and assume it fits.
+
+---
+
 ## Database
 
 - The **schema is hand-written SQL** in `src/db/schema.sql`. This file is the source of

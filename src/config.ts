@@ -95,7 +95,7 @@ export const zones: Zone[] = [
   {
     id: "world",
     name: "Mondo intero",
-    image: "world.png",
+    image: "world.jpg",
     width: 600,
     height: 484,
     minLongitude: -180,
@@ -106,7 +106,7 @@ export const zones: Zone[] = [
   {
     id: "valle-aosta",
     name: "Valle d'Aosta",
-    image: "valle-aosta.png",
+    image: "valle-aosta.jpg",
     width: 600,
     height: 484,
     minLongitude: 6.8,
@@ -117,7 +117,7 @@ export const zones: Zone[] = [
   {
     id: "piemonte",
     name: "Piemonte",
-    image: "piemonte.png",
+    image: "piemonte.jpg",
     width: 600,
     height: 484,
     minLongitude: 6.6,
@@ -128,7 +128,7 @@ export const zones: Zone[] = [
   {
     id: "liguria",
     name: "Liguria",
-    image: "liguria.png",
+    image: "liguria.jpg",
     width: 600,
     height: 484,
     minLongitude: 7.5,
@@ -139,7 +139,7 @@ export const zones: Zone[] = [
   {
     id: "lombardia",
     name: "Lombardia",
-    image: "lombardia.png",
+    image: "lombardia.jpg",
     width: 600,
     height: 484,
     minLongitude: 8.5,
@@ -150,7 +150,7 @@ export const zones: Zone[] = [
   {
     id: "trentino-alto-adige",
     name: "Trentino-Alto Adige",
-    image: "trentino-alto-adige.png",
+    image: "trentino-alto-adige.jpg",
     width: 600,
     height: 484,
     minLongitude: 10.4,
@@ -161,7 +161,7 @@ export const zones: Zone[] = [
   {
     id: "veneto",
     name: "Veneto",
-    image: "veneto.png",
+    image: "veneto.jpg",
     width: 600,
     height: 484,
     minLongitude: 10.6,
@@ -172,7 +172,7 @@ export const zones: Zone[] = [
   {
     id: "friuli-venezia-giulia",
     name: "Friuli-Venezia Giulia",
-    image: "friuli-venezia-giulia.png",
+    image: "friuli-venezia-giulia.jpg",
     width: 600,
     height: 484,
     minLongitude: 12.3,
@@ -183,7 +183,7 @@ export const zones: Zone[] = [
   {
     id: "emilia-romagna",
     name: "Emilia-Romagna",
-    image: "emilia-romagna.png",
+    image: "emilia-romagna.jpg",
     width: 600,
     height: 484,
     minLongitude: 9.15,
@@ -194,7 +194,7 @@ export const zones: Zone[] = [
   {
     id: "toscana",
     name: "Toscana",
-    image: "toscana.png",
+    image: "toscana.jpg",
     width: 600,
     height: 484,
     minLongitude: 9.7,
@@ -205,7 +205,7 @@ export const zones: Zone[] = [
   {
     id: "umbria",
     name: "Umbria",
-    image: "umbria.png",
+    image: "umbria.jpg",
     width: 600,
     height: 484,
     minLongitude: 11.9,
@@ -216,7 +216,7 @@ export const zones: Zone[] = [
   {
     id: "marche",
     name: "Marche",
-    image: "marche.png",
+    image: "marche.jpg",
     width: 600,
     height: 484,
     minLongitude: 12.2,
@@ -227,7 +227,7 @@ export const zones: Zone[] = [
   {
     id: "lazio",
     name: "Lazio",
-    image: "lazio.png",
+    image: "lazio.jpg",
     width: 600,
     height: 484,
     minLongitude: 11.4,
@@ -238,7 +238,7 @@ export const zones: Zone[] = [
   {
     id: "abruzzo",
     name: "Abruzzo",
-    image: "abruzzo.png",
+    image: "abruzzo.jpg",
     width: 600,
     height: 484,
     minLongitude: 13.0,
@@ -249,7 +249,7 @@ export const zones: Zone[] = [
   {
     id: "molise",
     name: "Molise",
-    image: "molise.png",
+    image: "molise.jpg",
     width: 600,
     height: 484,
     minLongitude: 14.1,
@@ -260,7 +260,7 @@ export const zones: Zone[] = [
   {
     id: "campania",
     name: "Campania",
-    image: "campania.png",
+    image: "campania.jpg",
     width: 600,
     height: 484,
     minLongitude: 13.8,
@@ -271,7 +271,7 @@ export const zones: Zone[] = [
   {
     id: "puglia",
     name: "Puglia",
-    image: "puglia.png",
+    image: "puglia.jpg",
     width: 600,
     height: 484,
     minLongitude: 14.9,
@@ -282,7 +282,7 @@ export const zones: Zone[] = [
   {
     id: "basilicata",
     name: "Basilicata",
-    image: "basilicata.png",
+    image: "basilicata.jpg",
     width: 600,
     height: 484,
     minLongitude: 15.35,
@@ -293,7 +293,7 @@ export const zones: Zone[] = [
   {
     id: "calabria",
     name: "Calabria",
-    image: "calabria.png",
+    image: "calabria.jpg",
     width: 600,
     height: 484,
     minLongitude: 15.6,
@@ -304,7 +304,7 @@ export const zones: Zone[] = [
   {
     id: "sicilia",
     name: "Sicilia",
-    image: "sicilia.png",
+    image: "sicilia.jpg",
     width: 600,
     height: 484,
     minLongitude: 11.9,
@@ -315,7 +315,7 @@ export const zones: Zone[] = [
   {
     id: "sardegna",
     name: "Sardegna",
-    image: "sardegna.png",
+    image: "sardegna.jpg",
     width: 600,
     height: 484,
     minLongitude: 8.1,

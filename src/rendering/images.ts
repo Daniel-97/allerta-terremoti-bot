@@ -1,47 +1,47 @@
-import worldPng from "@/rendering/img/world.png";
-import valleAostaPng from "@/rendering/img/valle-aosta.png";
-import piemontePng from "@/rendering/img/piemonte.png";
-import liguriaPng from "@/rendering/img/liguria.png";
-import lombardiaPng from "@/rendering/img/lombardia.png";
-import trentinoAltoAdigePng from "@/rendering/img/trentino-alto-adige.png";
-import venetoPng from "@/rendering/img/veneto.png";
-import friuliVeneziaGiuliaPng from "@/rendering/img/friuli-venezia-giulia.png";
-import emiliaRomagnaPng from "@/rendering/img/emilia-romagna.png";
-import toscanaPng from "@/rendering/img/toscana.png";
-import umbriaPng from "@/rendering/img/umbria.png";
-import marchePng from "@/rendering/img/marche.png";
-import lazioPng from "@/rendering/img/lazio.png";
-import abruzzoPng from "@/rendering/img/abruzzo.png";
-import molisePng from "@/rendering/img/molise.png";
-import campaniaPng from "@/rendering/img/campania.png";
-import pugliaPng from "@/rendering/img/puglia.png";
-import basilicataPng from "@/rendering/img/basilicata.png";
-import calabriaPng from "@/rendering/img/calabria.png";
-import siciliaPng from "@/rendering/img/sicilia.png";
-import sardegnaPng from "@/rendering/img/sardegna.png";
+import worldJpg from "@/rendering/img/world.jpg";
+import valleAostaJpg from "@/rendering/img/valle-aosta.jpg";
+import piemonteJpg from "@/rendering/img/piemonte.jpg";
+import liguriaJpg from "@/rendering/img/liguria.jpg";
+import lombardiaJpg from "@/rendering/img/lombardia.jpg";
+import trentinoAltoAdigeJpg from "@/rendering/img/trentino-alto-adige.jpg";
+import venetoJpg from "@/rendering/img/veneto.jpg";
+import friuliVeneziaGiuliaJpg from "@/rendering/img/friuli-venezia-giulia.jpg";
+import emiliaRomagnaJpg from "@/rendering/img/emilia-romagna.jpg";
+import toscanaJpg from "@/rendering/img/toscana.jpg";
+import umbriaJpg from "@/rendering/img/umbria.jpg";
+import marcheJpg from "@/rendering/img/marche.jpg";
+import lazioJpg from "@/rendering/img/lazio.jpg";
+import abruzzoJpg from "@/rendering/img/abruzzo.jpg";
+import moliseJpg from "@/rendering/img/molise.jpg";
+import campaniaJpg from "@/rendering/img/campania.jpg";
+import pugliaJpg from "@/rendering/img/puglia.jpg";
+import basilicataJpg from "@/rendering/img/basilicata.jpg";
+import calabriaJpg from "@/rendering/img/calabria.jpg";
+import siciliaJpg from "@/rendering/img/sicilia.jpg";
+import sardegnaJpg from "@/rendering/img/sardegna.jpg";
 
 const imageMap: Record<string, ArrayBuffer> = {
-  "world.png": worldPng,
-  "valle-aosta.png": valleAostaPng,
-  "piemonte.png": piemontePng,
-  "liguria.png": liguriaPng,
-  "lombardia.png": lombardiaPng,
-  "trentino-alto-adige.png": trentinoAltoAdigePng,
-  "veneto.png": venetoPng,
-  "friuli-venezia-giulia.png": friuliVeneziaGiuliaPng,
-  "emilia-romagna.png": emiliaRomagnaPng,
-  "toscana.png": toscanaPng,
-  "umbria.png": umbriaPng,
-  "marche.png": marchePng,
-  "lazio.png": lazioPng,
-  "abruzzo.png": abruzzoPng,
-  "molise.png": molisePng,
-  "campania.png": campaniaPng,
-  "puglia.png": pugliaPng,
-  "basilicata.png": basilicataPng,
-  "calabria.png": calabriaPng,
-  "sicilia.png": siciliaPng,
-  "sardegna.png": sardegnaPng,
+  "world.jpg": worldJpg,
+  "valle-aosta.jpg": valleAostaJpg,
+  "piemonte.jpg": piemonteJpg,
+  "liguria.jpg": liguriaJpg,
+  "lombardia.jpg": lombardiaJpg,
+  "trentino-alto-adige.jpg": trentinoAltoAdigeJpg,
+  "veneto.jpg": venetoJpg,
+  "friuli-venezia-giulia.jpg": friuliVeneziaGiuliaJpg,
+  "emilia-romagna.jpg": emiliaRomagnaJpg,
+  "toscana.jpg": toscanaJpg,
+  "umbria.jpg": umbriaJpg,
+  "marche.jpg": marcheJpg,
+  "lazio.jpg": lazioJpg,
+  "abruzzo.jpg": abruzzoJpg,
+  "molise.jpg": moliseJpg,
+  "campania.jpg": campaniaJpg,
+  "puglia.jpg": pugliaJpg,
+  "basilicata.jpg": basilicataJpg,
+  "calabria.jpg": calabriaJpg,
+  "sicilia.jpg": siciliaJpg,
+  "sardegna.jpg": sardegnaJpg,
 };
 
 export function getBaseImage(imageName: string): Uint8Array {
