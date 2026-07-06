@@ -227,3 +227,8 @@ These encode design decisions that are easy to violate by accident:
 
 - Use **Conventional Commits** (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`).
 - Keep commits focused; commit messages in English, imperative mood.
+- Commits must be authored as the human user: use the repo's configured `user.name` /
+  `user.email` (`git config user.name` / `user.email`), never a different identity.
+- Do **not** add any reference to the AI model/tool that made the commit — no
+  `Co-Authored-By` trailer, no "Generated with" line, no mention of Claude or any other
+  assistant anywhere in the commit message.
