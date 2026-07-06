@@ -12,6 +12,11 @@ Geofisica e Vulcanologia). Il bot funziona solo in **chat private** (nessun grup
 
 ---
 
+Il progetto si ispira a [terremotibot](https://github.com/botfactoryit/terremotibot) di
+**BotFactory.it**.
+
+---
+
 ## Come funziona
 
 1. **Avvia** il bot con `/start`.

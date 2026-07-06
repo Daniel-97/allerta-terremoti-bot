@@ -71,7 +71,7 @@ export const STRINGS = {
       "INGV - Istituto Nazionale di Geofisica e Vulcanologia\n" +
       "https://webservices.ingv.it/\n\n" +
       "🤖 *Autore*\n" +
-      "@Daniel-97\n\n" +
+      "@DaniZ97\n\n" +
       "💡 *Codice sorgente*\n" +
       "https://github.com/Daniel-97/allerta-terremoti-bot",
   },
