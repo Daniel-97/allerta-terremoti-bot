@@ -135,6 +135,16 @@ describe("generateEarthquakeImage", () => {
     expect(result.length).toBeGreaterThan(1000);
   });
 
+  it("produces a square (1:1) image so Telegram doesn't crop the preview", async () => {
+    const result = await generateEarthquakeImage(baseEvent, getBaseImage, getFonts);
+
+    // IHDR chunk: width at bytes 16-19, height at bytes 20-23 (big-endian uint32)
+    const view = new DataView(result.buffer, result.byteOffset, result.byteLength);
+    const width = view.getUint32(16);
+    const height = view.getUint32(20);
+    expect(width).toBe(height);
+  });
+
   it("rejects invalid coordinates", async () => {
     const invalidEvent = { ...baseEvent, lat: 999 };
     await expect(generateEarthquakeImage(invalidEvent, getBaseImage, getFonts)).rejects.toThrow(

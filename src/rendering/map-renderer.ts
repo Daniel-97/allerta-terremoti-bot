@@ -90,21 +90,39 @@ export async function renderOverlayToPng(svg: string, fonts: Fonts): Promise<Uin
   return pngBytes;
 }
 
+export interface EdgePadding {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+}
+
 export async function compositeImages(
   baseBytes: Uint8Array,
   overlayBytes: Uint8Array,
-  topPadding: number,
+  padding: EdgePadding,
 ): Promise<Uint8Array> {
-  const { PhotonImage, Rgba, padding_top, watermark } = await import("@cf-wasm/photon/workerd");
-  const base = PhotonImage.new_from_byteslice(baseBytes);
-  const overlay = PhotonImage.new_from_byteslice(overlayBytes);
-  const padded = padding_top(base, topPadding, new Rgba(255, 255, 255, 255));
+  const { PhotonImage, Rgba, padding_top, padding_bottom, padding_left, padding_right, watermark } =
+    await import("@cf-wasm/photon/workerd");
+  // Each padding_* call consumes its Rgba argument (wasm-bindgen ownership), so a
+  // fresh instance is needed per call — reusing one throws "null pointer passed to rust".
+  const white = () => new Rgba(255, 255, 255, 255);
 
+  const base = PhotonImage.new_from_byteslice(baseBytes);
+  const withTop = padding_top(base, padding.top, white());
+  base.free();
+  const withBottom = padding_bottom(withTop, padding.bottom, white());
+  withTop.free();
+  const withLeft = padding_left(withBottom, padding.left, white());
+  withBottom.free();
+  const padded = padding_right(withLeft, padding.right, white());
+  withLeft.free();
+
+  const overlay = PhotonImage.new_from_byteslice(overlayBytes);
   try {
     watermark(padded, overlay, BigInt(0), BigInt(0));
     return padded.get_bytes();
   } finally {
-    base.free();
     overlay.free();
     padded.free();
   }
@@ -112,6 +130,40 @@ export async function compositeImages(
 
 export type GetBaseImageFn = (imageName: string) => Uint8Array;
 export type GetFontsFn = () => Fonts;
+
+export interface SquarePadding {
+  squareSize: number;
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+}
+
+// A small bottom margin so the map isn't flush against the frame on the bottom
+// edge only (left/right get margin from squaring the image; top is anchored by
+// the banner) — purely aesthetic, kept modest so it doesn't inflate the side
+// margins it forces the square canvas to grow by (see computeSquarePadding).
+const BOTTOM_MARGIN = 20;
+
+// Telegram crops preview images that aren't 1:1 — pad the shorter axis so the
+// banner+map composite becomes square. Sizes are derived from the zone/banner
+// passed in, so this adapts to whatever dimensions are used.
+export function computeSquarePadding(zoneWidth: number, zoneHeight: number, bannerHeight: number): SquarePadding {
+  const contentHeight = zoneHeight + bannerHeight;
+  const desiredHeight = contentHeight + BOTTOM_MARGIN;
+  const squareSize = Math.max(zoneWidth, desiredHeight);
+
+  if (squareSize > zoneWidth) {
+    const bottom = squareSize - contentHeight;
+    const sideTotal = squareSize - zoneWidth;
+    const left = Math.floor(sideTotal / 2);
+    return { squareSize, top: 0, bottom, left, right: sideTotal - left };
+  }
+
+  const slack = squareSize - contentHeight;
+  const top = Math.floor(slack / 2);
+  return { squareSize, top, bottom: slack - top, left: 0, right: 0 };
+}
 
 export async function generateEarthquakeImage(
   event: ParsedEvent,
@@ -138,16 +190,24 @@ export async function generateEarthquakeImage(
     magnitudeLabel: `M${magnitude.toFixed(1)}`,
   });
 
-  const totalHeight = zone.height + BANNER_HEIGHT;
-  const svg = `<svg width="${zone.width}" height="${totalHeight}" xmlns="http://www.w3.org/2000/svg">
+  const { squareSize, top, bottom, left, right } = computeSquarePadding(zone.width, zone.height, BANNER_HEIGHT);
+
+  const svg = `<svg width="${squareSize}" height="${squareSize}" xmlns="http://www.w3.org/2000/svg">
+<g transform="translate(${left}, ${top})">
 ${banner}
 <g transform="translate(0, ${BANNER_HEIGHT})">
 ${markerCircles(x, y)}
 </g>
-${buildFrame(zone.width, totalHeight)}
+</g>
+${buildFrame(squareSize, squareSize)}
 </svg>`;
 
   const overlayBytes = await renderOverlayToPng(svg, getFonts());
-  const result = await compositeImages(baseBytes, overlayBytes, BANNER_HEIGHT);
+  const result = await compositeImages(baseBytes, overlayBytes, {
+    top: top + BANNER_HEIGHT,
+    bottom,
+    left,
+    right,
+  });
   return result;
 }
