@@ -8,6 +8,6 @@
     "crons": ["* * * * *", "*/5 * * * *", "0 3 * * *"]
   },
   "rules": [
-    { "type": "Data", "globs": ["**/*.png", "**/*.jpg", "**/*.ttf"], "fallthrough": false }
+    { "type": "Data", "globs": ["**/*.png", "**/*.jpg", "**/*.ttf", "**/*.woff2"], "fallthrough": false }
   ]
 }

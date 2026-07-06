@@ -20,17 +20,16 @@ function getBaseImage(imageName: string): Uint8Array {
 
 function getFonts(): Fonts {
   return {
-    regular: readFileSync(join(FONTS_DIR, "LiberationSans-Regular.ttf")),
-    bold: readFileSync(join(FONTS_DIR, "LiberationSans-Bold.ttf")),
+    bold: readFileSync(join(FONTS_DIR, "Arimo-Bold.woff2")),
   };
 }
 
 async function renderOverlayToPng(svg: string, fonts: Fonts): Promise<Uint8Array> {
   const resvg = await Resvg.async(svg, {
     font: {
-      fontBuffers: [fonts.regular, fonts.bold],
-      defaultFontFamily: "Liberation Sans",
-      sansSerifFamily: "Liberation Sans",
+      fontBuffers: [fonts.bold],
+      defaultFontFamily: "Arimo",
+      sansSerifFamily: "Arimo",
     },
   });
   return resvg.render().asPng();

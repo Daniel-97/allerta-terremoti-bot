@@ -80,9 +80,9 @@ export async function renderOverlayToPng(svg: string, fonts: Fonts): Promise<Uin
   const { Resvg } = await import("@cf-wasm/resvg/workerd");
   const resvg = await Resvg.async(svg, {
     font: {
-      fontBuffers: [fonts.regular, fonts.bold],
-      defaultFontFamily: "Liberation Sans",
-      sansSerifFamily: "Liberation Sans",
+      fontBuffers: [fonts.bold],
+      defaultFontFamily: "Arimo",
+      sansSerifFamily: "Arimo",
     },
   });
   const rendered = resvg.render();
