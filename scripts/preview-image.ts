@@ -93,8 +93,11 @@ async function main(): Promise<void> {
   const totalHeight = zone.height + BANNER_HEIGHT;
 
   const svg = `<svg width="${zone.width}" height="${totalHeight}" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<clipPath id="map-area"><rect x="0" y="0" width="${zone.width}" height="${zone.height}"/></clipPath>
+</defs>
 ${banner}
-<g transform="translate(0, ${BANNER_HEIGHT})">${markerSvg}</g>
+<g transform="translate(0, ${BANNER_HEIGHT})" clip-path="url(#map-area)">${markerSvg}</g>
 </svg>`;
 
   const overlayBytes = await renderOverlayToPng(svg, getFonts());

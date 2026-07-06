@@ -141,9 +141,15 @@ export async function generateEarthquakeImage(
   // The map is sized so BANNER_HEIGHT + zone.height is exactly zone.width — no
   // padding or framing needed, the composite is already square.
   const totalHeight = zone.height + BANNER_HEIGHT;
+  // Marker rings can extend past the map's top edge when the epicenter is near
+  // it (up to 36px radius); clip the marker group to the map area so it never
+  // paints over the banner above it.
   const svg = `<svg width="${zone.width}" height="${totalHeight}" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<clipPath id="map-area"><rect x="0" y="0" width="${zone.width}" height="${zone.height}"/></clipPath>
+</defs>
 ${banner}
-<g transform="translate(0, ${BANNER_HEIGHT})">
+<g transform="translate(0, ${BANNER_HEIGHT})" clip-path="url(#map-area)">
 ${markerCircles(x, y)}
 </g>
 </svg>`;
