@@ -59,8 +59,9 @@ export async function deliverFirstWave(
 
     try {
       if (imageBytes) {
+        const caption = `${text}\n_La posizione sulla mappa è indicativa e potrebbe non essere precisa._`;
         await bot.api.sendPhoto(rec.chatId, new InputFile(imageBytes, "earthquake.png"), {
-          caption: text,
+          caption,
           parse_mode: "Markdown",
           reply_markup: keyboard,
         });
