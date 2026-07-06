@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { Resvg } from "@cf-wasm/resvg/node";
-import { PhotonImage, Rgba, padding_top, padding_bottom, padding_left, padding_right, watermark } from "@cf-wasm/photon/node";
-import { selectZone, latLonToPixel, buildOverlaySvg, buildFrame, computeSquarePadding } from "@/rendering/map-renderer";
+import { PhotonImage, Rgba, padding_top, watermark } from "@cf-wasm/photon/node";
+import { selectZone, latLonToPixel, buildOverlaySvg } from "@/rendering/map-renderer";
 import { buildBannerFragment, BANNER_HEIGHT } from "@/rendering/banner";
 import { formatTime, depthLabel } from "@/notify/compose";
 import { createLogger } from "@/util/log";
@@ -36,30 +36,15 @@ async function renderOverlayToPng(svg: string, fonts: Fonts): Promise<Uint8Array
   return resvg.render().asPng();
 }
 
-interface EdgePadding {
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-}
-
-function compositeImages(baseBytes: Uint8Array, overlayBytes: Uint8Array, padding: EdgePadding): Uint8Array {
-  const white = () => new Rgba(255, 255, 255, 255);
+function compositeImages(baseBytes: Uint8Array, overlayBytes: Uint8Array, topPadding: number): Uint8Array {
   const base = PhotonImage.new_from_byteslice(baseBytes);
-  const withTop = padding_top(base, padding.top, white());
-  base.free();
-  const withBottom = padding_bottom(withTop, padding.bottom, white());
-  withTop.free();
-  const withLeft = padding_left(withBottom, padding.left, white());
-  withBottom.free();
-  const padded = padding_right(withLeft, padding.right, white());
-  withLeft.free();
-
   const overlay = PhotonImage.new_from_byteslice(overlayBytes);
+  const padded = padding_top(base, topPadding, new Rgba(255, 255, 255, 255));
   try {
     watermark(padded, overlay, BigInt(0), BigInt(0));
     return padded.get_bytes();
   } finally {
+    base.free();
     overlay.free();
     padded.free();
   }
@@ -105,18 +90,15 @@ async function main(): Promise<void> {
     magnitudeLabel: `M${event.magnitude.toFixed(1)}`,
   });
   const markerSvg = buildOverlaySvg(zone, x, y);
-  const { squareSize, top, bottom, left, right } = computeSquarePadding(zone.width, zone.height, BANNER_HEIGHT);
+  const totalHeight = zone.height + BANNER_HEIGHT;
 
-  const svg = `<svg width="${squareSize}" height="${squareSize}" xmlns="http://www.w3.org/2000/svg">
-<g transform="translate(${left}, ${top})">
+  const svg = `<svg width="${zone.width}" height="${totalHeight}" xmlns="http://www.w3.org/2000/svg">
 ${banner}
 <g transform="translate(0, ${BANNER_HEIGHT})">${markerSvg}</g>
-</g>
-${buildFrame(squareSize, squareSize)}
 </svg>`;
 
   const overlayBytes = await renderOverlayToPng(svg, getFonts());
-  const result = compositeImages(baseBytes, overlayBytes, { top: top + BANNER_HEIGHT, bottom, left, right });
+  const result = compositeImages(baseBytes, overlayBytes, BANNER_HEIGHT);
 
   mkdirSync(dirname(outputPath), { recursive: true });
   writeFileSync(outputPath, result);

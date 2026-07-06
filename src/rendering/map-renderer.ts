@@ -5,14 +5,25 @@ import { formatTime, depthLabel } from "@/notify/compose";
 import { buildBannerFragment, BANNER_HEIGHT } from "@/rendering/banner";
 import type { Fonts } from "@/rendering/fonts";
 
-// Check smaller/more specific zones first (order matters: sicilia/sardegna before sud due to overlaps)
-const SUB_ZONE_ORDER = ["sicilia", "sardegna", "nord", "centro", "sud"];
-const zoneById = new Map(zones.map((z) => [z.id, z]));
-const SUB_ZONES = SUB_ZONE_ORDER.map((id) => zoneById.get(id)!).filter(Boolean);
-const FULL_ITALY_ZONE = zones.find((z) => z.id === "italia")!;
+const SUB_ZONES = zones.filter((z) => z.id !== "world");
 const WORLD_ZONE = zones.find((z) => z.id === "world")!;
 
+function distanceToCenter(lat: number, lon: number, zone: Zone): number {
+  const centerLat = (zone.minLatitude + zone.maxLatitude) / 2;
+  const centerLon = (zone.minLongitude + zone.maxLongitude) / 2;
+  return Math.hypot(lat - centerLat, lon - centerLon);
+}
+
+// Region bounding boxes are rectangles approximating irregular shapes, so
+// neighbouring regions can both legitimately contain a point near their shared
+// border (e.g. Milan sits inside both Lombardia's and Piemonte's boxes). Among
+// all regions whose box contains the point, the one whose center is closest
+// wins — a much better proxy for "which region is this actually in" than an
+// arbitrary fixed check order.
 export function selectZone(lat: number, lon: number): Zone {
+  let best: Zone | null = null;
+  let bestDistance = Infinity;
+
   for (const zone of SUB_ZONES) {
     if (
       lon >= zone.minLongitude &&
@@ -20,18 +31,15 @@ export function selectZone(lat: number, lon: number): Zone {
       lat >= zone.minLatitude &&
       lat <= zone.maxLatitude
     ) {
-      return zone;
+      const distance = distanceToCenter(lat, lon, zone);
+      if (distance < bestDistance) {
+        best = zone;
+        bestDistance = distance;
+      }
     }
   }
-  if (
-    lon >= FULL_ITALY_ZONE.minLongitude &&
-    lon <= FULL_ITALY_ZONE.maxLongitude &&
-    lat >= FULL_ITALY_ZONE.minLatitude &&
-    lat <= FULL_ITALY_ZONE.maxLatitude
-  ) {
-    return FULL_ITALY_ZONE;
-  }
-  return WORLD_ZONE;
+
+  return best ?? WORLD_ZONE;
 }
 
 function mercatorY(latDeg: number): number {
@@ -68,14 +76,6 @@ ${markerCircles(x, y)}
 </svg>`;
 }
 
-const FRAME_COLOR = "#1a1a1a";
-const FRAME_WIDTH = 3;
-
-export function buildFrame(width: number, height: number): string {
-  const inset = FRAME_WIDTH / 2;
-  return `<rect x="${inset}" y="${inset}" width="${width - FRAME_WIDTH}" height="${height - FRAME_WIDTH}" fill="none" stroke="${FRAME_COLOR}" stroke-width="${FRAME_WIDTH}"/>`;
-}
-
 export async function renderOverlayToPng(svg: string, fonts: Fonts): Promise<Uint8Array> {
   const { Resvg } = await import("@cf-wasm/resvg/workerd");
   const resvg = await Resvg.async(svg, {
@@ -90,39 +90,21 @@ export async function renderOverlayToPng(svg: string, fonts: Fonts): Promise<Uin
   return pngBytes;
 }
 
-export interface EdgePadding {
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-}
-
 export async function compositeImages(
   baseBytes: Uint8Array,
   overlayBytes: Uint8Array,
-  padding: EdgePadding,
+  topPadding: number,
 ): Promise<Uint8Array> {
-  const { PhotonImage, Rgba, padding_top, padding_bottom, padding_left, padding_right, watermark } =
-    await import("@cf-wasm/photon/workerd");
-  // Each padding_* call consumes its Rgba argument (wasm-bindgen ownership), so a
-  // fresh instance is needed per call — reusing one throws "null pointer passed to rust".
-  const white = () => new Rgba(255, 255, 255, 255);
-
+  const { PhotonImage, Rgba, padding_top, watermark } = await import("@cf-wasm/photon/workerd");
   const base = PhotonImage.new_from_byteslice(baseBytes);
-  const withTop = padding_top(base, padding.top, white());
-  base.free();
-  const withBottom = padding_bottom(withTop, padding.bottom, white());
-  withTop.free();
-  const withLeft = padding_left(withBottom, padding.left, white());
-  withBottom.free();
-  const padded = padding_right(withLeft, padding.right, white());
-  withLeft.free();
-
   const overlay = PhotonImage.new_from_byteslice(overlayBytes);
+  const padded = padding_top(base, topPadding, new Rgba(255, 255, 255, 255));
+
   try {
     watermark(padded, overlay, BigInt(0), BigInt(0));
     return padded.get_bytes();
   } finally {
+    base.free();
     overlay.free();
     padded.free();
   }
@@ -130,40 +112,6 @@ export async function compositeImages(
 
 export type GetBaseImageFn = (imageName: string) => Uint8Array;
 export type GetFontsFn = () => Fonts;
-
-export interface SquarePadding {
-  squareSize: number;
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-}
-
-// A small bottom margin so the map isn't flush against the frame on the bottom
-// edge only (left/right get margin from squaring the image; top is anchored by
-// the banner) — purely aesthetic, kept modest so it doesn't inflate the side
-// margins it forces the square canvas to grow by (see computeSquarePadding).
-const BOTTOM_MARGIN = 20;
-
-// Telegram crops preview images that aren't 1:1 — pad the shorter axis so the
-// banner+map composite becomes square. Sizes are derived from the zone/banner
-// passed in, so this adapts to whatever dimensions are used.
-export function computeSquarePadding(zoneWidth: number, zoneHeight: number, bannerHeight: number): SquarePadding {
-  const contentHeight = zoneHeight + bannerHeight;
-  const desiredHeight = contentHeight + BOTTOM_MARGIN;
-  const squareSize = Math.max(zoneWidth, desiredHeight);
-
-  if (squareSize > zoneWidth) {
-    const bottom = squareSize - contentHeight;
-    const sideTotal = squareSize - zoneWidth;
-    const left = Math.floor(sideTotal / 2);
-    return { squareSize, top: 0, bottom, left, right: sideTotal - left };
-  }
-
-  const slack = squareSize - contentHeight;
-  const top = Math.floor(slack / 2);
-  return { squareSize, top, bottom: slack - top, left: 0, right: 0 };
-}
 
 export async function generateEarthquakeImage(
   event: ParsedEvent,
@@ -190,24 +138,17 @@ export async function generateEarthquakeImage(
     magnitudeLabel: `M${magnitude.toFixed(1)}`,
   });
 
-  const { squareSize, top, bottom, left, right } = computeSquarePadding(zone.width, zone.height, BANNER_HEIGHT);
-
-  const svg = `<svg width="${squareSize}" height="${squareSize}" xmlns="http://www.w3.org/2000/svg">
-<g transform="translate(${left}, ${top})">
+  // The map is sized so BANNER_HEIGHT + zone.height is exactly zone.width — no
+  // padding or framing needed, the composite is already square.
+  const totalHeight = zone.height + BANNER_HEIGHT;
+  const svg = `<svg width="${zone.width}" height="${totalHeight}" xmlns="http://www.w3.org/2000/svg">
 ${banner}
 <g transform="translate(0, ${BANNER_HEIGHT})">
 ${markerCircles(x, y)}
 </g>
-</g>
-${buildFrame(squareSize, squareSize)}
 </svg>`;
 
   const overlayBytes = await renderOverlayToPng(svg, getFonts());
-  const result = await compositeImages(baseBytes, overlayBytes, {
-    top: top + BANNER_HEIGHT,
-    bottom,
-    left,
-    right,
-  });
+  const result = await compositeImages(baseBytes, overlayBytes, BANNER_HEIGHT);
   return result;
 }

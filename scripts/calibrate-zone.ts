@@ -7,7 +7,10 @@ import { latLonToPixel } from "@/rendering/map-renderer";
 
 const IMG_DIR = join(import.meta.dirname, "..", "src", "rendering", "img");
 
-// Known reference cities (real-world coordinates) to check against the "centro" base map.
+// Known reference cities (real-world coordinates) used to sanity-check marker
+// placement. Only the ones that actually fall inside the target zone's bounding
+// box are plotted — regions are small enough that most of this list will be
+// off-canvas for any single zone.
 const REFERENCES: { name: string; lat: number; lon: number; color: string }[] = [
   { name: "Bologna", lat: 44.4949, lon: 11.3426, color: "#FF00FF" }, // magenta
   { name: "Ancona", lat: 43.6158, lon: 13.5189, color: "#00FFFF" }, // cyan
@@ -21,13 +24,24 @@ const REFERENCES: { name: string; lat: number; lon: number; color: string }[] = 
 ];
 
 async function main(): Promise<void> {
-  const zoneId = process.argv[2] ?? "centro";
+  const zoneId = process.argv[2] ?? "lazio";
   const zone = zones.find((z) => z.id === zoneId);
   if (!zone) throw new Error(`Zone not found: ${zoneId}`);
 
   const baseBytes = readFileSync(join(IMG_DIR, zone.image));
 
-  const markers = REFERENCES.map((ref) => {
+  const inZone = REFERENCES.filter(
+    (ref) =>
+      ref.lon >= zone.minLongitude &&
+      ref.lon <= zone.maxLongitude &&
+      ref.lat >= zone.minLatitude &&
+      ref.lat <= zone.maxLatitude,
+  );
+  if (inZone.length === 0) {
+    console.warn(`Nessuna città di riferimento ricade in "${zoneId}" — nessun marker verrà disegnato.`);
+  }
+
+  const markers = inZone.map((ref) => {
     const { x, y } = latLonToPixel(ref.lat, ref.lon, zone);
     console.log(`${ref.color}  ${ref.name.padEnd(15)} -> pixel (${x}, ${y})`);
     return `<circle cx="${x}" cy="${y}" r="7" fill="${ref.color}" stroke="black" stroke-width="1.5"/>`;
