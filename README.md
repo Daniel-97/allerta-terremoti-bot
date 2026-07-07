@@ -158,13 +158,15 @@ Prerequisiti: Node.js, un account Cloudflare, un database Turso, un token bot Te
 Ogni push su `main` esegue [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml),
 che installa le dipendenze e pubblica il Worker su Cloudflare, sincronizzando anche i
 secret `BOT_TOKEN`, `WEBHOOK_SECRET`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`,
-`GEONAMES_USERNAME`, `ADMIN_CHAT_IDS` e, se presente, `HEALTHCHECKS_URL`. Può essere
-avviato anche manualmente dalla tab **Actions** (`workflow_dispatch`).
+`GEONAMES_USERNAME`, `ADMIN_CHAT_IDS`. Può essere avviato anche manualmente dalla tab
+**Actions** (`workflow_dispatch`).
 
-Le variabili opzionali (`MAX_ATTEMPTS`, `ITALY_ALERT_THRESHOLD`, `WORLD_ALERT_THRESHOLD`,
-`MAX_LOCATIONS_PER_USER`, `LOOKBACK_WINDOW_MIN`, `DELIVERIES_RETENTION_DAYS`, `EVENTS_RETENTION_DAYS`) **non** sono
-sincronizzate automaticamente da questo workflow: se servono in produzione vanno impostate
-a mano (vedi sotto).
+Le variabili opzionali (`HEALTHCHECKS_URL`, `MAX_ATTEMPTS`, `ITALY_ALERT_THRESHOLD`,
+`WORLD_ALERT_THRESHOLD`, `MAX_LOCATIONS_PER_USER`, `LOOKBACK_WINDOW_MIN`,
+`DELIVERIES_RETENTION_DAYS`, `EVENTS_RETENTION_DAYS`) vengono sincronizzate automaticamente
+**se** esiste un secret GitHub con lo stesso nome; in caso contrario lo step per quella
+variabile viene semplicemente saltato, lasciando il default (o un eventuale valore già
+impostato a mano su Cloudflare).
 
 I cron trigger (poll principale, retry, pulizia) sono configurati in `wrangler.jsonc` e
 vengono pubblicati insieme al Worker.
