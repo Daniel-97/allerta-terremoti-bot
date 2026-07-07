@@ -135,7 +135,7 @@ export async function generateEarthquakeImage(
     location: zoneName,
     depthLabel: depthLabel(depth),
     dateTime: formatTime(time),
-    magnitudeLabel: `M${magnitude.toFixed(1)}`,
+    magnitudeLabel: magnitude.toFixed(1),
     magType,
   });
 

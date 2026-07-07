@@ -5,7 +5,7 @@ const BASE_DATA = {
   location: "Roma",
   depthLabel: "10.0 km",
   dateTime: "30/06/2026, 12:00",
-  magnitudeLabel: "M4.2",
+  magnitudeLabel: "4.2",
 };
 
 describe("buildBannerFragment", () => {
@@ -31,7 +31,7 @@ describe("buildBannerFragment", () => {
 
   it("still renders the magnitude number label unchanged", () => {
     const svg = buildBannerFragment({ ...BASE_DATA, magType: "ML" });
-    expect(svg).toContain(">M4.2<");
+    expect(svg).toContain(">4.2<");
   });
 
   it("keeps the base font size for short location names", () => {
