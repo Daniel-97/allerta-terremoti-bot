@@ -51,6 +51,13 @@ describe("listPendingForRetry", () => {
     expect(pending[0]!.attempts).toBe(1);
   });
 
+  it("returns pending deliveries below maxAttempts", async () => {
+    const pending = await listPendingForRetry(db, 3);
+    expect(pending).toHaveLength(1);
+    expect(pending[0]!.status).toBe("pending");
+    expect(pending[0]!.attempts).toBe(0);
+  });
+
   it("excludes deliveries at or above maxAttempts", async () => {
     const d = await db.select().from(schema.deliveries).then((r) => r[0]!);
     await updateStatus(db, d.id, "failed_transient", 3);

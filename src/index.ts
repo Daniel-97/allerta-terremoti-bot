@@ -64,20 +64,26 @@ export default {
     try {
       switch (controller.cron) {
         case "* * * * *":
-          await runMainCron({
-        HEALTHCHECKS_URL: config.HEALTHCHECKS_URL,
-        adminChatIds: config.adminChatIds,
-        italyAlertThreshold: config.italyAlertThreshold,
-        worldAlertThreshold: config.worldAlertThreshold,
-        lookbackWindowMin: config.lookbackWindowMin,
-      }, db, bot);
-          break;
-        case "*/5 * * * *":
-          await runRetryCron({
-            maxAttempts: config.maxAttempts,
-            italyAlertThreshold: config.italyAlertThreshold,
-            worldAlertThreshold: config.worldAlertThreshold,
-          }, db, bot);
+          try {
+            await runRetryCron({
+              maxAttempts: config.maxAttempts,
+              italyAlertThreshold: config.italyAlertThreshold,
+              worldAlertThreshold: config.worldAlertThreshold,
+            }, db, bot);
+          } catch (err) {
+            log.error({ cron: controller.cron, job: "retry", err: String(err) }, "scheduled trigger error");
+          }
+          try {
+            await runMainCron({
+              HEALTHCHECKS_URL: config.HEALTHCHECKS_URL,
+              adminChatIds: config.adminChatIds,
+              italyAlertThreshold: config.italyAlertThreshold,
+              worldAlertThreshold: config.worldAlertThreshold,
+              lookbackWindowMin: config.lookbackWindowMin,
+            }, db, bot);
+          } catch (err) {
+            log.error({ cron: controller.cron, job: "main", err: String(err) }, "scheduled trigger error");
+          }
           break;
         case "0 3 * * *":
           await runCleanupCron(db, {

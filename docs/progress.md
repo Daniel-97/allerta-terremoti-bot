@@ -1,6 +1,6 @@
 # allerta-terremoti-bot — Progress
 
-**Last updated:** 2026-06-30
+**Last updated:** 2026-07-07
 **Current milestone:** M3 (Detection & notification) — COMPLETED ✅
 
 ---
@@ -78,7 +78,7 @@
 - **Compose (`src/notify/compose.ts`):** 3 message formats: proximity, national (omits distance if no location), world (no personal distance). INGV page URL: `https://terremoti.ingv.it/event/<id>`. Buttons: Dettagli + INGV page. Time in `Europe/Rome`.
 - **Deliver (`src/notify/deliver.ts`):** `deliveries` rows idempotent (`ON CONFLICT DO NOTHING`), sends via `bot.api.sendMessage`, ~30/s rate (33ms sleep). Permanent errors → `setChatStatus('blocked')`; transient → marked for retry. Logs every delivery error (NFR-5.8.4).
 - **Main cron (`src/jobs/poll.ts`):** dead-man's-switch ping → fetch INGV (italy + world) → dedup → match → deliver first wave → save event. Logs cycle stats (NFR-5.8.6).
-- **Scheduled routing (`src/index.ts`):** dispatches by `event.cron` to main cron (`* * * * *`), retry (`*/5`), and cleanup (`0 3`).
+- **Scheduled routing (`src/index.ts`):** dispatches by `event.cron` to main cron (`* * * * *`, runs `runRetryCron` then `runMainCron`) and cleanup (`0 3`). Retry no longer has its own trigger — see "Retry cron folded into main cron" below.
 - **Details callback (`ev;<id>;det`):** reads event from `history`; if found, replies with new message (coords, depth, magnitude, stations, time); if gone, graceful "Dettagli non più disponibili." (FR-4.12).
 - **Tests:** `test/ingv/parser.spec.ts` (6), `test/geo/haversine.spec.ts` (4), `test/db/m3-repos.spec.ts` (9), `test/db/match.spec.ts` (2), `test/notify/errors.spec.ts` (6), `test/notify/compose.spec.ts` (7).
 - **DoD verified:** 114 total tests (75 workers + 39 db), all green.
@@ -136,7 +136,7 @@ test/
     locations.spec.ts     # node pool + libsql :memory:
 vitest.config.ts      # workers pool, excludes test/db
 vitest.db.config.ts   # node pool for test/db
-wrangler.jsonc        # 3 cron triggers: main (* * * * *), retry (*/5), cleanup (0 3)
+wrangler.jsonc        # 2 cron triggers: main (* * * * *, also runs retry), cleanup (0 3)
 ```
 
 ### Test gate (run before each milestone)
@@ -242,7 +242,9 @@ None — all milestones completed.
 - Rate limiting via sleep(33ms) between sends (~30/s); proper `retry_after` handling deferred to M5
 - Details callback responds with a new message (not edit-in-place)
 - INGV event page URL: `https://terremoti.ingv.it/event/<id>`
-- `scheduled` handler routes by `event.cron` to main, retry (`*/5`), and cleanup (`0 3`) crons.
+- `scheduled` handler routes by `event.cron` to main+retry (`* * * * *`) and cleanup (`0 3`) crons.
+- **Retry cron folded into main cron (2026-07-07):** `runRetryCron` no longer has its own `*/5 * * * *` trigger; it now runs on every `* * * * *` tick, right before `runMainCron`, each wrapped in its own try/catch so a failure in one never blocks the other. Retries are now attempted every minute instead of every 5; `MAX_ATTEMPTS` default raised from 3 to 15 to keep a comparable ~15 minute total retry window.
+- **`listPendingForRetry` now also picks up `status = 'pending'` deliveries** (not just `failed_transient`), so a delivery row stuck in `pending` — e.g. manually inserted, or orphaned by a worker crash between insert and send — gets retried instead of sitting forever until `cleanupCron` deletes it.
 
 ---
 

@@ -8,7 +8,7 @@ const schema = z.object({
   GEONAMES_USERNAME: z.string().min(1),
   ADMIN_CHAT_IDS: z.string().optional(),
   HEALTHCHECKS_URL: z.string().url().optional(),
-  MAX_ATTEMPTS: z.coerce.number().positive().int().default(3),
+  MAX_ATTEMPTS: z.coerce.number().positive().int().default(15),
   ITALY_ALERT_THRESHOLD: z.coerce.number().positive().default(5.0),
   WORLD_ALERT_THRESHOLD: z.coerce.number().positive().default(7.0),
   MAX_LOCATIONS_PER_USER: z.coerce.number().positive().int().default(10),

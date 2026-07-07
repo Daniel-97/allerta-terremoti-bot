@@ -1,4 +1,4 @@
-import { eq, and, lt, lte } from "drizzle-orm";
+import { eq, and, lt, lte, inArray } from "drizzle-orm";
 import { deliveries } from "@/db/schema";
 import { nowIso } from "@/util/time";
 import type { Db } from "@/db/types";
@@ -35,7 +35,12 @@ export async function listPendingForRetry(db: Db, maxAttempts: number) {
   return db
     .select()
     .from(deliveries)
-    .where(and(eq(deliveries.status, "failed_transient"), lt(deliveries.attempts, maxAttempts)));
+    .where(
+      and(
+        inArray(deliveries.status, ["failed_transient", "pending"]),
+        lt(deliveries.attempts, maxAttempts),
+      ),
+    );
 }
 
 export async function getDelivery(db: Db, eventId: string, chat: number) {

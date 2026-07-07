@@ -5,7 +5,7 @@
   "compatibility_date": "2025-05-01",
   "observability": { "enabled": true },
   "triggers": {
-    "crons": ["* * * * *", "*/5 * * * *", "0 3 * * *"]
+    "crons": ["* * * * *", "0 3 * * *"]
   },
   "rules": [
     { "type": "Data", "globs": ["**/*.png", "**/*.jpg", "**/*.ttf", "**/*.woff2"], "fallthrough": false }
