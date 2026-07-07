@@ -18,9 +18,7 @@ export function renderLocationsList(
   if (locs.length === 0) {
     return { text: STRINGS.posizioni.empty, keyboard: kb.locationsListKeyboard([]) };
   }
-  const lines = locs.map((l) => `📍 ${l.name}`);
-  const text = `${STRINGS.posizioni.listHeader}\n\n${lines.join("\n")}`;
-  return { text, keyboard: kb.locationsListKeyboard(locs) };
+  return { text: STRINGS.posizioni.listHeader, keyboard: kb.locationsListKeyboard(locs) };
 }
 
 export function renderLocationDetail(

@@ -3,7 +3,6 @@ import type { Logger } from "@/util/log";
 import * as panels from "@/bot/inline/panels";
 import { listLocations } from "@/db/repositories/locations";
 import { requestLocationKeyboard } from "@/bot/location-intake";
-import { STRINGS } from "@/i18n/strings";
 import type { Db } from "@/db/types";
 
 export async function handle(ctx: Context, db: Db, log: Logger): Promise<void> {
@@ -28,10 +27,6 @@ export async function handle(ctx: Context, db: Db, log: Logger): Promise<void> {
 
   await ctx.reply(panel.text, {
     reply_markup: panel.keyboard,
-    parse_mode: "Markdown",
-  });
-  await ctx.reply(STRINGS.posizioni.addPrompt, {
-    reply_markup: requestLocationKeyboard(),
     parse_mode: "Markdown",
   });
 }

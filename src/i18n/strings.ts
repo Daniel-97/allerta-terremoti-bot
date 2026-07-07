@@ -12,23 +12,24 @@ export const STRINGS = {
   },
   aiuto: {
     body:
-      "🤖 *Allerta Terremoti (INGV)*\n\n" +
-      "• /start — Avvia il bot\n" +
-      "• /aiuto — Questo messaggio\n" +
-      "• /posizioni — Aggiungi, visualizza o rimuovi posizioni\n" +
-      "• /impostazioni — Modifica raggio, magnitudo e preferenze globali\n" +
-      "• /stop — Disattiva il tuo account\n" +
-      "• /credits — Fonti e crediti\n\n" +
-      "Le allerte nazionali sono attive di default.\n" +
-      "Le allerte mondiali sono disattive (opt-in da /impostazioni).",
+      "❓ *Aiuto*\n\n" +
+      "🚀 /start — Avvia il bot\n" +
+      "❓ /aiuto — Questo messaggio\n" +
+      "📍 /posizioni — Aggiungi, visualizza o rimuovi posizioni\n" +
+      "⚙️ /impostazioni — Modifica raggio, magnitudo e preferenze globali\n" +
+      "🛑 /stop — Disattiva il tuo account\n" +
+      "ℹ️ /credits — Fonti e crediti\n\n" +
+      "🇮🇹 Le allerte nazionali sono attive di default.\n" +
+      "🌍 Le allerte mondiali sono disattive (opt-in da /impostazioni).",
   },
   posizioni: {
     empty:
+      "📍 *Posizioni*\n\n" +
       "Non hai ancora posizioni salvate.\n\n" +
-      "Premi il pulsante *Condividi posizione* per aggiungerne una.",
+      "Premi il pulsante *Condividi posizione* qui sotto per aggiungerne una.",
     addBtn: "➕ Aggiungi posizione",
-    listHeader: "Seleziona una delle posizioni da gestire:",
-    addPrompt: "➕ Vuoi aggiungere un'altra posizione? Usa il pulsante *Condividi posizione* qui sotto.",
+    listHeader: "📍 *Posizioni*\n\nSeleziona una posizione da gestire:",
+    addPrompt: "📍 Condividi la tua posizione per aggiungere un nuovo monitoraggio.",
     detailHeader: (name: string) => `📍 *${name}*`,
     cap:
       "Hai raggiunto il limite di 10 posizioni.\n" +
@@ -65,11 +66,13 @@ export const STRINGS = {
   },
   stop: {
     done:
-      "Notifiche disattivate. I tuoi dati sono conservati.\n" +
+      "🛑 *Notifiche disattivate*\n\n" +
+      "I tuoi dati sono conservati.\n" +
       "Per riattivare, invia /start.",
   },
   credits: {
     body:
+      "ℹ️ *Credits*\n\n" +
       "📡 *Fonti dati*\n" +
       "INGV - Istituto Nazionale di Geofisica e Vulcanologia\n" +
       "https://webservices.ingv.it/\n\n" +
