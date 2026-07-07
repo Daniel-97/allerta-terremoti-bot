@@ -2,6 +2,7 @@ export const STRINGS = {
   start: {
     welcome: (italyThreshold: number, worldThreshold: number) =>
       "👋 *Allerta Terremoti (INGV)*\n\n" +
+      "Ti avviso in tempo reale quando avviene un terremoto, usando i dati ufficiali dell'INGV.\n\n" +
       `Riceverai le allerte nazionali per **tutti** gli eventi sismici rilevanti (M ≥ ${italyThreshold.toFixed(1)}) ` +
       "che avvengono sul territorio italiano, indipendentemente dalle posizioni che hai salvato.\n\n" +
       "Questa funzione è attiva **di default**.\n\n" +
