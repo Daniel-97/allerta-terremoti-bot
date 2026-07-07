@@ -3,11 +3,10 @@ import type { Bot } from "grammy";
 import type { Db } from "@/db/types";
 
 vi.mock("@/services/ingv/client", () => ({
-  fetchItalyEvents: vi.fn(),
-  fetchWorldEvents: vi.fn(),
+  fetchIngvEvents: vi.fn(),
 }));
 
-import { fetchItalyEvents, fetchWorldEvents } from "@/services/ingv/client";
+import { fetchIngvEvents } from "@/services/ingv/client";
 import { runMainCron } from "@/jobs/poll";
 
 function fakeBot() {
@@ -26,14 +25,12 @@ const CONFIG = {
 
 describe("runMainCron INGV failure handling", () => {
   beforeEach(() => {
-    vi.mocked(fetchItalyEvents).mockReset();
-    vi.mocked(fetchWorldEvents).mockReset();
+    vi.mocked(fetchIngvEvents).mockReset();
   });
 
   it("does not notify admins when the INGV fetch fails", async () => {
     const abortError = new DOMException("The operation was aborted", "AbortError");
-    vi.mocked(fetchItalyEvents).mockRejectedValue(abortError);
-    vi.mocked(fetchWorldEvents).mockResolvedValue([]);
+    vi.mocked(fetchIngvEvents).mockRejectedValue(abortError);
 
     const bot = fakeBot();
     await runMainCron(CONFIG, {} as Db, bot);

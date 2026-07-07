@@ -1,5 +1,5 @@
 import { createLogger } from "@/util/log";
-import { fetchItalyEvents, fetchWorldEvents } from "@/services/ingv/client";
+import { fetchIngvEvents } from "@/services/ingv/client";
 import { insertIfNew as insertHistory } from "@/db/repositories/history";
 import { setState } from "@/db/repositories/system-state";
 import { findRecipients } from "@/notify/match";
@@ -7,6 +7,7 @@ import { deliverFirstWave } from "@/notify/deliver";
 import { notifyEventSummary } from "@/notify/admin";
 import type { Db } from "@/db/types";
 import type { Bot } from "grammy";
+import type { ParsedEvent } from "@/services/ingv/types";
 
 const log = createLogger("poll");
 
@@ -21,15 +22,11 @@ export async function runMainCron(
   }
 
   // 2. Fetch INGV
-  const allEvents: ParsedEventFromClient[] = [];
+  let allEvents: ParsedEvent[];
   try {
-    const [italy, world] = await Promise.all([
-      fetchItalyEvents(config.lookbackWindowMin),
-      fetchWorldEvents(config.lookbackWindowMin),
-    ]);
-    allEvents.push(...italy, ...world);
+    allEvents = await fetchIngvEvents(config.lookbackWindowMin);
     if (allEvents.length > 0) {
-      log.info({ italy: italy.length, world: world.length, total: allEvents.length }, "events fetched");
+      log.info({ count: allEvents.length }, "events fetched");
     }
   } catch (err) {
     log.error({ err: String(err) }, "ingv fetch failed");
@@ -71,5 +68,3 @@ export async function runMainCron(
   // 5. Update system_state
   await setState(db, "last_successful_sync_at", new Date().toISOString());
 }
-
-type ParsedEventFromClient = Awaited<ReturnType<typeof fetchItalyEvents>>[number];

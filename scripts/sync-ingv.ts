@@ -1,6 +1,6 @@
 import { loadConfig } from "@/config";
 import { createDb } from "@/db/client";
-import { fetchItalyEvents, fetchWorldEvents } from "@/services/ingv/client";
+import { fetchIngvEvents } from "@/services/ingv/client";
 import { insertIfNew } from "@/db/repositories/history";
 import { createLogger } from "@/util/log";
 
@@ -13,14 +13,9 @@ async function main(): Promise<void> {
 
   log.info({}, "fetching INGV events...");
 
-  const [italyEvents, worldEvents] = await Promise.all([
-    fetchItalyEvents(config.lookbackWindowMin),
-    fetchWorldEvents(config.lookbackWindowMin),
-  ]);
-
-  const allEvents = [...italyEvents, ...worldEvents];
+  const allEvents = await fetchIngvEvents(config.lookbackWindowMin);
   if (allEvents.length > 0) {
-    log.info({ italy: italyEvents.length, world: worldEvents.length }, "events fetched");
+    log.info({ count: allEvents.length }, "events fetched");
   }
   let newCount = 0;
   for (const event of allEvents) {

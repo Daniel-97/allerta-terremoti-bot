@@ -1,6 +1,5 @@
 import { createLogger } from "@/util/log";
 import { captureWarning } from "@/util/error-handler";
-import { ITALY_BBOX } from "@/util/geo-bbox";
 import { parseFdsnText } from "@/services/ingv/parser";
 import type { ParsedEvent } from "@/services/ingv/types";
 
@@ -13,22 +12,7 @@ function buildUrl(params: Record<string, string>): string {
   return `${ENDPOINT}?${qs}`;
 }
 
-export async function fetchItalyEvents(lookbackWindowMin: number): Promise<ParsedEvent[]> {
-  const startTime = new Date(Date.now() - lookbackWindowMin * 60_000)
-    .toISOString()
-    .replace(/\.\d{3}Z$/, '');
-  const url = buildUrl({
-    format: "text",
-    starttime: startTime,
-    minlatitude: String(ITALY_BBOX.minLat),
-    maxlatitude: String(ITALY_BBOX.maxLat),
-    minlongitude: String(ITALY_BBOX.minLon),
-    maxlongitude: String(ITALY_BBOX.maxLon),
-  });
-  return fetchText(url);
-}
-
-export async function fetchWorldEvents(lookbackWindowMin: number): Promise<ParsedEvent[]> {
+export async function fetchIngvEvents(lookbackWindowMin: number): Promise<ParsedEvent[]> {
   const startTime = new Date(Date.now() - lookbackWindowMin * 60_000)
     .toISOString()
     .replace(/\.\d{3}Z$/, '');
