@@ -114,9 +114,10 @@ describe("callback-data toggle", () => {
 describe("callback-data nav", () => {
   it("round-trips", () => {
     expect(encodeNav("back")).toBe("nav;back");
-    expect(encodeNav("home")).toBe("nav;home");
+    expect(encodeNav("add")).toBe("nav;add");
     expect(decodeNav("nav;back")).toEqual({ kind: "nav", target: "back" });
-    expect(decodeNav("nav;home")).toEqual({ kind: "nav", target: "home" });
+    expect(decodeNav("nav;add")).toEqual({ kind: "nav", target: "add" });
+    expect(decodeNav("nav;home")).toBeNull();
   });
 });
 
@@ -139,7 +140,7 @@ describe("decode generic", () => {
     expect(decode("l;3;del")!.kind).toBe("delete");
     expect(decode("l;3;del;ok")!.kind).toBe("deleteOk");
     expect(decode("set;ita;1")!.kind).toBe("toggle");
-    expect(decode("nav;home")!.kind).toBe("nav");
+    expect(decode("nav;back")!.kind).toBe("nav");
     expect(decode("l;5")!.kind).toBe("loc");
 
     expect(decode("l;5;r;100")!.kind).toBe("radius");
@@ -159,7 +160,7 @@ describe("decode generic", () => {
       [encodeToggle, ["ita", true]],
       [encodeToggle, ["wld", false]],
       [encodeNav, ["back"]],
-      [encodeNav, ["home"]],
+      [encodeNav, ["add"]],
       [encodeLoc, [100000]],
       [encodeEventDetail, ["INGV_20260630_123456"]],
     ] as const) {

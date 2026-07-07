@@ -9,8 +9,7 @@ export function locationsListKeyboard(
   for (const l of locs) {
     kb.text(l.name, cb.encodeLoc(l.id)).row();
   }
-  kb.text(STRINGS.posizioni.addBtn, "nav;add").row();
-  kb.text("↩️ Home", cb.encodeNav("home"));
+  kb.text(STRINGS.posizioni.addBtn, cb.encodeNav("add"));
   return kb;
 }
 
@@ -56,9 +55,7 @@ export function togglesKeyboard(
   return new InlineKeyboard()
     .text(STRINGS.impostazioni.italyLabel(italy), cb.encodeToggle("ita", !italy))
     .row()
-    .text(STRINGS.impostazioni.worldLabel(world), cb.encodeToggle("wld", !world))
-    .row()
-    .text("↩️ Home", cb.encodeNav("home"));
+    .text(STRINGS.impostazioni.worldLabel(world), cb.encodeToggle("wld", !world));
 }
 
 export function confirmDeleteKeyboard(

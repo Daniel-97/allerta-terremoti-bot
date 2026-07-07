@@ -3,6 +3,7 @@ import type { Logger } from "@/util/log";
 import * as panels from "@/bot/inline/panels";
 import { listLocations } from "@/db/repositories/locations";
 import { requestLocationKeyboard } from "@/bot/location-intake";
+import { STRINGS } from "@/i18n/strings";
 import type { Db } from "@/db/types";
 
 export async function handle(ctx: Context, db: Db, log: Logger): Promise<void> {
@@ -16,8 +17,21 @@ export async function handle(ctx: Context, db: Db, log: Logger): Promise<void> {
 
   const locs = await listLocations(db, chatId);
   const panel = panels.renderLocationsList(locs);
+
+  if (locs.length === 0) {
+    await ctx.reply(panel.text, {
+      reply_markup: requestLocationKeyboard(),
+      parse_mode: "Markdown",
+    });
+    return;
+  }
+
   await ctx.reply(panel.text, {
-    reply_markup: locs.length === 0 ? requestLocationKeyboard() : panel.keyboard,
+    reply_markup: panel.keyboard,
+    parse_mode: "Markdown",
+  });
+  await ctx.reply(STRINGS.posizioni.addPrompt, {
+    reply_markup: requestLocationKeyboard(),
     parse_mode: "Markdown",
   });
 }

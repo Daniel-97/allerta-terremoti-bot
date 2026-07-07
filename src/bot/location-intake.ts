@@ -17,7 +17,6 @@ const log = createLogger("bot");
 export function requestLocationKeyboard(): Keyboard {
   return new Keyboard()
     .requestLocation("📍 Condividi posizione")
-    .oneTime()
     .resized();
 }
 

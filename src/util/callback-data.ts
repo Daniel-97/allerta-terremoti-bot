@@ -31,7 +31,7 @@ export interface MagnitudeMenuCb {
 }
 export interface NavCb {
   kind: "nav";
-  target: "back" | "home";
+  target: "back" | "add";
 }
 export interface LocCb {
   kind: "loc";
@@ -132,13 +132,13 @@ export function decodeToggle(s: string): ToggleCb | null {
 }
 
 // nav
-export function encodeNav(target: "back" | "home"): string {
+export function encodeNav(target: "back" | "add"): string {
   return `nav;${target}`;
 }
 export function decodeNav(s: string): NavCb | null {
-  const m = s.match(/^nav;(back|home)$/);
+  const m = s.match(/^nav;(back|add)$/);
   if (!m) return null;
-  return { kind: "nav", target: m[1] as "back" | "home" };
+  return { kind: "nav", target: m[1] as "back" | "add" };
 }
 
 // loc select

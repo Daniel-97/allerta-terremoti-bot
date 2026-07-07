@@ -12,6 +12,7 @@ import { getChat, setAlertFlags } from "@/db/repositories/chats";
 import { getEvent } from "@/db/repositories/history";
 import { STRINGS } from "@/i18n/strings";
 import * as panels from "@/bot/inline/panels";
+import { requestLocationKeyboard } from "@/bot/location-intake";
 import type { Db } from "@/db/types";
 
 const log = createLogger("bot");
@@ -135,15 +136,16 @@ export async function handleCallbackQuery(
         const msg = ctx.callbackQuery?.message;
         if (!msg) return;
         const chatId = msg.chat.id;
-        if (cb.target === "home" || cb.target === "back") {
-          const locs = await listLocations(db, chatId);
-          if (cb.target === "home") {
-            await panels.editPanel(ctx, panels.renderLocationsList(locs));
-          } else {
-            // "back" — depends on current context; for now fallback to location list
-            await panels.editPanel(ctx, panels.renderLocationsList(locs));
-          }
+        if (cb.target === "add") {
+          await ctx.reply(STRINGS.posizioni.addPrompt, {
+            reply_markup: requestLocationKeyboard(),
+            parse_mode: "Markdown",
+          });
+          break;
         }
+        // "back" — depends on current context; for now fallback to location list
+        const locs = await listLocations(db, chatId);
+        await panels.editPanel(ctx, panels.renderLocationsList(locs));
         break;
       }
     }
