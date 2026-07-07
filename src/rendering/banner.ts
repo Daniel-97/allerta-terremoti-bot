@@ -9,6 +9,15 @@ export interface BannerData {
 export const BANNER_WIDTH = 600;
 export const BANNER_HEIGHT = 116;
 
+const LOCATION_X = 164;
+const LOCATION_MAX_WIDTH = BANNER_WIDTH - LOCATION_X - 20;
+const LOCATION_BASE_FONT_SIZE = 24;
+const LOCATION_MIN_FONT_SIZE = 14;
+// Empirically measured with Resvg for Arimo Bold at 24px, letter-spacing 0.5
+// (mixed-case Italian toponyms average ~12.5px/char; all-caps ones go up to
+// ~15px/char). Padded to 15 so the estimate stays conservative either way.
+const LOCATION_PX_PER_CHAR = 15;
+
 function escapeXml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -18,8 +27,30 @@ function escapeXml(value: string): string {
     .replace(/'/g, "&apos;");
 }
 
+// The renderer (resvg) has no text-measurement API available at build time, so
+// width is estimated from character count. Long location names first get a
+// smaller font to fit LOCATION_MAX_WIDTH; if even the minimum font size can't
+// fit them, they're truncated as a last resort so the banner never overflows.
+function fitLocation(location: string): { text: string; fontSize: number } {
+  const minSizeScale = LOCATION_MIN_FONT_SIZE / LOCATION_BASE_FONT_SIZE;
+  const maxCharsAtMinSize = Math.floor(LOCATION_MAX_WIDTH / (LOCATION_PX_PER_CHAR * minSizeScale));
+  const text = location.length > maxCharsAtMinSize ? `${location.slice(0, maxCharsAtMinSize - 1)}…` : location;
+
+  const estimatedWidth = text.length * LOCATION_PX_PER_CHAR;
+  const fontSize =
+    estimatedWidth <= LOCATION_MAX_WIDTH
+      ? LOCATION_BASE_FONT_SIZE
+      : Math.max(
+          LOCATION_MIN_FONT_SIZE,
+          Math.floor(LOCATION_BASE_FONT_SIZE * (LOCATION_MAX_WIDTH / estimatedWidth)),
+        );
+
+  return { text, fontSize };
+}
+
 export function buildBannerFragment(data: BannerData): string {
-  const location = escapeXml(data.location);
+  const { text: locationText, fontSize: locationFontSize } = fitLocation(data.location);
+  const location = escapeXml(locationText);
   const depth = escapeXml(data.depthLabel);
   const dateTime = escapeXml(data.dateTime);
   const magnitude = escapeXml(data.magnitudeLabel);
@@ -39,7 +70,7 @@ export function buildBannerFragment(data: BannerData): string {
 <text x="70" y="58" font-family="Arimo, sans-serif" font-size="46" font-weight="bold" fill="url(#wave)" text-anchor="middle">${magnitude}</text>
 <text x="70" y="86" font-family="Arimo, sans-serif" font-size="13" fill="#8a8a8a" text-anchor="middle" letter-spacing="0.5">MAGNITUDO${magType ? ` (${magType})` : ""}</text>
 <line x1="140" y1="16" x2="140" y2="100" stroke="#e2e2e2" stroke-width="1"/>
-<text x="164" y="44" font-family="Arimo, sans-serif" font-size="24" font-weight="bold" fill="url(#wave)" letter-spacing="0.5">${location}</text>
+<text x="${LOCATION_X}" y="44" font-family="Arimo, sans-serif" font-size="${locationFontSize}" font-weight="bold" fill="url(#wave)" letter-spacing="0.5">${location}</text>
 <text x="164" y="76" font-family="Arimo, sans-serif" font-size="16" fill="#6b6b6b">
   <tspan font-weight="bold" fill="#6b6b6b">Profondità:</tspan>
   <tspan font-weight="600" fill="#1a1a1a"> ${depth}</tspan>
