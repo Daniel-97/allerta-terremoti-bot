@@ -6,9 +6,12 @@ export function locationsListKeyboard(
   locs: { id: number; name: string }[],
 ): InlineKeyboard {
   const kb = new InlineKeyboard();
-  for (const l of locs) {
-    kb.text(l.name, cb.encodeLoc(l.id)).row();
-  }
+  const perRow = locs.length > 1 ? 2 : 1;
+  locs.forEach((l, i) => {
+    kb.text(l.name, cb.encodeLoc(l.id));
+    if ((i + 1) % perRow === 0) kb.row();
+  });
+  if (locs.length % perRow !== 0) kb.row();
   kb.text(STRINGS.posizioni.addBtn, cb.encodeNav("add"));
   return kb;
 }
