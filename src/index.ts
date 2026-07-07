@@ -63,7 +63,7 @@ export default {
 
     try {
       switch (controller.cron) {
-        case "* * * * *":
+        case "*/5 * * * *":
           try {
             await runRetryCron({
               maxAttempts: config.maxAttempts,

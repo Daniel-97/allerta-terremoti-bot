@@ -242,8 +242,9 @@ None — all milestones completed.
 - Rate limiting via sleep(33ms) between sends (~30/s); proper `retry_after` handling deferred to M5
 - Details callback responds with a new message (not edit-in-place)
 - INGV event page URL: `https://terremoti.ingv.it/event/<id>`
-- `scheduled` handler routes by `event.cron` to main+retry (`* * * * *`) and cleanup (`0 3`) crons.
-- **Retry cron folded into main cron (2026-07-07):** `runRetryCron` no longer has its own `*/5 * * * *` trigger; it now runs on every `* * * * *` tick, right before `runMainCron`, each wrapped in its own try/catch so a failure in one never blocks the other. Retries are now attempted every minute instead of every 5; `MAX_ATTEMPTS` default raised from 3 to 15 to keep a comparable ~15 minute total retry window.
+- `scheduled` handler routes by `event.cron` to main+retry (`*/5 * * * *`) and cleanup (`0 3`) crons.
+- **Retry cron folded into main cron (2026-07-07):** `runRetryCron` no longer has its own dedicated trigger; it now runs right before `runMainCron` on the same tick, each wrapped in its own try/catch so a failure in one never blocks the other.
+- **Main+retry cadence dropped to every 5 minutes (2026-07-07):** was every minute, to cut Cloudflare Workers cron invocations (and CPU time billing) by 80%. `MAX_ATTEMPTS` default reverted from 15 back to 3 to keep the total retry window at ~15 minutes (3 attempts × 5 min) instead of stretching to ~75 minutes.
 - **`listPendingForRetry` now also picks up `status = 'pending'` deliveries** (not just `failed_transient`), so a delivery row stuck in `pending` — e.g. manually inserted, or orphaned by a worker crash between insert and send — gets retried instead of sitting forever until `cleanupCron` deletes it.
 
 ---
