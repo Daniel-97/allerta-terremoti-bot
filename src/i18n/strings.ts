@@ -48,8 +48,8 @@ export const STRINGS = {
     title: "⚙️ *Impostazioni*",
     radiusTitle: (name: string) => `📏 *Raggio — ${name}*`,
     magnitudeTitle: (name: string) => `📊 *Magnitudo — ${name}*`,
-    italyLabel: (on: boolean) => (on ? "✅ Italia: ON" : "⬜ Italia: OFF"),
-    worldLabel: (on: boolean) => (on ? "✅ Mondo: ON" : "⬜ Mondo: OFF"),
+    italyLabel: (on: boolean) => (on ? "✅ Notifiche Italia: ON" : "❌ Notifiche Italia: OFF"),
+    worldLabel: (on: boolean) => (on ? "✅ Notifiche Mondo: ON" : "❌ Notifiche Mondo: OFF"),
   },
   toggles: {
     italyOn: "Le allerte nazionali sono ora *attive*.",
