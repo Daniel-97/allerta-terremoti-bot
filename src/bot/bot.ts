@@ -62,7 +62,7 @@ export function createBot(config: RuntimeConfig, db: Db): Bot {
   });
 
   // user slash commands
-  bot.command("start", (ctx) => start.handle(ctx, db, log));
+  bot.command("start", (ctx) => start.handle(ctx, db, log, config));
   bot.command("aiuto", (ctx) => aiuto.handle(ctx, db, log));
   bot.command("posizioni", (ctx) => posizioni.handle(ctx, db, log));
   bot.command("impostazioni", (ctx) => impostazioni.handle(ctx, db, log));

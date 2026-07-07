@@ -1,8 +1,8 @@
 # allerta-terremoti-bot
 
 Bot Telegram che invia **allerte sismiche in tempo reale** agli utenti in base alle
-posizioni che hanno salvato. I dati sismici arrivano dall'**INGV** (Istituto Nazionale di
-Geofisica e Vulcanologia). Il bot funziona solo in **chat private** (nessun gruppo).
+posizioni che hanno salvato. I dati sismici arrivano dall'[**INGV**](https://terremoti.ingv.it/)
+(Istituto Nazionale di Geofisica e Vulcanologia) ([come funziona](https://terremoti.ingv.it/help)).
 
 <p align="center">
   <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://t.me/allerta_terremoti_bot" alt="QR Code del bot" />
@@ -12,8 +12,12 @@ Geofisica e Vulcanologia). Il bot funziona solo in **chat private** (nessun grup
 
 ---
 
-Il progetto si ispira a [terremotibot](https://github.com/botfactoryit/terremotibot) di
-**BotFactory.it**.
+Il progetto si ispira a [terremotibot](https://github.com/botfactoryit/terremotibot).
+
+> ⚠️ **Disclaimer**: questo è un progetto indipendente, non ufficiale e non affiliato,
+> sponsorizzato o approvato dall'INGV (Istituto Nazionale di Geofisica e Vulcanologia). I
+> dati sismici sono ricavati dai servizi pubblici INGV, ma il bot non ha alcun legame con
+> l'ente.
 
 ---
 

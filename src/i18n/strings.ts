@@ -1,12 +1,13 @@
 export const STRINGS = {
   start: {
-    welcome:
+    welcome: (italyThreshold: number, worldThreshold: number) =>
       "👋 *Allerta Terremoti (INGV)*\n\n" +
-      "Riceverai le allerte nazionali per **tutti** gli eventi sismici rilevanti (M ≥ 5.0) " +
+      `Riceverai le allerte nazionali per **tutti** gli eventi sismici rilevanti (M ≥ ${italyThreshold.toFixed(1)}) ` +
       "che avvengono sul territorio italiano, indipendentemente dalle posizioni che hai salvato.\n\n" +
       "Questa funzione è attiva **di default**.\n\n" +
       "Per le allerte di prossimità (eventi vicini alle tue posizioni), aggiungi una o più posizioni con /posizioni.\n" +
-      "Per le allerte mondiali (M ≥ 7.0), attivale in /impostazioni.",
+      `Per le allerte mondiali (M ≥ ${worldThreshold.toFixed(1)}), attivale in /impostazioni.\n\n` +
+      "⚠️ _Bot non ufficiale, non affiliato all'INGV._",
   },
   aiuto: {
     body:
@@ -73,7 +74,11 @@ export const STRINGS = {
       "🤖 *Autore*\n" +
       "@DaniZ97\n\n" +
       "💡 *Codice sorgente*\n" +
-      "https://github.com/Daniel-97/allerta-terremoti-bot",
+      "https://github.com/Daniel-97/allerta-terremoti-bot\n\n" +
+      "⚠️ *Disclaimer*\n" +
+      "Questo bot non è ufficiale e non è in alcun modo affiliato, sponsorizzato o " +
+      "approvato dall'INGV. I dati sono ricavati dai servizi pubblici INGV ma il bot " +
+      "è un progetto indipendente.",
   },
   unknownCommand: {
     hint:
