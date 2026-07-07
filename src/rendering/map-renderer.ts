@@ -2,7 +2,14 @@ import { zones } from "@/config";
 import type { Zone } from "@/config";
 import type { ParsedEvent } from "@/services/ingv/types";
 import { formatTime, depthLabel } from "@/notify/compose";
-import { buildBannerFragment, BANNER_HEIGHT } from "@/rendering/banner";
+import {
+  buildBannerFragment,
+  escapeXml,
+  BANNER_HEIGHT,
+  LOCATION_MAX_WIDTH,
+  LOCATION_BASE_FONT_SIZE,
+  LOCATION_MIN_FONT_SIZE,
+} from "@/rendering/banner";
 import type { Fonts } from "@/rendering/fonts";
 
 const SUB_ZONES = zones.filter((z) => z.id !== "world");
@@ -76,6 +83,59 @@ ${markerCircles(x, y)}
 </svg>`;
 }
 
+async function measureTextWidth(
+  text: string,
+  fontSize: number,
+  boldFont: Uint8Array,
+): Promise<number> {
+  const { Resvg } = await import("@cf-wasm/resvg/workerd");
+  const svg = `<svg width="2000" height="${fontSize * 2}" xmlns="http://www.w3.org/2000/svg">
+<text x="0" y="${fontSize}" font-family="Arimo, sans-serif" font-size="${fontSize}" font-weight="bold" letter-spacing="0.5" fill="#000">${escapeXml(text)}</text>
+</svg>`;
+  const resvg = await Resvg.async(svg, {
+    font: { fontBuffers: [boldFont], defaultFontFamily: "Arimo", sansSerifFamily: "Arimo" },
+  });
+  const bbox = resvg.innerBBox();
+  return bbox ? bbox.width : 0;
+}
+
+// resvg has no text-measurement API at SVG-build time, so the location's fit
+// is determined by actually rendering it and reading back the glyph width —
+// a fixed px-per-character estimate can't be accurate for both short mixed-case
+// names and long all-caps ones. Long names first get a smaller font to fit
+// LOCATION_MAX_WIDTH; if even the minimum font size can't fit them, they're
+// truncated as a last resort so the banner never overflows.
+export async function fitLocationText(
+  location: string,
+  boldFont: Uint8Array,
+): Promise<{ text: string; fontSize: number }> {
+  const baseWidth = await measureTextWidth(location, LOCATION_BASE_FONT_SIZE, boldFont);
+  if (baseWidth <= LOCATION_MAX_WIDTH) {
+    return { text: location, fontSize: LOCATION_BASE_FONT_SIZE };
+  }
+
+  const scaledFontSize = Math.floor(LOCATION_BASE_FONT_SIZE * (LOCATION_MAX_WIDTH / baseWidth));
+  if (scaledFontSize >= LOCATION_MIN_FONT_SIZE) {
+    return { text: location, fontSize: scaledFontSize };
+  }
+
+  const avgCharWidthAtMinSize =
+    (baseWidth / location.length) * (LOCATION_MIN_FONT_SIZE / LOCATION_BASE_FONT_SIZE);
+  let maxChars = Math.max(1, Math.floor(LOCATION_MAX_WIDTH / avgCharWidthAtMinSize) - 1);
+  let text = `${location.slice(0, maxChars)}…`;
+
+  // The average-based estimate above can undershoot for character-heavy
+  // strings, so verify with a real measurement and trim further if needed.
+  while (maxChars > 1) {
+    const width = await measureTextWidth(text, LOCATION_MIN_FONT_SIZE, boldFont);
+    if (width <= LOCATION_MAX_WIDTH) break;
+    maxChars -= 1;
+    text = `${location.slice(0, maxChars)}…`;
+  }
+
+  return { text, fontSize: LOCATION_MIN_FONT_SIZE };
+}
+
 export async function renderOverlayToPng(svg: string, fonts: Fonts): Promise<Uint8Array> {
   const { Resvg } = await import("@cf-wasm/resvg/workerd");
   const resvg = await Resvg.async(svg, {
@@ -119,7 +179,14 @@ export async function generateEarthquakeImage(
   getFonts: GetFontsFn,
 ): Promise<Uint8Array> {
   const { lat, lon, magnitude, depth, time, zone: zoneName, magType } = event;
-  if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+  if (
+    !Number.isFinite(lat) ||
+    !Number.isFinite(lon) ||
+    lat < -90 ||
+    lat > 90 ||
+    lon < -180 ||
+    lon > 180
+  ) {
     throw new Error("Invalid coordinates");
   }
 
@@ -131,8 +198,15 @@ export async function generateEarthquakeImage(
     throw new Error(`Empty base image: ${zone.image}`);
   }
 
+  const fonts = getFonts();
+  const { text: fittedLocation, fontSize: locationFontSize } = await fitLocationText(
+    zoneName,
+    fonts.bold,
+  );
+
   const banner = buildBannerFragment({
-    location: zoneName,
+    location: fittedLocation,
+    locationFontSize,
     depthLabel: depthLabel(depth),
     dateTime: formatTime(time),
     magnitudeLabel: magnitude.toFixed(1),
@@ -155,7 +229,7 @@ ${markerCircles(x, y)}
 </g>
 </svg>`;
 
-  const overlayBytes = await renderOverlayToPng(svg, getFonts());
+  const overlayBytes = await renderOverlayToPng(svg, fonts);
   const result = await compositeImages(baseBytes, overlayBytes, BANNER_HEIGHT);
   return result;
 }

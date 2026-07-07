@@ -34,35 +34,27 @@ describe("buildBannerFragment", () => {
     expect(svg).toContain(">4.2<");
   });
 
-  it("keeps the base font size for short location names", () => {
+  it("defaults the location font size to 24 when not specified", () => {
     const svg = buildBannerFragment({ ...BASE_DATA, location: "Roma" });
-    expect(svg).toContain('font-size="24" font-weight="bold" fill="url(#wave)" letter-spacing="0.5">Roma<');
+    expect(svg).toContain(
+      'font-size="24" font-weight="bold" fill="url(#wave)" letter-spacing="0.5">Roma<',
+    );
   });
 
-  it("shrinks the font size for a long location name instead of overflowing", () => {
-    const longLocation = "Costa Siciliana nord-orientale (Messina)";
-    const svg = buildBannerFragment({ ...BASE_DATA, location: longLocation });
-    const match = svg.match(/<text x="164" y="44"[^>]*font-size="(\d+)"[^>]*>([^<]*)<\/text>/);
-    expect(match).not.toBeNull();
-    const [, fontSize, text] = match!;
-    expect(Number(fontSize)).toBeLessThan(24);
-    expect(text).toBe(longLocation);
+  it("uses the given locationFontSize for the location text", () => {
+    const svg = buildBannerFragment({
+      ...BASE_DATA,
+      location: "Costa Siciliana nord-orientale",
+      locationFontSize: 18,
+    });
+    expect(svg).toContain(
+      'font-size="18" font-weight="bold" fill="url(#wave)" letter-spacing="0.5">Costa Siciliana nord-orientale<',
+    );
   });
 
-  it("truncates with an ellipsis when even the minimum font size would overflow", () => {
-    const veryLongLocation = "A".repeat(200);
-    const svg = buildBannerFragment({ ...BASE_DATA, location: veryLongLocation });
-    const match = svg.match(/<text x="164" y="44"[^>]*font-size="(\d+)"[^>]*>([^<]*)<\/text>/);
-    expect(match).not.toBeNull();
-    const [, fontSize, text] = match!;
-    expect(Number(fontSize)).toBe(14);
-    expect(text!.endsWith("…")).toBe(true);
-    expect(text!.length).toBeLessThan(veryLongLocation.length);
-  });
-
-  it("escapes XML special characters in a truncated location", () => {
-    const veryLongLocation = `${"A".repeat(200)}<script>`;
-    const svg = buildBannerFragment({ ...BASE_DATA, location: veryLongLocation });
+  it("escapes XML special characters in the location", () => {
+    const svg = buildBannerFragment({ ...BASE_DATA, location: "Test <script>" });
     expect(svg).not.toContain("<script>");
+    expect(svg).toContain("Test &lt;script&gt;");
   });
 });

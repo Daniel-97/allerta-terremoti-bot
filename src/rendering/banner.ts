@@ -1,5 +1,6 @@
 export interface BannerData {
   location: string;
+  locationFontSize?: number;
   depthLabel: string;
   dateTime: string;
   magnitudeLabel: string;
@@ -9,16 +10,12 @@ export interface BannerData {
 export const BANNER_WIDTH = 600;
 export const BANNER_HEIGHT = 116;
 
-const LOCATION_X = 164;
-const LOCATION_MAX_WIDTH = BANNER_WIDTH - LOCATION_X - 20;
-const LOCATION_BASE_FONT_SIZE = 24;
-const LOCATION_MIN_FONT_SIZE = 14;
-// Empirically measured with Resvg for Arimo Bold at 24px, letter-spacing 0.5
-// (mixed-case Italian toponyms average ~12.5px/char; all-caps ones go up to
-// ~15px/char). Padded to 15 so the estimate stays conservative either way.
-const LOCATION_PX_PER_CHAR = 15;
+export const LOCATION_X = 164;
+export const LOCATION_MAX_WIDTH = BANNER_WIDTH - LOCATION_X - 20;
+export const LOCATION_BASE_FONT_SIZE = 24;
+export const LOCATION_MIN_FONT_SIZE = 14;
 
-function escapeXml(value: string): string {
+export function escapeXml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -27,30 +24,9 @@ function escapeXml(value: string): string {
     .replace(/'/g, "&apos;");
 }
 
-// The renderer (resvg) has no text-measurement API available at build time, so
-// width is estimated from character count. Long location names first get a
-// smaller font to fit LOCATION_MAX_WIDTH; if even the minimum font size can't
-// fit them, they're truncated as a last resort so the banner never overflows.
-function fitLocation(location: string): { text: string; fontSize: number } {
-  const minSizeScale = LOCATION_MIN_FONT_SIZE / LOCATION_BASE_FONT_SIZE;
-  const maxCharsAtMinSize = Math.floor(LOCATION_MAX_WIDTH / (LOCATION_PX_PER_CHAR * minSizeScale));
-  const text = location.length > maxCharsAtMinSize ? `${location.slice(0, maxCharsAtMinSize - 1)}…` : location;
-
-  const estimatedWidth = text.length * LOCATION_PX_PER_CHAR;
-  const fontSize =
-    estimatedWidth <= LOCATION_MAX_WIDTH
-      ? LOCATION_BASE_FONT_SIZE
-      : Math.max(
-          LOCATION_MIN_FONT_SIZE,
-          Math.floor(LOCATION_BASE_FONT_SIZE * (LOCATION_MAX_WIDTH / estimatedWidth)),
-        );
-
-  return { text, fontSize };
-}
-
 export function buildBannerFragment(data: BannerData): string {
-  const { text: locationText, fontSize: locationFontSize } = fitLocation(data.location);
-  const location = escapeXml(locationText);
+  const location = escapeXml(data.location);
+  const locationFontSize = data.locationFontSize ?? LOCATION_BASE_FONT_SIZE;
   const depth = escapeXml(data.depthLabel);
   const dateTime = escapeXml(data.dateTime);
   const magnitude = escapeXml(data.magnitudeLabel);

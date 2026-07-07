@@ -1,8 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { selectZone, latLonToPixel, buildOverlaySvg, generateEarthquakeImage } from "@/rendering/map-renderer";
+import {
+  selectZone,
+  latLonToPixel,
+  buildOverlaySvg,
+  generateEarthquakeImage,
+  fitLocationText,
+} from "@/rendering/map-renderer";
 import { zones } from "@/config";
 import { getBaseImage } from "@/rendering/images";
 import { getFonts } from "@/rendering/fonts";
+import { LOCATION_BASE_FONT_SIZE, LOCATION_MIN_FONT_SIZE } from "@/rendering/banner";
 import type { ParsedEvent } from "@/services/ingv/types";
 
 describe("selectZone", () => {
@@ -103,6 +110,38 @@ describe("buildOverlaySvg", () => {
   });
 });
 
+describe("fitLocationText", () => {
+  const boldFont = getFonts().bold;
+
+  it("keeps the base font size and text unchanged for short names", async () => {
+    const result = await fitLocationText("Roma", boldFont);
+    expect(result).toEqual({ text: "Roma", fontSize: LOCATION_BASE_FONT_SIZE });
+  });
+
+  it("does not shrink a mixed-case name that fits comfortably at the base size", async () => {
+    // Regression test: a flat per-character width estimate previously shrank
+    // this down to 16px even though it fits at a much larger size.
+    const result = await fitLocationText("Costa Siciliana nord-orientale (Messina)", boldFont);
+    expect(result.text).toBe("Costa Siciliana nord-orientale (Messina)");
+    expect(result.fontSize).toBeGreaterThanOrEqual(20);
+  });
+
+  it("shrinks an all-caps name that would overflow at the base size", async () => {
+    const result = await fitLocationText("COSTA SICILIANA NORD-ORIENTALE (MESSINA)", boldFont);
+    expect(result.text).toBe("COSTA SICILIANA NORD-ORIENTALE (MESSINA)");
+    expect(result.fontSize).toBeLessThan(LOCATION_BASE_FONT_SIZE);
+    expect(result.fontSize).toBeGreaterThanOrEqual(LOCATION_MIN_FONT_SIZE);
+  });
+
+  it("truncates with an ellipsis when even the minimum font size would overflow", async () => {
+    const veryLongLocation = "Costa ".repeat(40).trim();
+    const result = await fitLocationText(veryLongLocation, boldFont);
+    expect(result.fontSize).toBe(LOCATION_MIN_FONT_SIZE);
+    expect(result.text.endsWith("…")).toBe(true);
+    expect(result.text.length).toBeLessThan(veryLongLocation.length);
+  });
+});
+
 describe("generateEarthquakeImage", () => {
   const baseEvent: ParsedEvent = {
     eventId: "test-event",
@@ -125,7 +164,9 @@ describe("generateEarthquakeImage", () => {
 
     expect(result).toBeInstanceOf(Uint8Array);
     // PNG magic bytes
-    expect(Array.from(result.slice(0, 8))).toEqual([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    expect(Array.from(result.slice(0, 8))).toEqual([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+    ]);
     expect(result.length).toBeGreaterThan(1000);
   });
 
