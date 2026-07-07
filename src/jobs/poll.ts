@@ -4,7 +4,6 @@ import { insertIfNew as insertHistory } from "@/db/repositories/history";
 import { setState } from "@/db/repositories/system-state";
 import { findRecipients } from "@/notify/match";
 import { deliverFirstWave } from "@/notify/deliver";
-import { notifyEventSummary } from "@/notify/admin";
 import type { Db } from "@/db/types";
 import type { Bot } from "grammy";
 import type { ParsedEvent } from "@/services/ingv/types";
@@ -12,7 +11,7 @@ import type { ParsedEvent } from "@/services/ingv/types";
 const log = createLogger("poll");
 
 export async function runMainCron(
-  config: { HEALTHCHECKS_URL: string | undefined; adminChatIds: number[]; italyAlertThreshold: number; worldAlertThreshold: number; lookbackWindowMin: number },
+  config: { HEALTHCHECKS_URL: string | undefined; italyAlertThreshold: number; worldAlertThreshold: number; lookbackWindowMin: number },
   db: Db,
   bot: Bot,
 ): Promise<void> {
@@ -61,7 +60,6 @@ export async function runMainCron(
         failedTransient: outcome.failedTransient,
         failedPermanent: outcome.failedPermanent,
       }, "delivery wave completed");
-      await notifyEventSummary(bot, config.adminChatIds, event, recipients.length, outcome);
     }
   }
 

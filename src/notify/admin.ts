@@ -1,9 +1,6 @@
 import { createLogger } from "@/util/log";
 import { captureWarning } from "@/util/error-handler";
 import type { Bot } from "grammy";
-import type { ParsedEvent } from "@/services/ingv/types";
-import type { DeliveryOutcome } from "@/notify/deliver";
-import { formatMagType } from "@/notify/compose";
 
 const log = createLogger("admin");
 
@@ -27,26 +24,6 @@ export async function notifyNewUser(
       );
     } catch (err) {
       captureWarning(log, err, { adminChatId: id, action: "new-user notification" });
-    }
-  }
-}
-
-export async function notifyEventSummary(
-  bot: Bot,
-  adminChatIds: number[],
-  event: ParsedEvent,
-  recipientCount: number,
-  outcome: DeliveryOutcome,
-): Promise<void> {
-  for (const id of adminChatIds) {
-    try {
-      await bot.api.sendMessage(
-        id,
-        `📢 *Event summary*\nM ${event.magnitude.toFixed(1)}${formatMagType(event.magType)} — ${event.zone}\n\`${event.eventId}\`\nRecipients: ${recipientCount}\n✅ ${outcome.sent}  ⚠️ ${outcome.failedTransient}  ❌ ${outcome.failedPermanent}`,
-        { parse_mode: "Markdown" },
-      );
-    } catch (err) {
-      captureWarning(log, err, { adminChatId: id, action: "event-summary notification" });
     }
   }
 }

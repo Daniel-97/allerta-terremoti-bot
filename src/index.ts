@@ -76,7 +76,6 @@ export default {
           try {
             await runMainCron({
               HEALTHCHECKS_URL: config.HEALTHCHECKS_URL,
-              adminChatIds: config.adminChatIds,
               italyAlertThreshold: config.italyAlertThreshold,
               worldAlertThreshold: config.worldAlertThreshold,
               lookbackWindowMin: config.lookbackWindowMin,
