@@ -16,6 +16,10 @@ function buttonCount(kb: { inline_keyboard: unknown[][] }): number {
 describe("composeProximity", () => {
   const msg = composeProximity(EVENT, 15, "Roma");
 
+  it("starts with the proximity reason label", () => {
+    expect(msg.text.startsWith("🔔 Allerta di prossimità\n")).toBe(true);
+  });
+
   it("includes magnitude and zone in a single title line", () => {
     expect(msg.text).toContain("⚠️ Terremoto *M4.2* (ML) - Roma");
   });
@@ -39,6 +43,11 @@ describe("composeProximity", () => {
 });
 
 describe("composeNational", () => {
+  it("starts with the national reason label", () => {
+    const msg = composeNational(EVENT, 200, "Milano");
+    expect(msg.text.startsWith("🇮🇹 Allerta nazionale\n")).toBe(true);
+  });
+
   it("includes location and distance when present", () => {
     const msg = composeNational(EVENT, 200, "Milano");
     expect(msg.text).toContain("📍 *Milano* — 200 km");
@@ -57,6 +66,11 @@ describe("composeNational", () => {
 });
 
 describe("composeWorld", () => {
+  it("starts with the world reason label", () => {
+    const msg = composeWorld(EVENT);
+    expect(msg.text.startsWith("🌍 Allerta mondiale\n")).toBe(true);
+  });
+
   it("uses event.zone with no location line", () => {
     const msg = composeWorld(EVENT);
     expect(msg.text).toContain("⚠️ Terremoto *M4.2* (ML) - Roma");

@@ -55,8 +55,20 @@ function buildTitleLine(event: ParsedEvent): string {
   return formatTitle(event.magnitude, event.zone, true, true, event.magType);
 }
 
+function buildReasonLabel(reason: Recipient["reason"]): string {
+  switch (reason) {
+    case "proximity":
+      return "🔔 Allerta di prossimità";
+    case "national":
+      return "🇮🇹 Allerta nazionale";
+    case "world":
+      return "🌍 Allerta mondiale";
+  }
+}
+
 export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string): ComposedMessage {
   const text =
+    `${buildReasonLabel("proximity")}\n` +
     `${buildTitleLine(event)}\n` +
     `${buildLocationLine(distanceKm, locName)}\n` +
     `📏 Profondità: ${depthLabel(event.depth)}\n` +
@@ -68,6 +80,7 @@ export function composeProximity(event: ParsedEvent, distanceKm: number, locName
 export function composeNational(event: ParsedEvent, distanceKm: number | null, locName: string | null): ComposedMessage {
   const locLine = locName && distanceKm != null ? `${buildLocationLine(distanceKm, locName)}\n` : "";
   const text =
+    `${buildReasonLabel("national")}\n` +
     `${buildTitleLine(event)}\n` +
     locLine +
     `📏 Profondità: ${depthLabel(event.depth)}\n` +
@@ -78,6 +91,7 @@ export function composeNational(event: ParsedEvent, distanceKm: number | null, l
 
 export function composeWorld(event: ParsedEvent): ComposedMessage {
   const text =
+    `${buildReasonLabel("world")}\n` +
     `${buildTitleLine(event)}\n` +
     `📏 Profondità: ${depthLabel(event.depth)}\n` +
     `🕐 ${formatTime(event.time)}\n` +
