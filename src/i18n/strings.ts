@@ -74,12 +74,13 @@ export const STRINGS = {
     body:
       "ℹ️ *Credits*\n\n" +
       "📡 *Fonti dati*\n" +
-      "INGV - Istituto Nazionale di Geofisica e Vulcanologia\n" +
-      "https://webservices.ingv.it/\n\n" +
+      "[INGV - Istituto Nazionale di Geofisica e Vulcanologia](https://webservices.ingv.it/)\n\n" +
       "🤖 *Autore*\n" +
       "@DaniZ97\n\n" +
       "💡 *Codice sorgente*\n" +
-      "https://github.com/Daniel-97/allerta-terremoti-bot\n\n" +
+      "[allerta-terremoti-bot](https://github.com/Daniel-97/allerta-terremoti-bot)\n\n" +
+      "🙏 *Ispirazione*\n" +
+      "Progetto ispirato a [terremotibot](https://github.com/botfactoryit/terremotibot) di BotFactory\n\n" +
       "⚠️ *Disclaimer*\n" +
       "Questo bot non è ufficiale e non è in alcun modo affiliato, sponsorizzato o " +
       "approvato dall'INGV. I dati sono ricavati dai servizi pubblici INGV ma il bot " +
