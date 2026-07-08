@@ -137,6 +137,7 @@ export async function handleCallbackQuery(
         const chatId = msg.chat.id;
         if (cb.target === "add") {
           await ctx.reply(STRINGS.posizioni.addPrompt, {
+            reply_markup: { remove_keyboard: true },
             parse_mode: "Markdown",
           });
           break;
