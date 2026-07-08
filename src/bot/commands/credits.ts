@@ -9,5 +9,8 @@ export async function handle(ctx: Context, _db: unknown, log: Logger): Promise<v
     command: "/credits",
     outcome: "handled",
   }, "command handled");
-  await ctx.reply(STRINGS.credits.body, { parse_mode: "Markdown" });
+  await ctx.reply(STRINGS.credits.body, {
+    parse_mode: "Markdown",
+    link_preview_options: { is_disabled: true },
+  });
 }
