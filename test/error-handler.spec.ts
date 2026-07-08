@@ -24,7 +24,7 @@ describe("error-handler", () => {
       captureError(log, err, { chatId: 42 });
 
       expect(logs).toHaveLength(1);
-      const entry = logs[0];
+      const entry = logs[0]!;
       expect(entry.level).toBe("error");
       expect(entry.errName).toBe("Error");
       expect(entry.errMsg).toBe("something broke");
@@ -37,7 +37,7 @@ describe("error-handler", () => {
       captureError(log, "just a string");
 
       expect(logs).toHaveLength(1);
-      const entry = logs[0];
+      const entry = logs[0]!;
       expect(entry.errName).toBe("non-error");
       expect(entry.errMsg).toBe("just a string");
       expect(entry.errStack).toBeUndefined();
@@ -57,7 +57,7 @@ describe("error-handler", () => {
       captureWarning(log, new Error("transient issue"));
 
       expect(logs).toHaveLength(1);
-      const entry = logs[0];
+      const entry = logs[0]!;
       expect(entry.level).toBe("warn");
       expect(entry.errName).toBe("Error");
       expect(entry.errMsg).toBe("transient issue");

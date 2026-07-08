@@ -64,8 +64,8 @@ export async function matchChat(event: ParsedEvent, chatId: number, db: Db, ital
     best = { chatId, reason: "national", nearestLocationId: nearest?.locId ?? null, distanceKm: nearest?.km ?? null };
   }
 
-  // World
-  if (event.magnitude >= worldThreshold && chat.world_alerts) {
+  // World — never override a national match (Italian event is more specific)
+  if (event.magnitude >= worldThreshold && chat.world_alerts && best?.reason !== "national") {
     const nearest = best?.reason === "proximity" && best.nearestLocationId ? { locId: best.nearestLocationId, km: best.distanceKm } : null;
     best = { chatId, reason: "world", nearestLocationId: nearest?.locId ?? null, distanceKm: nearest?.km ?? null };
   }

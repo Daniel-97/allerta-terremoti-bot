@@ -5,7 +5,7 @@ import { sql } from "drizzle-orm";
 import * as schema from "@/db/schema";
 import { upsertActiveChat } from "@/db/repositories/chats";
 import { addLocation } from "@/db/repositories/locations";
-import { findRecipients } from "@/notify/match";
+import { findRecipients, matchChat } from "@/notify/match";
 
 const DDL = `
 CREATE TABLE IF NOT EXISTS chats (id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, username TEXT, status TEXT NOT NULL DEFAULT 'active', italy_alerts INTEGER NOT NULL DEFAULT 1, world_alerts INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, last_seen_at TEXT NOT NULL, updated_at TEXT NOT NULL);
@@ -43,5 +43,27 @@ describe("findRecipients", () => {
     await db.update(schema.chats).set({ status: "stopped" }).where(sql`id=1`);
     const ev = { eventId: "ev1", lat: 41.9, lon: 12.5, magnitude: 3.0, zone: "Roma", time: "2026-06-30T12:00:00", depth: 10, author: "INGV", catalog: "INGV", contributor: "INGV", contributorId: "I1", magType: "ML", magAuthor: "INGV" };
     expect(await findRecipients(ev, db, 5.0, 7.0)).toEqual([]);
+  });
+});
+
+describe("national vs world priority", () => {
+  let db: Awaited<ReturnType<typeof freshDb>>;
+  beforeEach(async () => {
+    db = await freshDb();
+    await upsertActiveChat(db, { id: 1, first_name: "A", last_name: null, username: null });
+  });
+
+  const bigItalianEvent = { eventId: "ev1", lat: 41.9, lon: 12.5, magnitude: 7.5, zone: "Roma", time: "2026-06-30T12:00:00", depth: 10, author: "INGV", catalog: "INGV", contributor: "INGV", contributorId: "I1", magType: "ML", magAuthor: "INGV" };
+
+  it("national wins for an Italian event when both italy_alerts and world_alerts are on", async () => {
+    await db.update(schema.chats).set({ world_alerts: true }).where(sql`id=1`);
+    const r = await matchChat(bigItalianEvent, 1, db, 5.0, 7.0);
+    expect(r?.reason).toBe("national");
+  });
+
+  it("world fires for an Italian event when italy_alerts is off", async () => {
+    await db.update(schema.chats).set({ italy_alerts: false, world_alerts: true }).where(sql`id=1`);
+    const r = await matchChat(bigItalianEvent, 1, db, 5.0, 7.0);
+    expect(r?.reason).toBe("world");
   });
 });
