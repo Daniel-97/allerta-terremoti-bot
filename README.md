@@ -24,8 +24,8 @@ Il progetto si ispira a [terremotibot](https://github.com/botfactoryit/terremoti
 ## Come funziona
 
 1. **Avvia** il bot con `/start`.
-2. **Aggiungi una posizione** condividendo una posizione Telegram (tasto rapido nella
-   tastiera o menu allegati). Il bot la converte in un nome `Comune (PROV)` e la salva.
+2. **Aggiungi una posizione** condividendo una posizione Telegram dal menu allegati
+   (📎 → Posizione). Il bot la converte in un nome `Comune (PROV)` e la salva.
 3. **Configura** le soglie per ogni posizione da `/impostazioni`:
    - **Raggio** — a quanti km dall'epicentro vuoi essere avvisato per quella posizione
      (default 100 km, massimo 300 km).

@@ -12,7 +12,6 @@ import { getChat, setAlertFlags } from "@/db/repositories/chats";
 import { getEvent } from "@/db/repositories/history";
 import { STRINGS } from "@/i18n/strings";
 import * as panels from "@/bot/inline/panels";
-import { requestLocationKeyboard } from "@/bot/location-intake";
 import type { Db } from "@/db/types";
 
 const log = createLogger("bot");
@@ -138,7 +137,6 @@ export async function handleCallbackQuery(
         const chatId = msg.chat.id;
         if (cb.target === "add") {
           await ctx.reply(STRINGS.posizioni.addPrompt, {
-            reply_markup: requestLocationKeyboard(),
             parse_mode: "Markdown",
           });
           break;

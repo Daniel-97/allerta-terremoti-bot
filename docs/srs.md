@@ -25,7 +25,6 @@ Fuori ambito per la versione 1 (v1): immagini/mappe nelle notifiche, pubblicazio
 - **Allerta nazionale / mondiale**: notifica per grandi eventi inviata a tutti gli utenti idonei a prescindere dalla distanza — nell'area italiana (`italy_alerts`) o nel resto del mondo sopra una soglia elevata (`world_alerts`).
 - **Consegna (delivery)**: singolo tentativo/esito di invio di una notifica a una chat.
 - **Inline keyboard**: pulsanti sotto un messaggio Telegram (callback).
-- **Reply keyboard**: tastiera personalizzata che sostituisce quella di sistema.
 - **Stateless**: senza stato conversazionale memorizzato tra messaggi.
 - **Idempotente**: operazione che, ripetuta, non produce effetti aggiuntivi.
 - **Watchdog**: meccanismo di auto-monitoraggio del sistema (es. fonte dati irraggiungibile).
@@ -148,7 +147,7 @@ I requisiti usano la forma "il sistema deve" e sono identificati da un codice **
 - **FR-7.1.1** Il messaggio di `/start` (e/o `/aiuto`) deve indicare esplicitamente che le **allerte nazionali sono attive per impostazione predefinita**, così che l'utente capisca perché può ricevere allerte anche senza aver aggiunto posizioni.
 - **FR-7.2 (`/stop`)** Il comando deve **disattivare** l'utente impostando lo stato "disattivato dall'utente" e interrompendo le notifiche. I dati dell'utente **non vengono cancellati** (disattivazione, non erasure). L'azione deve essere notificata all'amministratore (FR-9.3). Un successivo `/start` riattiva l'utente.
 - **FR-7.3 (`/credits`)** Il comando deve mostrare le fonti dei dati (INGV) con relativo link, l'autore del bot e i link utili. (Contenuti iniziali: fonte/link INGV; autore e ulteriori link come placeholder da definire.)
-- **FR-7.4** Il sistema deve gestire l'aggiunta di una posizione tramite una reply keyboard con pulsante `request_location`, mostrata solo quando necessaria e rimossa dopo l'uso.
+- **FR-7.4** Il sistema deve gestire l'aggiunta di una posizione tramite la condivisione nativa di Telegram (messaggio di tipo *location* o *venue* generato dal menu allegati del client). Il bot guida l'utente con un'istruzione testuale; non viene utilizzata alcuna reply keyboard.
 - **FR-7.5** Tutte le altre interazioni (selezione posizione, modifica preset, rimozione con conferma, toggle allerte nazionali/mondiali, dettagli evento) devono avvenire tramite pulsanti inline.
 - **FR-7.6** Le schermate interattive devono essere realizzate come un singolo messaggio-pannello che si aggiorna in place durante la navigazione.
 - **FR-7.7** Il sistema deve essere **stateless a livello conversazionale**: ogni messaggio è interpretabile dal solo contenuto corrente; il contesto necessario (ID posizione/evento, azione, valore) è codificato nel `callback_data` (≤ 64 byte).
@@ -193,8 +192,7 @@ Notifiche operative inviate automaticamente ai chat ID in `ADMIN_CHAT_IDS`.
 ### 4.1 Interfacce utente (Telegram)
 - **Comandi slash utente** registrati nel menu (`/start`, `/aiuto`, `/posizioni`, `/impostazioni`, `/stop`, `/credits`).
 - **Comandi amministrativi** non pubblicati nel menu (`/broadcast`, `/stats`, `/events`, `/delivery`, `/health`), riservati ai chat ID in `ADMIN_CHAT_IDS`.
-- **Inline keyboard** per tutte le azioni utente; payload nel `callback_data` (≤ 64 byte → schema compatto).
-- **Reply keyboard** unicamente per la condivisione della posizione (`request_location`).
+- **Inline keyboard** per tutte le azioni utente; payload nel `callback_data` (≤ 64 byte → schema compatto). Nessuna reply keyboard: le posizioni sono condivise via la condivisione nativa di Telegram (menu allegati).
 - Lingua: italiano per l'utente, inglese per i messaggi amministrativi. Nessuna immagine nelle notifiche in v1.
 
 ### 4.2 Interfacce software (servizi esterni)

@@ -1,4 +1,3 @@
-import { Keyboard } from "grammy";
 import type { Context } from "grammy";
 import type { RuntimeConfig } from "@/config";
 import type { Db } from "@/db/types";
@@ -13,12 +12,6 @@ import { STRINGS } from "@/i18n/strings";
 import { createLogger } from "@/util/log";
 
 const log = createLogger("bot");
-
-export function requestLocationKeyboard(): Keyboard {
-  return new Keyboard()
-    .requestLocation("📍 Condividi posizione")
-    .resized();
-}
 
 export async function handleLocation(
   ctx: Context,

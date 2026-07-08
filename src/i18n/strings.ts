@@ -26,10 +26,10 @@ export const STRINGS = {
     empty:
       "📍 *Posizioni*\n\n" +
       "Non hai ancora posizioni salvate.\n\n" +
-      "Premi il pulsante *Condividi posizione* qui sotto per aggiungerne una.",
+      "Premi *➕ Aggiungi posizione* qui sotto, poi condividi la tua posizione dal menu allegati (📎 → Posizione).",
     addBtn: "➕ Aggiungi posizione",
     listHeader: "📍 *Posizioni*\n\nSeleziona una posizione da gestire:",
-    addPrompt: "📍 Condividi la tua posizione per aggiungere un nuovo monitoraggio.",
+    addPrompt: "📍 Condividi la tua posizione dal menu allegati (📎 → Posizione) per aggiungere un nuovo monitoraggio.",
     detailHeader: (name: string) => `📍 *${name}*`,
     cap:
       "Hai raggiunto il limite di 10 posizioni.\n" +

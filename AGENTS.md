@@ -165,8 +165,9 @@ The bot also **pushes** notifications to admins (to `ADMIN_CHAT_IDS`):
 
 These encode design decisions that are easy to violate by accident:
 
-1. **Inline-first.** All end-user interaction uses inline keyboards. The reply keyboard is
-   used **only** for `request_location`. Never ask the user to type a value as free text.
+1. **Inline-first.** All end-user interaction uses inline keyboards. No reply keyboard is
+   used; locations are shared via Telegram's native location sharing (attachment menu).
+   Never ask the user to type a value as free text.
    (Admin commands are exempt — see "Admin commands".)
 2. **`callback_data` ≤ 64 bytes.** Use the compact scheme (e.g. `l;<id>;r;100`) with short
    IDs.
