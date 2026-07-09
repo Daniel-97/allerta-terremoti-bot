@@ -32,10 +32,9 @@ export function formatMagType(magType: string): string {
 }
 
 export function formatTitle(magnitude: number, zone: string, markdown = true, includeLabel = true, magType = ""): string {
-  const mag = `M${magnitude.toFixed(1)}`;
-  const magPart = markdown ? `*${mag}*` : mag;
-  const label = includeLabel ? "Terremoto " : "";
-  return `⚠️ ${label}${magPart}${formatMagType(magType)} - ${zone}`;
+  const magValue = magnitude.toFixed(1);
+  const label = includeLabel ? (markdown ? "*Magnitudo:* " : "Magnitudo: ") : "";
+  return `⚠️ ${label}${magValue}${formatMagType(magType)} - ${zone}`;
 }
 
 function buildLocationLine(distanceKm: number, locName: string): string {
@@ -58,32 +57,32 @@ function buildTitleLine(event: ParsedEvent): string {
 function buildReasonLabel(reason: Recipient["reason"]): string {
   switch (reason) {
     case "proximity":
-      return "🔔 Allerta di prossimità";
+      return "🔔 *Allerta di prossimità*";
     case "general":
-      return "📢 Terremoto rilevante";
+      return "📢 *Terremoto rilevante*";
   }
 }
 
 export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string): ComposedMessage {
   const text =
-    `${buildReasonLabel("proximity")}\n` +
+    `${buildReasonLabel("proximity")}\n\n` +
     `${buildTitleLine(event)}\n` +
     `${buildLocationLine(distanceKm, locName)}\n` +
-    `📏 Profondità: ${depthLabel(event.depth)}\n` +
-    `🕐 ${formatTime(event.time)}\n` +
-    `_Fonte: INGV_`;
+    `📏 *Profondità:* ${depthLabel(event.depth)}\n` +
+    `🕐 *Ora:* ${formatTime(event.time)}\n` +
+    `*Fonte:* INGV`;
   return { text, keyboard: buildKeyboard(event) };
 }
 
 export function composeGeneral(event: ParsedEvent, distanceKm: number | null, locName: string | null): ComposedMessage {
   const locLine = locName && distanceKm != null ? `${buildLocationLine(distanceKm, locName)}\n` : "";
   const text =
-    `${buildReasonLabel("general")}\n` +
+    `${buildReasonLabel("general")}\n\n` +
     `${buildTitleLine(event)}\n` +
     locLine +
-    `📏 Profondità: ${depthLabel(event.depth)}\n` +
-    `🕐 ${formatTime(event.time)}\n` +
-    `_Fonte: INGV_`;
+    `📏 *Profondità:* ${depthLabel(event.depth)}\n` +
+    `🕐 *Ora:* ${formatTime(event.time)}\n` +
+    `*Fonte:* INGV`;
   return { text, keyboard: buildKeyboard(event) };
 }
 
