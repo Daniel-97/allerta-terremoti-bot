@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { composeProximity, composeNational, composeWorld, formatTime, formatTitle, formatMagType } from "@/notify/compose";
+import { composeProximity, composeGeneral, formatTime, formatTitle, formatMagType } from "@/notify/compose";
 import type { ParsedEvent } from "@/services/ingv/types";
 
 const EVENT: ParsedEvent = {
@@ -42,43 +42,25 @@ describe("composeProximity", () => {
   });
 });
 
-describe("composeNational", () => {
-  it("starts with the national reason label", () => {
-    const msg = composeNational(EVENT, 200, "Milano");
-    expect(msg.text.startsWith("🇮🇹 Allerta nazionale\n")).toBe(true);
+describe("composeGeneral", () => {
+  it("starts with the general reason label", () => {
+    const msg = composeGeneral(EVENT, 200, "Milano");
+    expect(msg.text.startsWith("📢 Terremoto rilevante\n")).toBe(true);
   });
 
   it("includes location and distance when present", () => {
-    const msg = composeNational(EVENT, 200, "Milano");
+    const msg = composeGeneral(EVENT, 200, "Milano");
     expect(msg.text).toContain("📍 *Milano* — 200 km");
   });
 
   it("falls back to event.zone when no location", () => {
-    const msg = composeNational(EVENT, null, null);
+    const msg = composeGeneral(EVENT, null, null);
     expect(msg.text).not.toContain("📍");
     expect(msg.text).toContain("⚠️ Terremoto *M4.2* (ML) - Roma");
   });
 
   it("includes magnitude and zone in a single title line", () => {
-    const msg = composeNational(EVENT, 200, "Milano");
-    expect(msg.text).toContain("⚠️ Terremoto *M4.2* (ML) - Roma");
-  });
-});
-
-describe("composeWorld", () => {
-  it("starts with the world reason label", () => {
-    const msg = composeWorld(EVENT);
-    expect(msg.text.startsWith("🌍 Allerta mondiale\n")).toBe(true);
-  });
-
-  it("uses event.zone with no location line", () => {
-    const msg = composeWorld(EVENT);
-    expect(msg.text).toContain("⚠️ Terremoto *M4.2* (ML) - Roma");
-    expect(msg.text).not.toContain("📍");
-  });
-
-  it("includes magnitude and zone in a single title line", () => {
-    const msg = composeWorld(EVENT);
+    const msg = composeGeneral(EVENT, 200, "Milano");
     expect(msg.text).toContain("⚠️ Terremoto *M4.2* (ML) - Roma");
   });
 });
@@ -86,12 +68,12 @@ describe("composeWorld", () => {
 describe("keyboard eventId guard", () => {
   it("omits the button when eventId is empty", () => {
     const noIdEvent = { ...EVENT, eventId: "" };
-    const msg = composeWorld(noIdEvent);
+    const msg = composeGeneral(noIdEvent, null, null);
     expect(buttonCount(msg.keyboard)).toBe(0);
   });
 
   it("includes the button when eventId is present", () => {
-    const msg = composeWorld(EVENT);
+    const msg = composeGeneral(EVENT, null, null);
     expect(buttonCount(msg.keyboard)).toBe(1);
   });
 });

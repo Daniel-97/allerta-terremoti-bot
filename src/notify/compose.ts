@@ -59,10 +59,8 @@ function buildReasonLabel(reason: Recipient["reason"]): string {
   switch (reason) {
     case "proximity":
       return "🔔 Allerta di prossimità";
-    case "national":
-      return "🇮🇹 Allerta nazionale";
-    case "world":
-      return "🌍 Allerta mondiale";
+    case "general":
+      return "📢 Terremoto rilevante";
   }
 }
 
@@ -77,22 +75,12 @@ export function composeProximity(event: ParsedEvent, distanceKm: number, locName
   return { text, keyboard: buildKeyboard(event) };
 }
 
-export function composeNational(event: ParsedEvent, distanceKm: number | null, locName: string | null): ComposedMessage {
+export function composeGeneral(event: ParsedEvent, distanceKm: number | null, locName: string | null): ComposedMessage {
   const locLine = locName && distanceKm != null ? `${buildLocationLine(distanceKm, locName)}\n` : "";
   const text =
-    `${buildReasonLabel("national")}\n` +
+    `${buildReasonLabel("general")}\n` +
     `${buildTitleLine(event)}\n` +
     locLine +
-    `📏 Profondità: ${depthLabel(event.depth)}\n` +
-    `🕐 ${formatTime(event.time)}\n` +
-    `_Fonte: INGV_`;
-  return { text, keyboard: buildKeyboard(event) };
-}
-
-export function composeWorld(event: ParsedEvent): ComposedMessage {
-  const text =
-    `${buildReasonLabel("world")}\n` +
-    `${buildTitleLine(event)}\n` +
     `📏 Profondità: ${depthLabel(event.depth)}\n` +
     `🕐 ${formatTime(event.time)}\n` +
     `_Fonte: INGV_`;
@@ -112,13 +100,8 @@ export async function composeMessage(
 ): Promise<ComposedMessage> {
   const locName = await getNearestLocationName(db, rec.nearestLocationId);
 
-  if (rec.reason === "world" || (!locName && rec.reason === "national")) {
-    if (rec.reason === "world") return composeWorld(event);
-    return composeNational(event, null, null);
-  }
-
   if (rec.reason === "proximity") {
     return composeProximity(event, rec.distanceKm!, locName!);
   }
-  return composeNational(event, rec.distanceKm, locName);
+  return composeGeneral(event, rec.distanceKm, locName);
 }
