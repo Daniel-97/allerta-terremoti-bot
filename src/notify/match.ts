@@ -8,7 +8,7 @@ import { getChat } from "@/db/repositories/chats";
 
 export interface Recipient {
   chatId: number;
-  reason: "proximity" | "national" | "world";
+  reason: "proximity" | "general";
   nearestLocationId: number | null;
   distanceKm: number | null;
 }
@@ -58,16 +58,12 @@ export async function matchChat(event: ParsedEvent, chatId: number, db: Db, ital
     best = { chatId, reason: "proximity", nearestLocationId: nearestLocId, distanceKm: nearestDist };
   }
 
-  // National
-  if (event.magnitude >= italyThreshold && inBbox(event.lat, event.lon, ITALY_BBOX) && chat.italy_alerts) {
+  // General: Italian event above the Italy threshold, or any event above the world threshold
+  const isItalianMatch = event.magnitude >= italyThreshold && inBbox(event.lat, event.lon, ITALY_BBOX) && chat.italy_alerts;
+  const isWorldMatch = event.magnitude >= worldThreshold && chat.world_alerts;
+  if (isItalianMatch || isWorldMatch) {
     const nearest = best?.reason === "proximity" && best.nearestLocationId ? { locId: best.nearestLocationId, km: best.distanceKm } : null;
-    best = { chatId, reason: "national", nearestLocationId: nearest?.locId ?? null, distanceKm: nearest?.km ?? null };
-  }
-
-  // World — never override a national match (Italian event is more specific)
-  if (event.magnitude >= worldThreshold && chat.world_alerts && best?.reason !== "national") {
-    const nearest = best?.reason === "proximity" && best.nearestLocationId ? { locId: best.nearestLocationId, km: best.distanceKm } : null;
-    best = { chatId, reason: "world", nearestLocationId: nearest?.locId ?? null, distanceKm: nearest?.km ?? null };
+    best = { chatId, reason: "general", nearestLocationId: nearest?.locId ?? null, distanceKm: nearest?.km ?? null };
   }
 
   return best;
