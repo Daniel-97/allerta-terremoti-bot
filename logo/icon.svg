@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="80%">
+      <stop offset="0%" stop-color="#2c3a5c"/><stop offset="100%" stop-color="#121829"/>
+    </radialGradient>
+    <linearGradient id="wave" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffd66b"/><stop offset="50%" stop-color="#ff9a3c"/><stop offset="100%" stop-color="#ff7a3c"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="104" fill="url(#bg)"/>
+  <line x1="64" y1="256" x2="448" y2="256" stroke="#46557a" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  <polyline points="59,256 112,323 146,153 182,404 219,86 256,439 297,42 334,395 367,181 398,288 452,256" fill="none" stroke="url(#wave)" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>
