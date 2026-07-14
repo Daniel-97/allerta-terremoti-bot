@@ -34,7 +34,7 @@ export async function notifyNewUser(
   const message = formatNewUserMessage(chatRef, formatTime());
   for (const id of adminChatIds) {
     try {
-      await bot.api.sendMessage(id, message, { parse_mode: "Markdown" });
+      await bot.api.sendMessage(id, message, { parse_mode: "HTML" });
     } catch (err) {
       captureWarning(log, err, { adminChatId: id, action: "new-user notification" });
     }
@@ -49,7 +49,7 @@ export async function notifyUserStop(
   const message = formatUserStopMessage(chatId, formatTime());
   for (const id of adminChatIds) {
     try {
-      await bot.api.sendMessage(id, message, { parse_mode: "Markdown" });
+      await bot.api.sendMessage(id, message, { parse_mode: "HTML" });
     } catch (err) {
       captureWarning(log, err, { adminChatId: id, action: "user-stop notification" });
     }
