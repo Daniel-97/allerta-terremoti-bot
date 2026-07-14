@@ -38,18 +38,17 @@ export const STRINGS = {
     listHeader: "📍 <b>Posizioni</b>\n\nSeleziona una posizione da gestire:",
     addPrompt:
       "📍 Invia la tua posizione attuale col pulsante qui sotto, oppure scegli un punto sulla mappa dal menu allegati (📎 → Posizione) — utile ad esempio per la casa di un familiare.",
+    requestLocationBtn: "📍 Invia la mia posizione attuale",
+    requestLocationPlaceholder: "Oppure 📎 → Posizione per scegliere sulla mappa",
     detailHeader: (name: string) => `📍 <b>${escapeHtml(name)}</b>`,
-    cap:
-      "Hai raggiunto il limite di 10 posizioni.\n" +
-      "Rimuovine una prima di aggiungerne nuove.",
+    cap: "Hai raggiunto il limite di 10 posizioni.\n" + "Rimuovine una prima di aggiungerne nuove.",
     duplicate:
       "Hai già una posizione in questo comune.\n" +
       "Ogni comune può essere salvato una sola volta.",
     outOfArea:
       "Posizione fuori dall'area ammessa.\n" +
       "Sono accettate solo posizioni in Italia, San Marino, Austria e Svizzera.",
-    geocodingFail:
-      "Non riesco a determinare il comune. Riprova.",
+    geocodingFail: "Non riesco a determinare il comune. Riprova.",
     added: (name: string) => `✅ Posizione <b>${escapeHtml(name)}</b> aggiunta.`,
     removed: (name: string) => `🗑 Posizione <b>${escapeHtml(name)}</b> rimossa.`,
   },
@@ -67,8 +66,7 @@ export const STRINGS = {
     worldOff: "Le allerte mondiali sono ora disattive.",
   },
   delete: {
-    confirm: (name: string) =>
-      `Confermi di voler rimuovere <b>${escapeHtml(name)}</b>?`,
+    confirm: (name: string) => `Confermi di voler rimuovere <b>${escapeHtml(name)}</b>?`,
     confirmBtn: "✅ Conferma",
     cancelBtn: "❌ Annulla",
   },
@@ -95,24 +93,19 @@ export const STRINGS = {
       "è un progetto indipendente.",
   },
   unknownCommand: {
-    hint:
-      "Non ho capito.\n" +
-      "Usa /aiuto per vedere i comandi disponibili.",
+    hint: "Non ho capito.\n" + "Usa /aiuto per vedere i comandi disponibili.",
   },
   errors: {
-    generic:
-      "Si è verificato un errore. Riprova più tardi.",
+    generic: "Si è verificato un errore. Riprova più tardi.",
   },
-  locationLimitReached:
-    "Hai raggiunto il limite massimo di posizioni.",
+  locationLimitReached: "Hai raggiunto il limite massimo di posizioni.",
 } as const;
 
 export const ADMIN = {
   broadcast: {
     empty: "❌ Message cannot be empty.",
     tooLong: (len: number) => `❌ Message too long (${len} chars). Max 4096.`,
-    sent: (sent: number, total: number) =>
-      `📨 Broadcast sent to ${sent}/${total} active users.`,
+    sent: (sent: number, total: number) => `📨 Broadcast sent to ${sent}/${total} active users.`,
   },
   stats: {
     title: "📊 <b>Bot Statistics</b>",

@@ -132,10 +132,10 @@ export async function handleCallbackQuery(ctx: Context, db: Db): Promise<void> {
         if (cb.target === "add") {
           await ctx.reply(STRINGS.posizioni.addPrompt, {
             reply_markup: {
-              keyboard: [[{ text: "📍 Invia la mia posizione attuale", request_location: true }]],
+              keyboard: [[{ text: STRINGS.posizioni.requestLocationBtn, request_location: true }]],
               resize_keyboard: true,
               one_time_keyboard: true,
-              input_field_placeholder: "Oppure 📎 → Posizione per scegliere sulla mappa",
+              input_field_placeholder: STRINGS.posizioni.requestLocationPlaceholder,
             },
             parse_mode: "HTML",
           });

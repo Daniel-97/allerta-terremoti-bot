@@ -7,6 +7,7 @@ import { upsertActiveChat } from "@/db/repositories/chats";
 import { addLocation, getLocation } from "@/db/repositories/locations";
 import { handleCallbackQuery } from "@/bot/inline/router";
 import { encodeDeleteOk, encodeNav } from "@/util/callback-data";
+import { STRINGS } from "@/i18n/strings";
 import type { Context } from "grammy";
 
 const DDL = `
@@ -104,7 +105,7 @@ describe("handleCallbackQuery nav add", () => {
     expect(reply).toHaveBeenCalledTimes(1);
     const [, options] = reply.mock.calls[0]!;
     expect(options.reply_markup.keyboard[0][0]).toEqual({
-      text: "📍 Invia la mia posizione attuale",
+      text: STRINGS.posizioni.requestLocationBtn,
       request_location: true,
     });
   });

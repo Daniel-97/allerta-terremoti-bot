@@ -1,13 +1,28 @@
 import { describe, it, expect } from "vitest";
-import { composeProximity, composeGeneral, formatTime, formatTitle, formatMagType } from "@/notify/compose";
+import {
+  composeProximity,
+  composeGeneral,
+  formatTime,
+  formatTitle,
+  formatMagType,
+} from "@/notify/compose";
 import { encodeLoc } from "@/util/callback-data";
 import type { ParsedEvent } from "@/services/ingv/types";
 
 const EVENT: ParsedEvent = {
-  eventId: "ev1", zone: "Roma", time: "2026-06-30T12:00:00",
-  lat: 41.9, lon: 12.5, depth: 10, author: "INGV", catalog: "INGV",
-  contributor: "INGV", contributorId: "I1", magType: "ML",
-  magnitude: 4.2, magAuthor: "INGV",
+  eventId: "ev1",
+  zone: "Roma",
+  time: "2026-06-30T12:00:00",
+  lat: 41.9,
+  lon: 12.5,
+  depth: 10,
+  author: "INGV",
+  catalog: "INGV",
+  contributor: "INGV",
+  contributorId: "I1",
+  magType: "ML",
+  magnitude: 4.2,
+  magAuthor: "INGV",
 };
 
 function buttonCount(kb: { inline_keyboard: unknown[][] }): number {
@@ -43,9 +58,17 @@ describe("composeProximity", () => {
   });
 
   it("includes a soglie button with the encoded location id", () => {
-    const buttons = msg.keyboard.inline_keyboard.flat() as { text: string; callback_data?: string }[];
+    const buttons = msg.keyboard.inline_keyboard.flat() as {
+      text: string;
+      callback_data?: string;
+    }[];
     const soglieBtn = buttons.find((b) => b.callback_data === encodeLoc(42));
     expect(soglieBtn?.text).toBe("⚙️ Soglie per Roma");
+  });
+
+  it("escapes HTML-sensitive characters in the location name", () => {
+    const msg = composeProximity(EVENT, 15, "A & B", 42);
+    expect(msg.text).toContain("📍 <b>A &amp; B</b> — 15 km");
   });
 });
 

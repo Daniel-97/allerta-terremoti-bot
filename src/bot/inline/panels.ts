@@ -1,5 +1,6 @@
 import type { Context } from "grammy";
 import type { InlineKeyboard } from "grammy";
+import { GrammyError } from "grammy";
 import { STRINGS } from "@/i18n/strings";
 import * as kb from "@/bot/inline/keyboards";
 import { captureWarning } from "@/util/error-handler";
@@ -67,6 +68,16 @@ export async function editPanel(ctx: Context, panel: Panel): Promise<void> {
       parse_mode: "HTML",
     });
   } catch (err) {
+    const cannotEditText =
+      err instanceof GrammyError &&
+      err.description.includes("there is no text in the message to edit");
+    if (cannotEditText) {
+      await ctx.reply(panel.text, {
+        reply_markup: panel.keyboard,
+        parse_mode: "HTML",
+      });
+      return;
+    }
     captureWarning(log, err, { action: "editMessageText" });
   }
 }
