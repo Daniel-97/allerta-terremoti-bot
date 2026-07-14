@@ -4,23 +4,18 @@ import { ADMIN } from "@/i18n/strings";
 import { listByEvent } from "@/db/repositories/deliveries";
 import type { Db } from "@/db/types";
 
-export async function handle(
-  ctx: Context,
-  db: Db,
-  log: Logger,
-  args: string,
-): Promise<void> {
+export async function handle(ctx: Context, db: Db, log: Logger, args: string): Promise<void> {
   log.info({ chatId: ctx.chat?.id, command: "/delivery", outcome: "handled" }, "command handled");
 
   const eventId = args.trim();
   if (!eventId) {
-    await ctx.reply(ADMIN.delivery.usage, { parse_mode: "Markdown" });
+    await ctx.reply(ADMIN.delivery.usage, { parse_mode: "HTML" });
     return;
   }
 
   const rows = await listByEvent(db, eventId);
   if (rows.length === 0) {
-    await ctx.reply(ADMIN.delivery.notFound(eventId), { parse_mode: "Markdown" });
+    await ctx.reply(ADMIN.delivery.notFound(eventId), { parse_mode: "HTML" });
     return;
   }
 
@@ -35,5 +30,5 @@ export async function handle(
   lines.push(ADMIN.delivery.summary(total, sent, transient, permanent, pending));
 
   const header = ADMIN.delivery.title(eventId);
-  await ctx.reply([header, ...lines].join("\n"), { parse_mode: "Markdown" });
+  await ctx.reply([header, ...lines].join("\n"), { parse_mode: "HTML" });
 }

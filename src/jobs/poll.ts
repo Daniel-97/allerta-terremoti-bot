@@ -11,7 +11,12 @@ import type { ParsedEvent } from "@/services/ingv/types";
 const log = createLogger("poll");
 
 export async function runMainCron(
-  config: { HEALTHCHECKS_URL: string | undefined; italyAlertThreshold: number; worldAlertThreshold: number; lookbackWindowMin: number },
+  config: {
+    HEALTHCHECKS_URL: string | undefined;
+    italyAlertThreshold: number;
+    worldAlertThreshold: number;
+    lookbackWindowMin: number;
+  },
   db: Db,
   bot: Bot,
 ): Promise<void> {
@@ -50,16 +55,24 @@ export async function runMainCron(
     if (!isNew) continue; // already processed
 
     // 4. Match + deliver
-    const recipients = await findRecipients(event, db, config.italyAlertThreshold, config.worldAlertThreshold);
+    const recipients = await findRecipients(
+      event,
+      db,
+      config.italyAlertThreshold,
+      config.worldAlertThreshold,
+    );
     if (recipients.length > 0) {
       const outcome = await deliverFirstWave(bot, event, recipients, db);
-      log.info({
-        eventId: event.eventId,
-        recipients: recipients.length,
-        sent: outcome.sent,
-        failedTransient: outcome.failedTransient,
-        failedPermanent: outcome.failedPermanent,
-      }, "delivery wave completed");
+      log.info(
+        {
+          eventId: event.eventId,
+          recipients: recipients.length,
+          sent: outcome.sent,
+          failedTransient: outcome.failedTransient,
+          failedPermanent: outcome.failedPermanent,
+        },
+        "delivery wave completed",
+      );
     }
   }
 

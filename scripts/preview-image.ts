@@ -35,7 +35,11 @@ async function renderOverlayToPng(svg: string, fonts: Fonts): Promise<Uint8Array
   return resvg.render().asPng();
 }
 
-function compositeImages(baseBytes: Uint8Array, overlayBytes: Uint8Array, topPadding: number): Uint8Array {
+function compositeImages(
+  baseBytes: Uint8Array,
+  overlayBytes: Uint8Array,
+  topPadding: number,
+): Uint8Array {
   const base = PhotonImage.new_from_byteslice(baseBytes);
   const overlay = PhotonImage.new_from_byteslice(overlayBytes);
   const padded = padding_top(base, topPadding, new Rgba(255, 255, 255, 255));
@@ -57,7 +61,9 @@ async function main(): Promise<void> {
   const outputPath = outArg ?? join(import.meta.dirname, "output", "preview.png");
 
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || !Number.isFinite(magnitude)) {
-    throw new Error("Parametri non validi. Uso: tsx scripts/preview-image.ts <lat> <lon> [magnitudo] [outputPath]");
+    throw new Error(
+      "Parametri non validi. Uso: tsx scripts/preview-image.ts <lat> <lon> [magnitudo] [outputPath]",
+    );
   }
 
   const event: ParsedEvent = {

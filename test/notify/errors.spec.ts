@@ -31,6 +31,8 @@ describe("classifyTelegramError", () => {
   });
 
   it("classifies 500-like transient errors correctly", () => {
-    expect(classifyTelegramError(new Error("Telegram API error 503 Service Unavailable"))).toBe("transient");
+    expect(classifyTelegramError(new Error("Telegram API error 503 Service Unavailable"))).toBe(
+      "transient",
+    );
   });
 });

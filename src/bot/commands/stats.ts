@@ -4,11 +4,7 @@ import { ADMIN } from "@/i18n/strings";
 import { sql } from "drizzle-orm";
 import type { Db } from "@/db/types";
 
-export async function handle(
-  ctx: Context,
-  db: Db,
-  log: Logger,
-): Promise<void> {
+export async function handle(ctx: Context, db: Db, log: Logger): Promise<void> {
   log.info({ chatId: ctx.chat?.id, command: "/stats", outcome: "handled" }, "command handled");
 
   const { chats, history, locations, systemState } = await import("../../db/schema");
@@ -27,13 +23,16 @@ export async function handle(
   const blocked = userCounts["blocked"] ?? 0;
   const deleted = userCounts["deleted"] ?? 0;
 
-  const locRows = await db
-    .select({ c: sql<number>`count(*)` })
-    .from(locations);
+  const locRows = await db.select({ c: sql<number>`count(*)` }).from(locations);
   const locationsCount = locRows[0]!.c;
 
   const lastEventRow = await db
-    .select({ id: history.id, zone: history.zone, mag: history.magnitude_value, date: history.date })
+    .select({
+      id: history.id,
+      zone: history.zone,
+      mag: history.magnitude_value,
+      date: history.date,
+    })
     .from(history)
     .orderBy(sql`${history.date} desc`)
     .limit(1);
@@ -58,5 +57,5 @@ export async function handle(
     ADMIN.stats.lastPoll(pollRow[0]?.value ?? null),
   ];
 
-  await ctx.reply(lines.join("\n\n"), { parse_mode: "Markdown" });
+  await ctx.reply(lines.join("\n\n"), { parse_mode: "HTML" });
 }

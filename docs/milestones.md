@@ -23,6 +23,7 @@ then grow it. Do not build all layers horizontally.
 in a private chat, with the full quality toolchain in place.
 
 **Scope:**
+
 - Initialize the project: TypeScript (strict), ESLint + Prettier, Vitest +
   `@cloudflare/vitest-pool-workers`, `wrangler.jsonc`.
 - Create the folder structure from `AGENTS.md` (empty/stub modules are fine).
@@ -35,6 +36,7 @@ in a private chat, with the full quality toolchain in place.
 - `.dev.vars.example` documented; deploy to production; set the webhook with a secret token.
 
 **DoD:**
+
 - Sending `/start` to the production bot returns a reply.
 - Webhook rejects requests with a missing/wrong secret token.
 - Lint/typecheck/test/build green; a trivial test runs under the Workers pool.
@@ -49,6 +51,7 @@ in a private chat, with the full quality toolchain in place.
 correctly.
 
 **Scope:**
+
 - Apply `schema.sql` to the Turso database (document the command). Run
   `PRAGMA foreign_keys = ON` on every connection.
 - `src/db/client.ts` (libSQL/Drizzle) and `src/db/schema.ts` (Drizzle table defs kept in
@@ -60,6 +63,7 @@ correctly.
 - `src/i18n/strings.ts` (Italian, user-facing) — start the centralized strings module.
 
 **DoD:**
+
 - First-ever `/start` inserts a chat; a later `/start` after a non-active status resets it
   to `active`.
 - Group messages are ignored.
@@ -75,6 +79,7 @@ correctly.
 inline panels. No alerts yet.
 
 **Scope:**
+
 - **Location intake (FR-1):** reply keyboard with `request_location`; accept location/venue;
   reverse-geocode via GeoNames (`src/geocoding/geonames.ts`) with short timeout + graceful
   fallback; name as `Comune (PROV)`; reject outside IT/SM/AT/CH; enforce `(chat, name)`
@@ -91,6 +96,7 @@ inline panels. No alerts yet.
 - Location removal with two-tap inline confirmation.
 
 **DoD:**
+
 - A user can add/list/remove locations, hit the cap and uniqueness messages, set radius &
   magnitude from presets, and toggle both alert preferences — all via buttons.
 - No free-text value entry anywhere; reply keyboard used only for `request_location`.
@@ -107,6 +113,7 @@ inline panels. No alerts yet.
 main-cron run, with idempotent delivery tracking.
 
 **Scope:**
+
 - **INGV client (`src/ingv/`):** fetch events with FDSN filters — Italy query over
   `ITALY_BBOX` (lat 35–48, lon 6–27) without a magnitude floor, plus a global query for
   `magnitude ≥ WORLD_ALERT_THRESHOLD`; restrict to `LOOKBACK_WINDOW` via `starttime`. Prefer
@@ -127,6 +134,7 @@ main-cron run, with idempotent delivery tracking.
 - **Details callback:** read from `history`; graceful "no longer available" message (FR-4.12).
 
 **DoD:**
+
 - A simulated/fixture INGV event produces correct recipients and one message each;
   re-running the cron on the same event sends nothing (idempotent).
 - Proximity, national, and world formats are correct; a user eligible via multiple rules
@@ -142,6 +150,7 @@ main-cron run, with idempotent delivery tracking.
 **Objective:** retries, cleanup, self-monitoring, and the full admin surface.
 
 **Scope:**
+
 - **Retry cron:** re-send `failed_transient` with `attempts < MAX_ATTEMPTS`.
 - **Cleanup cron (daily):** delete `deliveries` older than 3 months; delete `history` events
   with no deliveries older than the lookback window.
@@ -157,6 +166,7 @@ main-cron run, with idempotent delivery tracking.
   All best-effort / fire-and-forget.
 
 **DoD:**
+
 - Transient failures are retried and resolve; cleanup removes the right rows and preserves
   the rest.
 - Simulated repeated INGV failure triggers exactly one admin alert, then a recovery notice.
@@ -172,6 +182,7 @@ main-cron run, with idempotent delivery tracking.
 **Objective:** make it robust and observable for production.
 
 **Scope:**
+
 - Telegram rate-limit handling (respect 429 `retry_after`); robust error handling on every
   external call; structured logs for polling cycles, delivery errors, and broadcasts.
 - Optional overlap lock in `system_state` (NFR-2.4) if runs risk overlapping.
@@ -180,6 +191,7 @@ main-cron run, with idempotent delivery tracking.
 - README setup/deploy steps verified end-to-end on a clean environment.
 
 **DoD:**
+
 - A burst of events/users does not double-notify, lose alerts, or exceed rate limits.
 - All invariants verified; lint/typecheck/test/build green; production deploy reproducible
   from the README.

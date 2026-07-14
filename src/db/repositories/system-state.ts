@@ -4,11 +4,7 @@ import { nowIso } from "@/util/time";
 import type { Db } from "@/db/types";
 
 export async function getState(db: Db, key: string): Promise<string | null> {
-  const rows = await db
-    .select()
-    .from(systemState)
-    .where(eq(systemState.key, key))
-    .limit(1);
+  const rows = await db.select().from(systemState).where(eq(systemState.key, key)).limit(1);
   return rows[0]?.value ?? null;
 }
 

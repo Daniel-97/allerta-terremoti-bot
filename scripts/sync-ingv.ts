@@ -34,11 +34,14 @@ async function main(): Promise<void> {
     if (isNew) newCount++;
   }
 
-  log.info({
-    total: allEvents.length,
-    new: newCount,
-    existing: allEvents.length - newCount,
-  }, "sync complete");
+  log.info(
+    {
+      total: allEvents.length,
+      new: newCount,
+      existing: allEvents.length - newCount,
+    },
+    "sync complete",
+  );
 
   await db.$client?.close?.();
 }

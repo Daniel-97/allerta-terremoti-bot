@@ -33,16 +33,26 @@ describe("listPendingForRetry", () => {
   beforeEach(async () => {
     db = await freshDb();
     await historyInsert(db, {
-      id: "ev1", zone: "Roma", date: "2026-06-30T12:00:00Z",
-      lat: 41.9, lon: 12.5, depth: 10, stations_count: 5,
-      magnitude_type: "ML", magnitude_value: 4.2, magnitude_uncertainty: 0.3,
+      id: "ev1",
+      zone: "Roma",
+      date: "2026-06-30T12:00:00Z",
+      lat: 41.9,
+      lon: 12.5,
+      depth: 10,
+      stations_count: 5,
+      magnitude_type: "ML",
+      magnitude_value: 4.2,
+      magnitude_uncertainty: 0.3,
     });
     await upsertActiveChat(db, { id: 100, first_name: "U", last_name: null, username: null });
     await deliveryInsert(db, { event_id: "ev1", chat: 100 });
   });
 
   it("returns failed_transient deliveries below maxAttempts", async () => {
-    const d = await db.select().from(schema.deliveries).then((r) => r[0]!);
+    const d = await db
+      .select()
+      .from(schema.deliveries)
+      .then((r) => r[0]!);
     await updateStatus(db, d.id, "failed_transient", 1);
 
     const pending = await listPendingForRetry(db, 3);
@@ -59,7 +69,10 @@ describe("listPendingForRetry", () => {
   });
 
   it("excludes deliveries at or above maxAttempts", async () => {
-    const d = await db.select().from(schema.deliveries).then((r) => r[0]!);
+    const d = await db
+      .select()
+      .from(schema.deliveries)
+      .then((r) => r[0]!);
     await updateStatus(db, d.id, "failed_transient", 3);
 
     const pending = await listPendingForRetry(db, 3);
@@ -67,7 +80,10 @@ describe("listPendingForRetry", () => {
   });
 
   it("excludes sent deliveries", async () => {
-    const d = await db.select().from(schema.deliveries).then((r) => r[0]!);
+    const d = await db
+      .select()
+      .from(schema.deliveries)
+      .then((r) => r[0]!);
     await updateStatus(db, d.id, "sent", 1);
 
     const pending = await listPendingForRetry(db, 3);
@@ -75,7 +91,10 @@ describe("listPendingForRetry", () => {
   });
 
   it("excludes failed_permanent deliveries", async () => {
-    const d = await db.select().from(schema.deliveries).then((r) => r[0]!);
+    const d = await db
+      .select()
+      .from(schema.deliveries)
+      .then((r) => r[0]!);
     await updateStatus(db, d.id, "failed_permanent", 1);
 
     const pending = await listPendingForRetry(db, 3);

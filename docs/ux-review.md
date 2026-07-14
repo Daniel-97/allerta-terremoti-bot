@@ -25,6 +25,7 @@ Questi aspetti sono corretti e non vanno modificati:
 ## P0 — Bug funzionale: `/start` non riattiva un utente dopo `/stop`
 
 **Problema.** Il messaggio di `/stop` (`STRINGS.stop.done`) promette: "Per riattivare, invia /start". Ma nessun percorso di codice riporta lo status a `active`:
+
 - `src/bot/commands/stop.ts` imposta `status = "stopped"`.
 - `src/bot/commands/start.ts` non chiama mai `setChatStatus`.
 - `touchChat` (`src/db/repositories/chats.ts`) in `onConflictDoUpdate` aggiorna solo `last_seen_at` e dati anagrafici, **non** lo status.
@@ -32,6 +33,7 @@ Questi aspetti sono corretti e non vanno modificati:
 Risultato: l'utente crede di essersi riattivato ma resta `stopped` e non riceve più notifiche.
 
 **Correzione.**
+
 1. In `start.handle` (`src/bot/commands/start.ts`): chiamare `setChatStatus(db, ctx.chat!.id, "active")` prima della reply di benvenuto. Nota: l'handler attualmente riceve `_db: unknown` — tipizzarlo come `Db` e usarlo.
 2. Decidere il comportamento per status `blocked` (utente che ha bloccato e poi sbloccato il bot): consigliato riattivare anche in quel caso, dato che se l'utente scrive /start il bot è evidentemente sbloccato.
 3. Aggiungere un test: chat con status `stopped` → `/start` → status `active`.
@@ -45,6 +47,7 @@ Risultato: l'utente crede di essersi riattivato ma resta `stopped` e non riceve 
 **Problema.** `STRINGS.posizioni.addPrompt` e `STRINGS.posizioni.empty` istruiscono l'utente a usare "📎 → Posizione" (menu allegati), un percorso poco scopribile. La skill indica che la reply keyboard con `request_location` è **l'unico modo** per richiedere la posizione con un pulsante (solo chat private — vincolo già soddisfatto: il bot ha un middleware private-only in `src/bot/bot.ts`).
 
 **Correzione.**
+
 1. Nel handler della callback `nav:add` (`src/bot/inline/router.ts`, case `"nav"` con `target === "add"`) e nel pannello "posizioni vuote": inviare il prompt con una reply keyboard:
    ```ts
    reply_markup: {
@@ -67,6 +70,7 @@ Risultato: l'utente crede di essersi riattivato ma resta `stopped` e non riceve 
 **Problema.** Telegram richiede a tutti i bot di supportare `/start`, `/help` e `/settings`. In `src/bot/bot.ts`, `/help` è riservato agli admin: un utente normale che digita `/help` riceve "Non ho capito" (`STRINGS.unknownCommand.hint`). `/settings` non esiste affatto.
 
 **Correzione.**
+
 1. `/help`: per i non-admin, invocare lo stesso handler di `/aiuto` (`aiuto.handle`); per gli admin mantenere l'help amministrativo attuale.
 2. `/settings`: registrare `bot.command("settings", ...)` come alias che invoca `impostazioni.handle`.
 3. NON aggiungere questi alias al menu di `set-commands.ts` (il menu resta in italiano); devono solo rispondere se digitati.
@@ -81,6 +85,7 @@ Risultato: l'utente crede di essersi riattivato ma resta `stopped` e non riceve 
 **Problema.** La keyboard delle notifiche (`buildKeyboard` in `src/notify/compose.ts`) contiene solo il pulsante URL "📡 INGV". Il momento in cui l'utente vuole regolare raggio/magnitudo è esattamente quando riceve una notifica di troppo: oggi deve ricordarsi di `/posizioni` e rinavigare.
 
 **Correzione.**
+
 1. Solo per le notifiche di **prossimità** (`composeProximity`): aggiungere alla keyboard un pulsante `⚙️ Soglie per {locName}` con callback `encodeLoc(locId)` — riusa il pannello dettaglio posizione già esistente e il router attuale senza nuova logica.
 2. Serve passare `locId` a `composeProximity` (oggi riceve solo `locName` e `distanceKm`): propagarlo da `src/notify/deliver.ts` / `match.ts`.
 3. NON aggiungere il pulsante alle notifiche generali/mondiali (nessuna posizione associata; evitare clutter).
@@ -95,6 +100,7 @@ Risultato: l'utente crede di essersi riattivato ma resta `stopped` e non riceve 
 **Problema.** Il bot non ha alcuna reply keyboard. È una scelta difendibile per un bot notification-driven, ma l'utente tipo configura il bot una volta e ci torna dopo mesi, quando non ricorda più i comandi.
 
 **Correzione (opzionale ma consigliata — decisione finale al maintainer).**
+
 1. In `start.handle`: inviare il benvenuto con reply keyboard `[📍 Posizioni] [⚙️ Impostazioni] [❓ Aiuto]`, `resize_keyboard: true`, `is_persistent: true`.
 2. Aggiungere tre `bot.hears("📍 Posizioni", ...)` ecc. in `src/bot/bot.ts` che invocano gli **stessi handler** dei comandi (`posizioni.handle`, `impostazioni.handle`, `aiuto.handle`). Le etichette dei pulsanti sono costanti condivise in `src/i18n/strings.ts` (etichetta = payload: se cambia l'etichetta deve cambiare anche l'`hears`).
 3. `/start` re-invia sempre la keyboard (ancora di salvezza se persa).
@@ -130,6 +136,7 @@ Risultato: l'utente crede di essersi riattivato ma resta `stopped` e non riceve 
 **Problema.** Il case `"evDetail"` in `src/bot/inline/router.ts` (e `encodeEvDetail` in `callback-data.ts`) non è referenziato da nessuna keyboard: nessun pulsante lo genera. Inoltre, se riattivato, invia un **nuovo messaggio** invece di editare.
 
 **Correzione.** Due opzioni:
+
 - Rimuovere il case e l'encoder (con relativi test), oppure
 - Riattivarlo agganciandolo alla notifica (pulsante "🔎 Dettagli") — in tal caso va bene la reply come nuovo messaggio SOLO se si vuole preservare la notifica originale; altrimenti preferire l'edit. Se riattivato, valutare insieme all'intervento P2 sulla notifica per non superare 2 pulsanti per riga.
 

@@ -1,5 +1,6 @@
 import type { Context } from "grammy";
 import type { InlineKeyboard } from "grammy";
+import { GrammyError } from "grammy";
 import { STRINGS } from "@/i18n/strings";
 import * as kb from "@/bot/inline/keyboards";
 import { captureWarning } from "@/util/error-handler";
@@ -12,9 +13,7 @@ export interface Panel {
   keyboard: InlineKeyboard;
 }
 
-export function renderLocationsList(
-  locs: { id: number; name: string }[],
-): Panel {
+export function renderLocationsList(locs: { id: number; name: string }[]): Panel {
   if (locs.length === 0) {
     return { text: STRINGS.posizioni.empty, keyboard: kb.locationsListKeyboard([]) };
   }
@@ -48,10 +47,7 @@ export function renderMagnitudePresets(locId: number): Panel {
   };
 }
 
-export function renderSettings(
-  italy: boolean,
-  world: boolean,
-): Panel {
+export function renderSettings(italy: boolean, world: boolean): Panel {
   return {
     text: STRINGS.impostazioni.title,
     keyboard: kb.togglesKeyboard(italy, world),
@@ -69,9 +65,19 @@ export async function editPanel(ctx: Context, panel: Panel): Promise<void> {
   try {
     await ctx.editMessageText(panel.text, {
       reply_markup: panel.keyboard,
-      parse_mode: "Markdown",
+      parse_mode: "HTML",
     });
   } catch (err) {
+    const cannotEditText =
+      err instanceof GrammyError &&
+      err.description.includes("there is no text in the message to edit");
+    if (cannotEditText) {
+      await ctx.reply(panel.text, {
+        reply_markup: panel.keyboard,
+        parse_mode: "HTML",
+      });
+      return;
+    }
     captureWarning(log, err, { action: "editMessageText" });
   }
 }
@@ -79,6 +85,6 @@ export async function editPanel(ctx: Context, panel: Panel): Promise<void> {
 export async function replyPanel(ctx: Context, panel: Panel): Promise<void> {
   await ctx.reply(panel.text, {
     reply_markup: panel.keyboard,
-    parse_mode: "Markdown",
+    parse_mode: "HTML",
   });
 }

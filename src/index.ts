@@ -65,23 +65,37 @@ export default {
       switch (controller.cron) {
         case "*/5 * * * *":
           try {
-            await runRetryCron({
-              maxAttempts: config.maxAttempts,
-              italyAlertThreshold: config.italyAlertThreshold,
-              worldAlertThreshold: config.worldAlertThreshold,
-            }, db, bot);
+            await runRetryCron(
+              {
+                maxAttempts: config.maxAttempts,
+                italyAlertThreshold: config.italyAlertThreshold,
+                worldAlertThreshold: config.worldAlertThreshold,
+              },
+              db,
+              bot,
+            );
           } catch (err) {
-            log.error({ cron: controller.cron, job: "retry", err: String(err) }, "scheduled trigger error");
+            log.error(
+              { cron: controller.cron, job: "retry", err: String(err) },
+              "scheduled trigger error",
+            );
           }
           try {
-            await runMainCron({
-              HEALTHCHECKS_URL: config.HEALTHCHECKS_URL,
-              italyAlertThreshold: config.italyAlertThreshold,
-              worldAlertThreshold: config.worldAlertThreshold,
-              lookbackWindowMin: config.lookbackWindowMin,
-            }, db, bot);
+            await runMainCron(
+              {
+                HEALTHCHECKS_URL: config.HEALTHCHECKS_URL,
+                italyAlertThreshold: config.italyAlertThreshold,
+                worldAlertThreshold: config.worldAlertThreshold,
+                lookbackWindowMin: config.lookbackWindowMin,
+              },
+              db,
+              bot,
+            );
           } catch (err) {
-            log.error({ cron: controller.cron, job: "main", err: String(err) }, "scheduled trigger error");
+            log.error(
+              { cron: controller.cron, job: "main", err: String(err) },
+              "scheduled trigger error",
+            );
           }
           break;
         case "0 3 * * *":

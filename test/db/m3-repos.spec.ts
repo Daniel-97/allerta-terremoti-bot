@@ -4,7 +4,11 @@ import { drizzle } from "drizzle-orm/libsql";
 import { sql } from "drizzle-orm";
 import * as schema from "@/db/schema";
 import { insertIfNew as historyInsert, getEvent } from "@/db/repositories/history";
-import { insertIfNew as deliveryInsert, updateStatus, getDelivery } from "@/db/repositories/deliveries";
+import {
+  insertIfNew as deliveryInsert,
+  updateStatus,
+  getDelivery,
+} from "@/db/repositories/deliveries";
 import { getState, setState, incrementState } from "@/db/repositories/system-state";
 import { upsertActiveChat } from "@/db/repositories/chats";
 
@@ -26,22 +30,38 @@ async function freshDb() {
 
 describe("history repo", () => {
   let db: Awaited<ReturnType<typeof freshDb>>;
-  beforeEach(async () => { db = await freshDb(); });
+  beforeEach(async () => {
+    db = await freshDb();
+  });
 
   it("insertIfNew returns true for new event", async () => {
     const newEvent = await historyInsert(db, {
-      id: "ev1", zone: "Roma", date: "2026-06-30T12:00:00Z",
-      lat: 41.9, lon: 12.5, depth: 10, stations_count: 5,
-      magnitude_type: "ML", magnitude_value: 4.2, magnitude_uncertainty: 0.3,
+      id: "ev1",
+      zone: "Roma",
+      date: "2026-06-30T12:00:00Z",
+      lat: 41.9,
+      lon: 12.5,
+      depth: 10,
+      stations_count: 5,
+      magnitude_type: "ML",
+      magnitude_value: 4.2,
+      magnitude_uncertainty: 0.3,
     });
     expect(newEvent).toBe(true);
   });
 
   it("insertIfNew returns false for duplicate event", async () => {
     const ev = {
-      id: "ev1", zone: "Roma", date: "2026-06-30T12:00:00Z",
-      lat: 41.9, lon: 12.5, depth: 10, stations_count: 5,
-      magnitude_type: "ML", magnitude_value: 4.2, magnitude_uncertainty: 0.3,
+      id: "ev1",
+      zone: "Roma",
+      date: "2026-06-30T12:00:00Z",
+      lat: 41.9,
+      lon: 12.5,
+      depth: 10,
+      stations_count: 5,
+      magnitude_type: "ML",
+      magnitude_value: 4.2,
+      magnitude_uncertainty: 0.3,
     };
     await historyInsert(db, ev);
     const dup = await historyInsert(db, ev);
@@ -50,9 +70,16 @@ describe("history repo", () => {
 
   it("getEvent returns the event", async () => {
     await historyInsert(db, {
-      id: "ev1", zone: "Roma", date: "2026-06-30T12:00:00Z",
-      lat: 41.9, lon: 12.5, depth: 10, stations_count: 5,
-      magnitude_type: "ML", magnitude_value: 4.2, magnitude_uncertainty: 0.3,
+      id: "ev1",
+      zone: "Roma",
+      date: "2026-06-30T12:00:00Z",
+      lat: 41.9,
+      lon: 12.5,
+      depth: 10,
+      stations_count: 5,
+      magnitude_type: "ML",
+      magnitude_value: 4.2,
+      magnitude_uncertainty: 0.3,
     });
     const e = await getEvent(db, "ev1");
     expect(e?.zone).toBe("Roma");
@@ -65,9 +92,16 @@ describe("deliveries repo", () => {
   beforeEach(async () => {
     db = await freshDb();
     await historyInsert(db, {
-      id: "ev1", zone: "Roma", date: "2026-06-30T12:00:00Z",
-      lat: 41.9, lon: 12.5, depth: null, stations_count: null,
-      magnitude_type: null, magnitude_value: 4.2, magnitude_uncertainty: null,
+      id: "ev1",
+      zone: "Roma",
+      date: "2026-06-30T12:00:00Z",
+      lat: 41.9,
+      lon: 12.5,
+      depth: null,
+      stations_count: null,
+      magnitude_type: null,
+      magnitude_value: 4.2,
+      magnitude_uncertainty: null,
     });
     await upsertActiveChat(db, { id: 100, first_name: "U", last_name: null, username: null });
   });
@@ -96,7 +130,9 @@ describe("deliveries repo", () => {
 
 describe("system_state repo", () => {
   let db: Awaited<ReturnType<typeof freshDb>>;
-  beforeEach(async () => { db = await freshDb(); });
+  beforeEach(async () => {
+    db = await freshDb();
+  });
 
   it("getState returns null for missing key", async () => {
     expect(await getState(db, "nonexistent")).toBeNull();

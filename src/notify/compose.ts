@@ -2,6 +2,8 @@ import { InlineKeyboard } from "grammy";
 import type { ParsedEvent } from "@/services/ingv/types";
 import type { Recipient } from "@/notify/match";
 import { getLocation } from "@/db/repositories/locations";
+import { encodeLoc } from "@/util/callback-data";
+import { escapeHtml } from "@/util/html";
 import type { Db } from "@/db/types";
 
 const INGV_SOURCE_URL_PREFIX = "https://terremoti.ingv.it/event/";
@@ -31,14 +33,20 @@ export function formatMagType(magType: string): string {
   return magType ? ` (${magType})` : "";
 }
 
-export function formatTitle(magnitude: number, zone: string, markdown = true, includeLabel = true, magType = ""): string {
+export function formatTitle(
+  magnitude: number,
+  zone: string,
+  markdown = true,
+  includeLabel = true,
+  magType = "",
+): string {
   const magValue = magnitude.toFixed(1);
-  const label = includeLabel ? (markdown ? "*Magnitudo:* " : "Magnitudo: ") : "";
-  return `⚠️ ${label}${magValue}${formatMagType(magType)} - ${zone}`;
+  const label = includeLabel ? (markdown ? "<b>Magnitudo:</b> " : "Magnitudo: ") : "";
+  return `⚠️ ${label}${magValue}${formatMagType(magType)} - ${escapeHtml(zone)}`;
 }
 
 function buildLocationLine(distanceKm: number, locName: string): string {
-  return `📍 *${locName}* — ${distanceKm.toFixed(0)} km`;
+  return `📍 <b>${escapeHtml(locName)}</b> — ${distanceKm.toFixed(0)} km`;
 }
 
 function buildKeyboard(event: ParsedEvent): InlineKeyboard {
@@ -57,32 +65,44 @@ function buildTitleLine(event: ParsedEvent): string {
 function buildReasonLabel(reason: Recipient["reason"]): string {
   switch (reason) {
     case "proximity":
-      return "🔔 *Allerta di prossimità*";
+      return "🔔 <b>Allerta di prossimità</b>";
     case "general":
-      return "📢 *Terremoto rilevante*";
+      return "📢 <b>Terremoto rilevante</b>";
   }
 }
 
-export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string): ComposedMessage {
+export function composeProximity(
+  event: ParsedEvent,
+  distanceKm: number,
+  locName: string,
+  locId: number,
+): ComposedMessage {
   const text =
     `${buildReasonLabel("proximity")}\n\n` +
     `${buildTitleLine(event)}\n` +
     `${buildLocationLine(distanceKm, locName)}\n` +
-    `📏 *Profondità:* ${depthLabel(event.depth)}\n` +
-    `🕐 *Ora:* ${formatTime(event.time)}\n` +
-    `*Fonte:* INGV`;
-  return { text, keyboard: buildKeyboard(event) };
+    `📏 <b>Profondità:</b> ${depthLabel(event.depth)}\n` +
+    `🕐 <b>Ora:</b> ${formatTime(event.time)}\n` +
+    `<b>Fonte:</b> INGV`;
+  const keyboard = buildKeyboard(event);
+  keyboard.text(`⚙️ Soglie per ${locName}`, encodeLoc(locId));
+  return { text, keyboard };
 }
 
-export function composeGeneral(event: ParsedEvent, distanceKm: number | null, locName: string | null): ComposedMessage {
-  const locLine = locName && distanceKm != null ? `${buildLocationLine(distanceKm, locName)}\n` : "";
+export function composeGeneral(
+  event: ParsedEvent,
+  distanceKm: number | null,
+  locName: string | null,
+): ComposedMessage {
+  const locLine =
+    locName && distanceKm != null ? `${buildLocationLine(distanceKm, locName)}\n` : "";
   const text =
     `${buildReasonLabel("general")}\n\n` +
     `${buildTitleLine(event)}\n` +
     locLine +
-    `📏 *Profondità:* ${depthLabel(event.depth)}\n` +
-    `🕐 *Ora:* ${formatTime(event.time)}\n` +
-    `*Fonte:* INGV`;
+    `📏 <b>Profondità:</b> ${depthLabel(event.depth)}\n` +
+    `🕐 <b>Ora:</b> ${formatTime(event.time)}\n` +
+    `<b>Fonte:</b> INGV`;
   return { text, keyboard: buildKeyboard(event) };
 }
 
@@ -100,7 +120,7 @@ export async function composeMessage(
   const locName = await getNearestLocationName(db, rec.nearestLocationId);
 
   if (rec.reason === "proximity") {
-    return composeProximity(event, rec.distanceKm!, locName!);
+    return composeProximity(event, rec.distanceKm!, locName!, rec.nearestLocationId!);
   }
   return composeGeneral(event, rec.distanceKm, locName);
 }

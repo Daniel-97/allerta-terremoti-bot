@@ -59,7 +59,13 @@ export async function runRetryCron(
       zone: event.zone,
     };
 
-    const recipient = await matchChat(parsedEvent, delivery.chat, db, config.italyAlertThreshold, config.worldAlertThreshold);
+    const recipient = await matchChat(
+      parsedEvent,
+      delivery.chat,
+      db,
+      config.italyAlertThreshold,
+      config.worldAlertThreshold,
+    );
     if (!recipient) {
       skipped++;
       continue;
@@ -71,20 +77,23 @@ export async function runRetryCron(
     try {
       imageBytes = await generateEarthquakeImage(parsedEvent, getBaseImage, getFonts);
     } catch (imgErr) {
-      log.warn({ chatId: delivery.chat, eventId: delivery.event_id, err: String(imgErr) }, "image generation fallback");
+      log.warn(
+        { chatId: delivery.chat, eventId: delivery.event_id, err: String(imgErr) },
+        "image generation fallback",
+      );
     }
 
     try {
       if (imageBytes) {
         await bot.api.sendPhoto(delivery.chat, new InputFile(imageBytes, "earthquake.png"), {
           caption: text,
-          parse_mode: "Markdown",
+          parse_mode: "HTML",
           reply_markup: keyboard,
         });
       } else {
         await bot.api.sendMessage(delivery.chat, text, {
           reply_markup: keyboard,
-          parse_mode: "Markdown",
+          parse_mode: "HTML",
         });
       }
       await updateStatus(db, delivery.id, "sent", delivery.attempts + 1);
@@ -104,12 +113,15 @@ export async function runRetryCron(
     await sleep(33);
   }
 
-  log.info({
-    total: pending.length,
-    sent,
-    failedTransient,
-    failedPermanent,
-    skipped,
-    durationMs: Date.now() - start,
-  }, "retry cycle finished");
+  log.info(
+    {
+      total: pending.length,
+      sent,
+      failedTransient,
+      failedPermanent,
+      skipped,
+      durationMs: Date.now() - start,
+    },
+    "retry cycle finished",
+  );
 }

@@ -2,9 +2,19 @@ import { z } from "zod";
 import type { ParsedEvent } from "@/services/ingv/types";
 
 const KNOWN_HEADER_COLUMNS = [
-  "#eventid", "time", "latitude", "longitude", "depth/km",
-  "author", "catalog", "contributor", "contributorid",
-  "magtype", "magnitude", "magauthor", "eventlocationname",
+  "#eventid",
+  "time",
+  "latitude",
+  "longitude",
+  "depth/km",
+  "author",
+  "catalog",
+  "contributor",
+  "contributorid",
+  "magtype",
+  "magnitude",
+  "magauthor",
+  "eventlocationname",
 ] as const;
 
 const MIN_COLUMNS = KNOWN_HEADER_COLUMNS.length;
@@ -29,7 +39,8 @@ function validateHeader(header: string): void {
   const cols = header.toLowerCase().split("|");
   if (cols.length < MIN_COLUMNS) throw new Error("Invalid INGV FDSN text format header");
   for (let i = 0; i < MIN_COLUMNS; i++) {
-    if (cols[i] !== KNOWN_HEADER_COLUMNS[i]) throw new Error("Invalid INGV FDSN text format header");
+    if (cols[i] !== KNOWN_HEADER_COLUMNS[i])
+      throw new Error("Invalid INGV FDSN text format header");
   }
 }
 

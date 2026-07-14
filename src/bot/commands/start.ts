@@ -1,22 +1,30 @@
 import type { Context } from "grammy";
 import type { Logger } from "@/util/log";
+import type { Db } from "@/db/types";
 import { STRINGS } from "@/i18n/strings";
+import { mainMenuReplyMarkup } from "@/bot/main-menu";
+import { setChatStatus } from "@/db/repositories/chats";
 
 export async function handle(
   ctx: Context,
-  _db: unknown,
+  db: Db,
   log: Logger,
   config: { italyAlertThreshold: number; worldAlertThreshold: number },
 ): Promise<void> {
-  log.info({
-    chatId: ctx.chat?.id,
-    userId: ctx.from?.id,
-    first_name: ctx.from?.first_name,
-    command: "/start",
-    outcome: "handled",
-  }, "command handled");
-  await ctx.reply(
-    STRINGS.start.welcome(config.italyAlertThreshold, config.worldAlertThreshold),
-    { parse_mode: "Markdown" },
+  const chatId = ctx.chat!.id;
+  await setChatStatus(db, chatId, "active");
+  log.info(
+    {
+      chatId,
+      userId: ctx.from?.id,
+      first_name: ctx.from?.first_name,
+      command: "/start",
+      outcome: "handled",
+    },
+    "command handled",
   );
+  await ctx.reply(STRINGS.start.welcome(config.italyAlertThreshold, config.worldAlertThreshold), {
+    parse_mode: "HTML",
+    reply_markup: mainMenuReplyMarkup,
+  });
 }

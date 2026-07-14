@@ -37,10 +37,6 @@ export interface LocCb {
   kind: "loc";
   locId: number;
 }
-export interface EvDetailCb {
-  kind: "evDetail";
-  eventId: string;
-}
 export type Callback =
   | RadiusCb
   | MagnitudeCb
@@ -50,8 +46,7 @@ export type Callback =
   | DeleteOkCb
   | ToggleCb
   | NavCb
-  | LocCb
-  | EvDetailCb;
+  | LocCb;
 
 // radius
 export function encodeRadius(locId: number, radius: number): string {
@@ -151,16 +146,6 @@ export function decodeLoc(s: string): LocCb | null {
   return { kind: "loc", locId: Number(m[1]) };
 }
 
-// event detail
-export function encodeEventDetail(eventId: string): string {
-  return `ev;${eventId};det`;
-}
-export function decodeEvDetail(s: string): EvDetailCb | null {
-  const m = s.match(/^ev;(.+);det$/);
-  if (!m) return null;
-  return { kind: "evDetail", eventId: m[1]! };
-}
-
 // generic decode dispatcher
 export function decode(s: string): Callback | null {
   if (!s) return null;
@@ -174,7 +159,6 @@ export function decode(s: string): Callback | null {
     decodeToggle(s) ??
     decodeNav(s) ??
     decodeLoc(s) ??
-    decodeEvDetail(s) ??
     null
   );
 }

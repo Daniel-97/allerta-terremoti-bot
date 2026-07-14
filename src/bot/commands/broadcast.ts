@@ -11,12 +11,7 @@ function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-export async function handle(
-  ctx: Context,
-  db: Db,
-  log: Logger,
-  args: string,
-): Promise<void> {
+export async function handle(ctx: Context, db: Db, log: Logger, args: string): Promise<void> {
   if (!args) {
     await ctx.reply(ADMIN.broadcast.empty);
     return;
@@ -28,10 +23,7 @@ export async function handle(
 
   const { chats } = await import("../../db/schema");
   const { eq } = await import("drizzle-orm");
-  const activeChats = await db
-    .select()
-    .from(chats)
-    .where(eq(chats.status, "active"));
+  const activeChats = await db.select().from(chats).where(eq(chats.status, "active"));
 
   let sent = 0;
   for (const chat of activeChats) {
@@ -45,13 +37,16 @@ export async function handle(
     await sleep(33);
   }
 
-  log.info({
-    adminChatId: ctx.chat?.id,
-    adminUsername: ctx.from?.username,
-    recipientCount: activeChats.length,
-    sent,
-    argsLength: args.length,
-  }, "broadcast completed");
+  log.info(
+    {
+      adminChatId: ctx.chat?.id,
+      adminUsername: ctx.from?.username,
+      recipientCount: activeChats.length,
+      sent,
+      argsLength: args.length,
+    },
+    "broadcast completed",
+  );
 
   await ctx.reply(ADMIN.broadcast.sent(sent, activeChats.length));
 }

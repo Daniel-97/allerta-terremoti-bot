@@ -17,10 +17,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const sqlScript = readFileSync(
-    new URL("../src/db/schema.sql", import.meta.url),
-    "utf8",
-  );
+  const sqlScript = readFileSync(new URL("../src/db/schema.sql", import.meta.url), "utf8");
 
   const client = createClient({
     url,

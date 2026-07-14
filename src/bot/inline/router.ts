@@ -9,17 +9,13 @@ import {
   deleteLocation,
 } from "@/db/repositories/locations";
 import { getChat, setAlertFlags } from "@/db/repositories/chats";
-import { getEvent } from "@/db/repositories/history";
 import { STRINGS } from "@/i18n/strings";
 import * as panels from "@/bot/inline/panels";
 import type { Db } from "@/db/types";
 
 const log = createLogger("bot");
 
-export async function handleCallbackQuery(
-  ctx: Context,
-  db: Db,
-): Promise<void> {
+export async function handleCallbackQuery(ctx: Context, db: Db): Promise<void> {
   const data = ctx.callbackQuery?.data ?? "";
   const cb = decode(data);
 
@@ -48,7 +44,10 @@ export async function handleCallbackQuery(
           await ctx.answerCallbackQuery({ text: "Posizione non trovata" });
           return;
         }
-        await panels.editPanel(ctx, panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id));
+        await panels.editPanel(
+          ctx,
+          panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id),
+        );
         break;
       }
       case "radiusMenu": {
@@ -63,7 +62,10 @@ export async function handleCallbackQuery(
         await updateRadius(db, cb.locId, cb.radius);
         const loc = await getLocation(db, cb.locId);
         if (loc) {
-          await panels.editPanel(ctx, panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id));
+          await panels.editPanel(
+            ctx,
+            panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id),
+          );
         }
         break;
       }
@@ -71,7 +73,10 @@ export async function handleCallbackQuery(
         await updateMagnitude(db, cb.locId, cb.magnitude / 10);
         const loc = await getLocation(db, cb.locId);
         if (loc) {
-          await panels.editPanel(ctx, panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id));
+          await panels.editPanel(
+            ctx,
+            panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id),
+          );
         }
         break;
       }
@@ -84,12 +89,19 @@ export async function handleCallbackQuery(
       }
       case "deleteOk": {
         const loc = await getLocation(db, cb.locId);
-        if (loc) {
-          await deleteLocation(db, cb.locId);
-          await ctx.answerCallbackQuery({ text: `Posizione "${loc.name}" rimossa` });
-          const locs = await listLocations(db, loc.chat);
-          await panels.editPanel(ctx, panels.renderLocationsList(locs));
+        if (!loc) {
+          const msg = ctx.callbackQuery?.message;
+          await ctx.answerCallbackQuery({ text: "Posizione già rimossa" });
+          if (msg) {
+            const locs = await listLocations(db, msg.chat.id);
+            await panels.editPanel(ctx, panels.renderLocationsList(locs));
+          }
+          break;
         }
+        await deleteLocation(db, cb.locId);
+        await ctx.answerCallbackQuery({ text: `Posizione "${loc.name}" rimossa` });
+        const locs = await listLocations(db, loc.chat);
+        await panels.editPanel(ctx, panels.renderLocationsList(locs));
         break;
       }
       case "toggle": {
@@ -113,32 +125,19 @@ export async function handleCallbackQuery(
         await panels.editPanel(ctx, panels.renderSettings(italy, world));
         break;
       }
-      case "evDetail": {
-        const ev = await getEvent(db, cb.eventId);
-        if (!ev) {
-          await ctx.answerCallbackQuery({ text: STRINGS.eventDetail.notAvailable });
-          return;
-        }
-        const lines = [
-          `📍 *${ev.zone}*`,
-          `📏 Coordinate: ${ev.lat.toFixed(3)}, ${ev.lon.toFixed(3)}`,
-          `📏 Profondità: ${ev.depth != null ? `${ev.depth.toFixed(1)} km` : "N/D"}`,
-          `📊 Magnitudo: *${ev.magnitude_value.toFixed(1)}* (${ev.magnitude_type ?? "N/D"})`,
-          ev.magnitude_uncertainty != null ? `   Incertezza: ±${ev.magnitude_uncertainty.toFixed(1)}` : "",
-          `📡 Stazioni: ${ev.stations_count ?? "N/D"}`,
-          `🕐 ${ev.date}`,
-        ].filter(Boolean).join("\n");
-        await ctx.reply(`${STRINGS.eventDetail.title}\n\n${lines}\n\n${STRINGS.eventDetail.source}`, { parse_mode: "Markdown" });
-        break;
-      }
       case "nav": {
         const msg = ctx.callbackQuery?.message;
         if (!msg) return;
         const chatId = msg.chat.id;
         if (cb.target === "add") {
           await ctx.reply(STRINGS.posizioni.addPrompt, {
-            reply_markup: { remove_keyboard: true },
-            parse_mode: "Markdown",
+            reply_markup: {
+              keyboard: [[{ text: STRINGS.posizioni.requestLocationBtn, request_location: true }]],
+              resize_keyboard: true,
+              one_time_keyboard: true,
+              input_field_placeholder: STRINGS.posizioni.requestLocationPlaceholder,
+            },
+            parse_mode: "HTML",
           });
           break;
         }

@@ -73,15 +73,8 @@ export async function getChat(db: Db, id: number) {
   return rows[0];
 }
 
-export async function setChatStatus(
-  db: Db,
-  id: number,
-  status: ChatStatus,
-): Promise<void> {
-  await db
-    .update(chats)
-    .set({ status, updated_at: nowIso() })
-    .where(eq(chats.id, id));
+export async function setChatStatus(db: Db, id: number, status: ChatStatus): Promise<void> {
+  await db.update(chats).set({ status, updated_at: nowIso() }).where(eq(chats.id, id));
 }
 
 export async function setAlertFlags(
@@ -96,10 +89,7 @@ export async function setAlertFlags(
 }
 
 export async function listActiveChats(db: Db) {
-  return db
-    .select()
-    .from(chats)
-    .where(eq(chats.status, "active"));
+  return db.select().from(chats).where(eq(chats.status, "active"));
 }
 
 export async function countByStatus(db: Db) {

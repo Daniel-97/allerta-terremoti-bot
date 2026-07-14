@@ -13,7 +13,13 @@ export interface NewDelivery {
 export async function insertIfNew(db: Db, d: NewDelivery): Promise<boolean> {
   const result = await db
     .insert(deliveries)
-    .values({ event_id: d.event_id, chat: d.chat, status: "pending", attempts: 0, updated_at: nowIso() })
+    .values({
+      event_id: d.event_id,
+      chat: d.chat,
+      status: "pending",
+      attempts: 0,
+      updated_at: nowIso(),
+    })
     .onConflictDoNothing({ target: [deliveries.event_id, deliveries.chat] })
     .returning({ id: deliveries.id });
   return result.length > 0;
@@ -53,10 +59,7 @@ export async function getDelivery(db: Db, eventId: string, chat: number) {
 }
 
 export async function listByEvent(db: Db, eventId: string) {
-  return db
-    .select()
-    .from(deliveries)
-    .where(eq(deliveries.event_id, eventId));
+  return db.select().from(deliveries).where(eq(deliveries.event_id, eventId));
 }
 
 export async function deleteOlderThan(db: Db, days: number): Promise<number> {

@@ -25,26 +25,15 @@ export async function addLocation(db: Db, loc: NewLocation): Promise<number> {
 }
 
 export async function listLocations(db: Db, chat: number) {
-  return db
-    .select()
-    .from(locations)
-    .where(eq(locations.chat, chat))
-    .orderBy(locations.id);
+  return db.select().from(locations).where(eq(locations.chat, chat)).orderBy(locations.id);
 }
 
 export async function getLocation(db: Db, id: number) {
-  const rows = await db
-    .select()
-    .from(locations)
-    .where(eq(locations.id, id))
-    .limit(1);
+  const rows = await db.select().from(locations).where(eq(locations.id, id)).limit(1);
   return rows[0];
 }
 
-export async function countLocations(
-  db: Db,
-  chat: number,
-): Promise<number> {
+export async function countLocations(db: Db, chat: number): Promise<number> {
   const rows = await db
     .select({ c: sql<number>`count(*)` })
     .from(locations)
@@ -61,35 +50,19 @@ export async function findByName(db: Db, chat: number, name: string) {
   return rows[0];
 }
 
-export async function updateRadius(
-  db: Db,
-  id: number,
-  radius: number,
-): Promise<void> {
+export async function updateRadius(db: Db, id: number, radius: number): Promise<void> {
   await db.update(locations).set({ radius }).where(eq(locations.id, id));
 }
 
-export async function updateMagnitude(
-  db: Db,
-  id: number,
-  magnitude: number,
-): Promise<void> {
-  await db
-    .update(locations)
-    .set({ magnitude_threshold: magnitude })
-    .where(eq(locations.id, id));
+export async function updateMagnitude(db: Db, id: number, magnitude: number): Promise<void> {
+  await db.update(locations).set({ magnitude_threshold: magnitude }).where(eq(locations.id, id));
 }
 
-export async function deleteLocation(
-  db: Db,
-  id: number,
-): Promise<void> {
+export async function deleteLocation(db: Db, id: number): Promise<void> {
   await db.delete(locations).where(eq(locations.id, id));
 }
 
 export async function countAll(db: Db): Promise<number> {
-  const rows = await db
-    .select({ c: sql<number>`count(*)` })
-    .from(locations);
+  const rows = await db.select({ c: sql<number>`count(*)` }).from(locations);
   return rows[0]!.c;
 }

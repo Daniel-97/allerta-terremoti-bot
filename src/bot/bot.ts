@@ -34,10 +34,7 @@ export function createBot(config: RuntimeConfig, db: Db): Bot {
   // private-only middleware + touch on every private message
   bot.use(async (ctx, next) => {
     if (ctx.chat?.type !== "private") {
-      log.info(
-        { chatId: ctx.chat?.id, type: ctx.chat?.type },
-        "ignored: non-private chat",
-      );
+      log.info({ chatId: ctx.chat?.id, type: ctx.chat?.type }, "ignored: non-private chat");
       return;
     }
     if (ctx.from) {
@@ -97,11 +94,12 @@ export function createBot(config: RuntimeConfig, db: Db): Bot {
   });
   bot.command("help", async (ctx) => {
     if (!ctx.chat || !config.adminChatIds.includes(ctx.chat.id)) {
-      await ctx.reply(STRINGS.unknownCommand.hint);
+      await aiuto.handle(ctx, db, log);
       return;
     }
     await help.handle(ctx, log);
   });
+  bot.command("settings", (ctx) => impostazioni.handle(ctx, db, log));
 
   // callback queries (inline button presses)
   bot.on("callback_query:data", (ctx) => handleCallbackQuery(ctx, db));
@@ -109,6 +107,11 @@ export function createBot(config: RuntimeConfig, db: Db): Bot {
   // location / venue messages
   bot.on("message:location", (ctx) => handleLocation(ctx, db, config));
   bot.on("message:venue", (ctx) => handleLocation(ctx, db, config));
+
+  // main menu reply-keyboard shortcuts
+  bot.hears(STRINGS.mainMenu.posizioni, (ctx) => posizioni.handle(ctx, db, log));
+  bot.hears(STRINGS.mainMenu.impostazioni, (ctx) => impostazioni.handle(ctx, db, log));
+  bot.hears(STRINGS.mainMenu.aiuto, (ctx) => aiuto.handle(ctx, db, log));
 
   // unrecognized text messages
   bot.on("message:text", async (ctx) => {

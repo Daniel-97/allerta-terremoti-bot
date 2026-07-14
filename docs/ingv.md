@@ -28,7 +28,7 @@ senza spazi. Si può usare sia il metodo HTTP GET che POST.
 Nello standard FDSN **non esiste un filtro "per nazione"**: si filtra sempre per
 **geografia** (riquadro o raggio).
 
-- **Solo Italia** → si usa un *bounding box* (riquadro) che copre il territorio
+- **Solo Italia** → si usa un _bounding box_ (riquadro) che copre il territorio
   italiano, oppure un filtro a raggio attorno a un punto.
 - **Copertura mondiale** → il catalogo ISIDe dell'INGV è incentrato sull'area
   **italiana e mediterranea** (eventi dal gennaio 1985), perciò non offre una
@@ -40,12 +40,12 @@ Nello standard FDSN **non esiste un filtro "per nazione"**: si filtra sempre per
 
 **Riquadro indicativo per l'Italia:**
 
-| Parametro     | Valore |
-|---------------|--------|
-| minlatitude   | 35     |
-| maxlatitude   | 47.5   |
-| minlongitude  | 6      |
-| maxlongitude  | 19     |
+| Parametro    | Valore |
+| ------------ | ------ |
+| minlatitude  | 35     |
+| maxlatitude  | 47.5   |
+| minlongitude | 6      |
+| maxlongitude | 19     |
 
 ---
 
@@ -55,46 +55,52 @@ La maggior parte dei parametri ha anche una forma abbreviata (indicata tra
 parentesi).
 
 ### Temporali
-| Parametro | Descrizione |
-|-----------|-------------|
+
+| Parametro             | Descrizione                                                |
+| --------------------- | ---------------------------------------------------------- |
 | `starttime` (`start`) | Inizio intervallo, formato ISO `AAAA-MM-GGThh:mm:ss` (UTC) |
-| `endtime` (`end`)     | Fine intervallo (UTC) |
-| `updatedafter`        | Solo eventi modificati dopo la data indicata |
+| `endtime` (`end`)     | Fine intervallo (UTC)                                      |
+| `updatedafter`        | Solo eventi modificati dopo la data indicata               |
 
 ### Geografici – riquadro (bounding box)
-| Parametro | Descrizione |
-|-----------|-------------|
-| `minlatitude` (`minlat`) / `maxlatitude` (`maxlat`)   | Latitudine min/max |
+
+| Parametro                                             | Descrizione         |
+| ----------------------------------------------------- | ------------------- |
+| `minlatitude` (`minlat`) / `maxlatitude` (`maxlat`)   | Latitudine min/max  |
 | `minlongitude` (`minlon`) / `maxlongitude` (`maxlon`) | Longitudine min/max |
 
 ### Geografici – raggio (alternativi al riquadro)
-| Parametro | Descrizione |
-|-----------|-------------|
-| `latitude` (`lat`) / `longitude` (`lon`) | Coordinate del centro |
-| `minradius` / `maxradius`                | Raggio in **gradi** |
+
+| Parametro                                | Descrizione              |
+| ---------------------------------------- | ------------------------ |
+| `latitude` (`lat`) / `longitude` (`lon`) | Coordinate del centro    |
+| `minradius` / `maxradius`                | Raggio in **gradi**      |
 | `minradiuskm` / `maxradiuskm`            | Raggio in **chilometri** |
 
 ### Magnitudo e profondità
-| Parametro | Descrizione |
-|-----------|-------------|
-| `minmagnitude` (`minmag`) / `maxmagnitude` (`maxmag`) | Magnitudo min/max |
-| `magnitudetype` | Tipo di magnitudo (es. `ML`, `Mw`, `Md`) |
-| `mindepth` / `maxdepth` | Profondità min/max in km |
+
+| Parametro                                             | Descrizione                              |
+| ----------------------------------------------------- | ---------------------------------------- |
+| `minmagnitude` (`minmag`) / `maxmagnitude` (`maxmag`) | Magnitudo min/max                        |
+| `magnitudetype`                                       | Tipo di magnitudo (es. `ML`, `Mw`, `Md`) |
+| `mindepth` / `maxdepth`                               | Profondità min/max in km                 |
 
 ### Identificativo e contenuto
-| Parametro | Descrizione |
-|-----------|-------------|
-| `eventid` | Recupero diretto di un singolo evento |
-| `includeallorigins`    | Include tutte le localizzazioni alternative |
-| `includeallmagnitudes` | Include tutte le stime di magnitudo |
-| `includearrivals`      | Include i tempi di arrivo alle stazioni |
-| `limit`  | Numero massimo di risultati (esiste un default, va aumentato se serve) |
-| `offset` | Paginazione: indice di partenza |
-| `orderby`| Ordinamento (es. `time`, `magnitude`) |
+
+| Parametro              | Descrizione                                                            |
+| ---------------------- | ---------------------------------------------------------------------- |
+| `eventid`              | Recupero diretto di un singolo evento                                  |
+| `includeallorigins`    | Include tutte le localizzazioni alternative                            |
+| `includeallmagnitudes` | Include tutte le stime di magnitudo                                    |
+| `includearrivals`      | Include i tempi di arrivo alle stazioni                                |
+| `limit`                | Numero massimo di risultati (esiste un default, va aumentato se serve) |
+| `offset`               | Paginazione: indice di partenza                                        |
+| `orderby`              | Ordinamento (es. `time`, `magnitude`)                                  |
 
 ### Formato di output
-| Parametro | Valori |
-|-----------|--------|
+
+| Parametro | Valori                                                   |
+| --------- | -------------------------------------------------------- |
 | `format`  | `xml` (QuakeML), `text`, `json`, `geojson`, `kml`, `csv` |
 
 Nel formato `text` i campi sono separati dal carattere `|` (barra verticale) e
@@ -106,21 +112,25 @@ profondità, autore, magnitudo, tipo di magnitudo e località.
 ## 4. Esempi pratici
 
 **Eventi recenti in Italia, magnitudo ≥ 2, formato testo:**
+
 ```
 https://webservices.ingv.it/fdsnws/event/1/query?starttime=2026-06-01T00:00:00&minmagnitude=2&minlatitude=35&maxlatitude=47.5&minlongitude=6&maxlongitude=19&format=text
 ```
 
 **Eventi entro 10 km da un punto (filtro a raggio), formato GeoJSON:**
+
 ```
 https://webservices.ingv.it/fdsnws/event/1/query?starttime=2024-06-01&endtime=2024-07-01&minmagnitude=1.5&latitude=40.822&longitude=14.139&maxradiuskm=10&format=geojson
 ```
 
 **Singolo evento per ID con tutte le magnitudo:**
+
 ```
 https://webservices.ingv.it/fdsnws/event/1/query?eventid=46227982&includeallmagnitudes=true
 ```
 
 **Esempio in Python:**
+
 ```python
 import requests
 
@@ -155,23 +165,23 @@ print(f"Trovati {len(eventi)} eventi")
 
 Documentazione e dettagli tratti dalle seguenti pagine:
 
-1. INGV – Osservatorio Nazionale Terremoti, *Webservices and software*
+1. INGV – Osservatorio Nazionale Terremoti, _Webservices and software_
    https://terremoti.ingv.it/webservices_and_software
-2. INGV – *ISIDe, Italian Seismological Instrumental and Parametric Database*
+2. INGV – _ISIDe, Italian Seismological Instrumental and Parametric Database_
    (dataset, formati e copertura) — https://data.ingv.it/dataset/09
 3. INGV – Documentazione OpenAPI Earthquake Event (Swagger)
    https://webservices.ingv.it/swagger-ui/dist/?url=https://ingv.github.io/openapi/fdsnws/event/0.0.1/event.yaml
-4. GitHub – *insomniacslk/ingv* (riferimento all'API documentata)
+4. GitHub – _insomniacslk/ingv_ (riferimento all'API documentata)
    https://github.com/insomniacslk/ingv
-5. ASMI – *FDSN event web service* (esempi di vincoli temporali, box e circolari)
+5. ASMI – _FDSN event web service_ (esempi di vincoli temporali, box e circolari)
    https://emidius.mi.ingv.it/ASMI/services/events.php
-6. ITACA – *FDSNWS Event Web-Service* (esempi di query FDSN)
+6. ITACA – _FDSNWS Event Web-Service_ (esempi di query FDSN)
    https://itaca.mi.ingv.it/fdsnws/event/1/query-options.html
-7. Piersoft – *Come creare una mappa con i Terremoti registrati da INGV*
+7. Piersoft – _Come creare una mappa con i Terremoti registrati da INGV_
    (esempio formato `text` e licenza CC-BY)
    https://www.piersoft.it/come-creare-una-mappa-con-i-terremoti-registrati-da-ingv/
-8. Capotosti et al., *Seismic and Geodetic Monitoring of the Federico II
-   Building (Naples)*, GNGTS 2025 (esempio di query a raggio in GeoJSON)
+8. Capotosti et al., _Seismic and Geodetic Monitoring of the Federico II
+   Building (Naples)_, GNGTS 2025 (esempio di query a raggio in GeoJSON)
    https://ricerca.ogs.it/retrieve/abf786b9-8025-49a4-818b-972aab7446cd/Capotosti_etal_GNGTS2025.pdf
 
 > **Nota:** l'endpoint e la struttura dei parametri seguono lo standard FDSN-event
