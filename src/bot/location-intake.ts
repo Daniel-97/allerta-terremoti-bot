@@ -1,5 +1,4 @@
 import type { Context } from "grammy";
-import type { ReplyKeyboardMarkup } from "grammy/types";
 import type { Db } from "@/db/types";
 import type { RuntimeConfig } from "@/config";
 import { isAllowedArea } from "@/util/geo-bbox";
@@ -14,10 +13,6 @@ import { createLogger } from "@/util/log";
 import { mainMenuReplyMarkup } from "@/bot/main-menu";
 
 const log = createLogger("bot");
-
-// grammy's ReplyKeyboardMarkup expects mutable arrays; mainMenuReplyMarkup is
-// declared `as const` (read-only) for safe sharing across consumers.
-const mainMenuKeyboard = mainMenuReplyMarkup as unknown as ReplyKeyboardMarkup;
 
 export type LocationFlowOutcome =
   | { kind: "out_of_area" }
@@ -79,22 +74,22 @@ export async function handleLocation(
 
   switch (outcome.kind) {
     case "out_of_area":
-      await ctx.reply(STRINGS.posizioni.outOfArea, { reply_markup: mainMenuKeyboard });
+      await ctx.reply(STRINGS.posizioni.outOfArea, { reply_markup: mainMenuReplyMarkup });
       return;
     case "cap_reached":
-      await ctx.reply(STRINGS.posizioni.cap, { reply_markup: mainMenuKeyboard });
+      await ctx.reply(STRINGS.posizioni.cap, { reply_markup: mainMenuReplyMarkup });
       return;
     case "geocoding_failed":
-      await ctx.reply(STRINGS.posizioni.geocodingFail, { reply_markup: mainMenuKeyboard });
+      await ctx.reply(STRINGS.posizioni.geocodingFail, { reply_markup: mainMenuReplyMarkup });
       return;
     case "duplicate":
-      await ctx.reply(STRINGS.posizioni.duplicate, { reply_markup: mainMenuKeyboard });
+      await ctx.reply(STRINGS.posizioni.duplicate, { reply_markup: mainMenuReplyMarkup });
       return;
     case "added":
       log.info({ chatId, locId: outcome.id, name: outcome.name }, "location added");
       await ctx.reply(STRINGS.posizioni.added(outcome.name), {
         parse_mode: "Markdown",
-        reply_markup: mainMenuKeyboard,
+        reply_markup: mainMenuReplyMarkup,
       });
       return;
   }
