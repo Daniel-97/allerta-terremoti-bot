@@ -13,18 +13,27 @@ describe("formatNewUserMessage", () => {
   });
 
   it("falls back to '?' for name and 'no username' when absent", () => {
-    const msg = formatNewUserMessage({ id: 2, first_name: null, last_name: null, username: null }, "2026-07-14 10:00");
+    const msg = formatNewUserMessage(
+      { id: 2, first_name: null, last_name: null, username: null },
+      "2026-07-14 10:00",
+    );
     expect(msg).toContain("Name: ?");
     expect(msg).toContain("User: no username");
   });
 
   it("escapes HTML-sensitive characters in first_name", () => {
-    const msg = formatNewUserMessage({ id: 3, first_name: "<script>", last_name: null, username: null }, "2026-07-14 10:00");
+    const msg = formatNewUserMessage(
+      { id: 3, first_name: "<script>", last_name: null, username: null },
+      "2026-07-14 10:00",
+    );
     expect(msg).toContain("Name: &lt;script&gt;");
   });
 
   it("escapes HTML-sensitive characters in username", () => {
-    const msg = formatNewUserMessage({ id: 4, first_name: "Bo", last_name: null, username: "a&b" }, "2026-07-14 10:00");
+    const msg = formatNewUserMessage(
+      { id: 4, first_name: "Bo", last_name: null, username: "a&b" },
+      "2026-07-14 10:00",
+    );
     expect(msg).toContain("User: @a&amp;b");
   });
 });

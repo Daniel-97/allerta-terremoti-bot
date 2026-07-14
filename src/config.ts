@@ -44,14 +44,15 @@ function parseAdminChatIds(raw: string | undefined): number[] {
 }
 
 export function loadConfig(env: unknown): RuntimeConfig {
-  const cleaned = typeof env === "object" && env !== null
-    ? Object.fromEntries(
-        Object.entries(env as Record<string, unknown>).map(([k, v]) => [
-          k,
-          v === "" ? undefined : v,
-        ]),
-      )
-    : env;
+  const cleaned =
+    typeof env === "object" && env !== null
+      ? Object.fromEntries(
+          Object.entries(env as Record<string, unknown>).map(([k, v]) => [
+            k,
+            v === "" ? undefined : v,
+          ]),
+        )
+      : env;
   const raw = schema.parse(cleaned);
   const adminChatIds = parseAdminChatIds(raw.ADMIN_CHAT_IDS);
   return {

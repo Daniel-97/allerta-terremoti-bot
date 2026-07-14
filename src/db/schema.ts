@@ -1,22 +1,19 @@
 import { sqliteTable, integer, text, real, uniqueIndex, index } from "drizzle-orm/sqlite-core";
 
-export const chats = sqliteTable(
-  "chats",
-  {
-    id: integer().primaryKey(),
-    first_name: text("first_name"),
-    last_name: text("last_name"),
-    username: text("username"),
-    status: text("status", { enum: ["active", "blocked", "stopped", "deleted"] })
-      .notNull()
-      .default("active"),
-    italy_alerts: integer("italy_alerts", { mode: "boolean" }).notNull().default(true),
-    world_alerts: integer("world_alerts", { mode: "boolean" }).notNull().default(false),
-    created_at: text("created_at").notNull(),
-    last_seen_at: text("last_seen_at").notNull(),
-    updated_at: text("updated_at").notNull(),
-  },
-);
+export const chats = sqliteTable("chats", {
+  id: integer().primaryKey(),
+  first_name: text("first_name"),
+  last_name: text("last_name"),
+  username: text("username"),
+  status: text("status", { enum: ["active", "blocked", "stopped", "deleted"] })
+    .notNull()
+    .default("active"),
+  italy_alerts: integer("italy_alerts", { mode: "boolean" }).notNull().default(true),
+  world_alerts: integer("world_alerts", { mode: "boolean" }).notNull().default(false),
+  created_at: text("created_at").notNull(),
+  last_seen_at: text("last_seen_at").notNull(),
+  updated_at: text("updated_at").notNull(),
+});
 
 export const locations = sqliteTable(
   "locations",

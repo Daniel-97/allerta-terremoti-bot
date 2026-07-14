@@ -3,12 +3,7 @@ import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { sql } from "drizzle-orm";
 import * as schema from "@/db/schema";
-import {
-  touchChat,
-  upsertActiveChat,
-  getChat,
-  setChatStatus,
-} from "@/db/repositories/chats";
+import { touchChat, upsertActiveChat, getChat, setChatStatus } from "@/db/repositories/chats";
 
 const DDL = `
 CREATE TABLE chats (

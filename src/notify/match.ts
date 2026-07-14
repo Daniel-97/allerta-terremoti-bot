@@ -13,7 +13,12 @@ export interface Recipient {
   distanceKm: number | null;
 }
 
-export async function findRecipients(event: ParsedEvent, db: Db, italyThreshold: number, worldThreshold: number): Promise<Recipient[]> {
+export async function findRecipients(
+  event: ParsedEvent,
+  db: Db,
+  italyThreshold: number,
+  worldThreshold: number,
+): Promise<Recipient[]> {
   const recipients = new Map<number, Recipient>();
 
   // fetch all active chats — this is efficient for v1 (10-100 users)
@@ -35,7 +40,13 @@ export async function findRecipients(event: ParsedEvent, db: Db, italyThreshold:
   });
 }
 
-export async function matchChat(event: ParsedEvent, chatId: number, db: Db, italyThreshold: number, worldThreshold: number): Promise<Recipient | null> {
+export async function matchChat(
+  event: ParsedEvent,
+  chatId: number,
+  db: Db,
+  italyThreshold: number,
+  worldThreshold: number,
+): Promise<Recipient | null> {
   const chat = await getChat(db, chatId);
   if (!chat || chat.status !== "active") return null;
 
@@ -55,15 +66,31 @@ export async function matchChat(event: ParsedEvent, chatId: number, db: Db, ital
     }
   }
   if (nearestLocId !== null) {
-    best = { chatId, reason: "proximity", nearestLocationId: nearestLocId, distanceKm: nearestDist };
+    best = {
+      chatId,
+      reason: "proximity",
+      nearestLocationId: nearestLocId,
+      distanceKm: nearestDist,
+    };
   }
 
   // General: Italian event above the Italy threshold, or any event above the world threshold
-  const isItalianMatch = event.magnitude >= italyThreshold && inBbox(event.lat, event.lon, ITALY_BBOX) && chat.italy_alerts;
+  const isItalianMatch =
+    event.magnitude >= italyThreshold &&
+    inBbox(event.lat, event.lon, ITALY_BBOX) &&
+    chat.italy_alerts;
   const isWorldMatch = event.magnitude >= worldThreshold && chat.world_alerts;
   if (isItalianMatch || isWorldMatch) {
-    const nearest = best?.reason === "proximity" && best.nearestLocationId ? { locId: best.nearestLocationId, km: best.distanceKm } : null;
-    best = { chatId, reason: "general", nearestLocationId: nearest?.locId ?? null, distanceKm: nearest?.km ?? null };
+    const nearest =
+      best?.reason === "proximity" && best.nearestLocationId
+        ? { locId: best.nearestLocationId, km: best.distanceKm }
+        : null;
+    best = {
+      chatId,
+      reason: "general",
+      nearestLocationId: nearest?.locId ?? null,
+      distanceKm: nearest?.km ?? null,
+    };
   }
 
   return best;

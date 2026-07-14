@@ -45,24 +45,24 @@ la condivisione della posizione.
 
 ### Comandi disponibili
 
-| Comando | Descrizione |
-|---|---|
-| `/start` | Messaggio di benvenuto, invita a condividere la prima posizione |
-| `/aiuto` | Spiega come funziona il bot |
-| `/posizioni` | Elenca e gestisce le posizioni salvate |
-| `/impostazioni` | Apre il pannello impostazioni (raggio, magnitudo, allerte nazionali/mondiali) |
-| `/stop` | Disattiva le notifiche. I dati e le posizioni salvate **non** vengono cancellati |
-| `/credits` | Fonti dei dati, autore e link utili |
+| Comando         | Descrizione                                                                      |
+| --------------- | -------------------------------------------------------------------------------- |
+| `/start`        | Messaggio di benvenuto, invita a condividere la prima posizione                  |
+| `/aiuto`        | Spiega come funziona il bot                                                      |
+| `/posizioni`    | Elenca e gestisce le posizioni salvate                                           |
+| `/impostazioni` | Apre il pannello impostazioni (raggio, magnitudo, allerte nazionali/mondiali)    |
+| `/stop`         | Disattiva le notifiche. I dati e le posizioni salvate **non** vengono cancellati |
+| `/credits`      | Fonti dei dati, autore e link utili                                              |
 
 ---
 
 ## Fonti dei dati
 
-| Fonte | Uso |
-|---|---|
-| **INGV** (servizio FDSN) | Unica fonte degli eventi sismici, interrogata periodicamente |
-| **GeoNames** | Geocoding inverso delle sole posizioni salvate dagli utenti (coordinate → nome comune) |
-| **Telegram Bot API** | Ricezione messaggi e invio delle allerte |
+| Fonte                    | Uso                                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------------- |
+| **INGV** (servizio FDSN) | Unica fonte degli eventi sismici, interrogata periodicamente                           |
+| **GeoNames**             | Geocoding inverso delle sole posizioni salvate dagli utenti (coordinate → nome comune) |
+| **Telegram Bot API**     | Ricezione messaggi e invio delle allerte                                               |
 
 > **Copertura INGV**: magnitudo ≥ 2.5 in Italia, ≥ 5.0 nel Mediterraneo, ≥ 6.0 nel resto del
 > mondo. Le allerte mondiali sono quindi affidabili solo da M6.0 in su (la soglia di default
@@ -75,13 +75,13 @@ la condivisione della posizione.
 Riservati agli amministratori (chat ID elencati in `ADMIN_CHAT_IDS`). Non compaiono nel
 menu comandi pubblico e vengono ignorati silenziosamente se usati da altri utenti.
 
-| Comando | Descrizione |
-|---|---|
-| `/broadcast <messaggio>` | Invia un messaggio di testo a tutti gli utenti attivi |
-| `/stats` | Statistiche operative: utenti, posizioni, ultimo evento processato |
-| `/events` | Ultimi ~10 eventi sismici processati con relativo ID |
-| `/delivery <event_id>` | Stato di invio di un evento (consegnati / falliti) |
-| `/health` | Verifica la raggiungibilità dei servizi esterni (Telegram, INGV, GeoNames, database) |
+| Comando                  | Descrizione                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------ |
+| `/broadcast <messaggio>` | Invia un messaggio di testo a tutti gli utenti attivi                                |
+| `/stats`                 | Statistiche operative: utenti, posizioni, ultimo evento processato                   |
+| `/events`                | Ultimi ~10 eventi sismici processati con relativo ID                                 |
+| `/delivery <event_id>`   | Stato di invio di un evento (consegnati / falliti)                                   |
+| `/health`                | Verifica la raggiungibilità dei servizi esterni (Telegram, INGV, GeoNames, database) |
 
 Il bot invia inoltre notifiche push automatiche agli admin per: nuovo utente, riepilogo
 invii dopo un evento sismico, utente che disattiva le notifiche con `/stop`.
@@ -90,22 +90,22 @@ invii dopo un evento sismico, utente che disattiva le notifiche con `/stop`.
 
 ## Variabili d'ambiente
 
-| Variabile | Obbligatoria | Default | Descrizione |
-|---|---|---|---|
-| `BOT_TOKEN` | sì | — | Token del bot Telegram (rilasciato da [@BotFather](https://t.me/BotFather)) |
-| `WEBHOOK_SECRET` | sì | — | Segreto usato per verificare che le richieste webhook arrivino davvero da Telegram |
-| `TURSO_DATABASE_URL` | sì | — | URL di connessione al database |
-| `TURSO_AUTH_TOKEN` | sì | — | Token di autenticazione al database |
-| `GEONAMES_USERNAME` | sì | — | Username GeoNames per il geocoding inverso delle posizioni |
-| `ADMIN_CHAT_IDS` | no | nessuno | Chat ID Telegram (separati da virgola) abilitati ai comandi amministrativi |
-| `HEALTHCHECKS_URL` | no | nessuno | URL di monitoraggio esterno, pingato a ogni ciclo di controllo per segnalare che il bot è vivo |
-| `MAX_ATTEMPTS` | no | `3` | Numero massimo di tentativi di invio in caso di errore temporaneo |
-| `ITALY_ALERT_THRESHOLD` | no | `5.0` | Magnitudo minima per le allerte nazionali |
-| `WORLD_ALERT_THRESHOLD` | no | `7.0` | Magnitudo minima per le allerte mondiali |
-| `MAX_LOCATIONS_PER_USER` | no | `10` | Numero massimo di posizioni salvabili per utente |
-| `LOOKBACK_WINDOW_MIN` | no | `60` | Finestra temporale (minuti) usata per interrogare l'INGV alla ricerca di nuovi eventi |
-| `DELIVERIES_RETENTION_DAYS` | no | `90` | Giorni di conservazione dello storico invii prima della pulizia automatica |
-| `EVENTS_RETENTION_DAYS` | no | `365` | Giorni di conservazione degli eventi sismici prima della pulizia automatica |
+| Variabile                   | Obbligatoria | Default | Descrizione                                                                                    |
+| --------------------------- | ------------ | ------- | ---------------------------------------------------------------------------------------------- |
+| `BOT_TOKEN`                 | sì           | —       | Token del bot Telegram (rilasciato da [@BotFather](https://t.me/BotFather))                    |
+| `WEBHOOK_SECRET`            | sì           | —       | Segreto usato per verificare che le richieste webhook arrivino davvero da Telegram             |
+| `TURSO_DATABASE_URL`        | sì           | —       | URL di connessione al database                                                                 |
+| `TURSO_AUTH_TOKEN`          | sì           | —       | Token di autenticazione al database                                                            |
+| `GEONAMES_USERNAME`         | sì           | —       | Username GeoNames per il geocoding inverso delle posizioni                                     |
+| `ADMIN_CHAT_IDS`            | no           | nessuno | Chat ID Telegram (separati da virgola) abilitati ai comandi amministrativi                     |
+| `HEALTHCHECKS_URL`          | no           | nessuno | URL di monitoraggio esterno, pingato a ogni ciclo di controllo per segnalare che il bot è vivo |
+| `MAX_ATTEMPTS`              | no           | `3`     | Numero massimo di tentativi di invio in caso di errore temporaneo                              |
+| `ITALY_ALERT_THRESHOLD`     | no           | `5.0`   | Magnitudo minima per le allerte nazionali                                                      |
+| `WORLD_ALERT_THRESHOLD`     | no           | `7.0`   | Magnitudo minima per le allerte mondiali                                                       |
+| `MAX_LOCATIONS_PER_USER`    | no           | `10`    | Numero massimo di posizioni salvabili per utente                                               |
+| `LOOKBACK_WINDOW_MIN`       | no           | `60`    | Finestra temporale (minuti) usata per interrogare l'INGV alla ricerca di nuovi eventi          |
+| `DELIVERIES_RETENTION_DAYS` | no           | `90`    | Giorni di conservazione dello storico invii prima della pulizia automatica                     |
+| `EVENTS_RETENTION_DAYS`     | no           | `365`   | Giorni di conservazione degli eventi sismici prima della pulizia automatica                    |
 
 ---
 
@@ -128,19 +128,23 @@ Prerequisiti: Node.js, un account Cloudflare, un database Turso, un token bot Te
    **Opzione A — Polling (Telegram reale, nessun tunnel)**
 
    Esegue il bot come processo Node in polling, bypassando webhook e Worker.
+
    ```bash
    npm run start-polling
    ```
+
    Riceve aggiornamenti reali da Telegram. `Ctrl+C` per fermarlo.
 
    **Opzione B — Simulazione contro `wrangler dev`**
 
    Avvia il Worker in locale ed esegue una richiesta `/start` simulata via HTTP.
+
    ```bash
    npx wrangler dev
    # in un altro terminale
    npm run simulate
    ```
+
    Telegram non riceve la risposta, ma log e database confermano che la pipeline
    funziona (verifica del secret, database, middleware, handler).
 

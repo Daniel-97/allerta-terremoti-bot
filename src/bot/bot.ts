@@ -34,10 +34,7 @@ export function createBot(config: RuntimeConfig, db: Db): Bot {
   // private-only middleware + touch on every private message
   bot.use(async (ctx, next) => {
     if (ctx.chat?.type !== "private") {
-      log.info(
-        { chatId: ctx.chat?.id, type: ctx.chat?.type },
-        "ignored: non-private chat",
-      );
+      log.info({ chatId: ctx.chat?.id, type: ctx.chat?.type }, "ignored: non-private chat");
       return;
     }
     if (ctx.from) {

@@ -15,7 +15,7 @@ function buildUrl(params: Record<string, string>): string {
 export async function fetchIngvEvents(lookbackWindowMin: number): Promise<ParsedEvent[]> {
   const startTime = new Date(Date.now() - lookbackWindowMin * 60_000)
     .toISOString()
-    .replace(/\.\d{3}Z$/, '');
+    .replace(/\.\d{3}Z$/, "");
   const url = buildUrl({
     format: "text",
     starttime: startTime,
@@ -29,7 +29,10 @@ async function fetchText(url: string): Promise<ParsedEvent[]> {
   try {
     const res = await fetch(url, { signal: ctrl.signal });
     if (!res.ok) {
-      const body = await res.text().then((t) => t.slice(0, 500)).catch(() => "");
+      const body = await res
+        .text()
+        .then((t) => t.slice(0, 500))
+        .catch(() => "");
       log.warn({ status: res.status, body, url }, "ingv http error");
       return [];
     }

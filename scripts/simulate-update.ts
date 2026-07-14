@@ -37,13 +37,9 @@ function makeFakeStartUpdate(
 
 async function main(): Promise<void> {
   const config = loadConfig(process.env);
-  const chatId = process.env.TEST_CHAT_ID
-    ? Number(process.env.TEST_CHAT_ID)
-    : 123456789;
+  const chatId = process.env.TEST_CHAT_ID ? Number(process.env.TEST_CHAT_ID) : 123456789;
 
-  const body = JSON.stringify(
-    makeFakeStartUpdate(chatId, "Test", "User", "testuser"),
-  );
+  const body = JSON.stringify(makeFakeStartUpdate(chatId, "Test", "User", "testuser"));
 
   log.info({ chatId }, "sending fake /start update");
 

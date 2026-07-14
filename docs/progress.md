@@ -156,16 +156,16 @@ npm run lint && npm run typecheck && npm test && npm run build
 
 ### Configuration (`.env.example`)
 
-| Variable | Required since |
-|---|---|
-| `BOT_TOKEN` | M0 |
-| `WEBHOOK_SECRET` | M0 |
-| `TURSO_DATABASE_URL` | M1 |
-| `TURSO_AUTH_TOKEN` | M1 |
-| `GEONAMES_USERNAME` | M2 |
-| `ADMIN_CHAT_IDS` | M4 (optional before) |
-| `HEALTHCHECKS_URL` | M3 (optional before) |
-| `MAX_ATTEMPTS` | optional, code constant fallback |
+| Variable             | Required since                   |
+| -------------------- | -------------------------------- |
+| `BOT_TOKEN`          | M0                               |
+| `WEBHOOK_SECRET`     | M0                               |
+| `TURSO_DATABASE_URL` | M1                               |
+| `TURSO_AUTH_TOKEN`   | M1                               |
+| `GEONAMES_USERNAME`  | M2                               |
+| `ADMIN_CHAT_IDS`     | M4 (optional before)             |
+| `HEALTHCHECKS_URL`   | M3 (optional before)             |
+| `MAX_ATTEMPTS`       | optional, code constant fallback |
 
 Empty strings in `.env` are treated as absent (handled in `config.ts` preprocess step).
 

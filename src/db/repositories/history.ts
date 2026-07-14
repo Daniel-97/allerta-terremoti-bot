@@ -2,18 +2,21 @@ import { eq, lt, and, notExists, sql } from "drizzle-orm";
 import { history, deliveries } from "@/db/schema";
 import type { Db } from "@/db/types";
 
-export async function insertIfNew(db: Db, event: {
-  id: string;
-  zone: string;
-  date: string;
-  lat: number;
-  lon: number;
-  depth: number | null;
-  stations_count: number | null;
-  magnitude_type: string | null;
-  magnitude_value: number;
-  magnitude_uncertainty: number | null;
-}): Promise<boolean> {
+export async function insertIfNew(
+  db: Db,
+  event: {
+    id: string;
+    zone: string;
+    date: string;
+    lat: number;
+    lon: number;
+    depth: number | null;
+    stations_count: number | null;
+    magnitude_type: string | null;
+    magnitude_value: number;
+    magnitude_uncertainty: number | null;
+  },
+): Promise<boolean> {
   const result = await db
     .insert(history)
     .values({
@@ -28,11 +31,7 @@ export async function insertIfNew(db: Db, event: {
 }
 
 export async function getEvent(db: Db, id: string) {
-  const rows = await db
-    .select()
-    .from(history)
-    .where(eq(history.id, id))
-    .limit(1);
+  const rows = await db.select().from(history).where(eq(history.id, id)).limit(1);
   return rows[0];
 }
 

@@ -3,11 +3,7 @@ import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { sql } from "drizzle-orm";
 import * as schema from "@/db/schema";
-import {
-  upsertActiveChat,
-  setAlertFlags,
-  getChat,
-} from "@/db/repositories/chats";
+import { upsertActiveChat, setAlertFlags, getChat } from "@/db/repositories/chats";
 
 const DDL = `
 CREATE TABLE IF NOT EXISTS chats (

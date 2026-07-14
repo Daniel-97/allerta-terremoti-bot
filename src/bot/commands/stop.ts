@@ -7,13 +7,15 @@ import type { Db } from "@/db/types";
 export async function handle(ctx: Context, db: Db, log: Logger): Promise<void> {
   const chatId = ctx.chat!.id;
   await setChatStatus(db, chatId, "stopped");
-  log.info({
-    chatId,
-    userId: ctx.from?.id,
-    first_name: ctx.from?.first_name,
-    command: "/stop",
-    outcome: "deactivated",
-  }, "command handled");
+  log.info(
+    {
+      chatId,
+      userId: ctx.from?.id,
+      first_name: ctx.from?.first_name,
+      command: "/stop",
+      outcome: "deactivated",
+    },
+    "command handled",
+  );
   await ctx.reply(STRINGS.stop.done);
 }
-

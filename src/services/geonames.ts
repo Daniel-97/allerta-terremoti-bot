@@ -22,7 +22,10 @@ export async function reverseGeocode(
   try {
     const res = await fetch(url, { signal: ctrl.signal });
     if (!res.ok) {
-      const body = await res.text().then((t) => t.slice(0, MAX_BODY_LOG_LENGTH)).catch(() => "");
+      const body = await res
+        .text()
+        .then((t) => t.slice(0, MAX_BODY_LOG_LENGTH))
+        .catch(() => "");
       const msg = res.status >= 500 ? "geonames server error" : "geonames client error";
       log.warn({ status: res.status, body, lat, lon }, msg);
       return null;
@@ -33,9 +36,7 @@ export async function reverseGeocode(
       log.info({ lat, lon }, "geonames: no results");
       return null;
     }
-    return g.adminCode2
-      ? `${g.toponymName} (${g.adminCode2})`
-      : g.toponymName;
+    return g.adminCode2 ? `${g.toponymName} (${g.adminCode2})` : g.toponymName;
   } catch (err) {
     const errName = err instanceof Error ? err.name : "unknown";
     const errMsg = err instanceof Error ? err.message : String(err);

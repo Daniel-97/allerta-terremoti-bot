@@ -2,9 +2,9 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { reverseGeocode } from "@/services/geonames";
 
 function mockFetchOnce(body: unknown, status = 200) {
-  return vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-    new Response(JSON.stringify(body), { status }),
-  );
+  return vi
+    .spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(new Response(JSON.stringify(body), { status }));
 }
 
 describe("reverseGeocode", () => {
@@ -46,9 +46,7 @@ describe("reverseGeocode logging", () => {
   it("logs status and body for 401 with geonames client error msg", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const body = JSON.stringify({ status: { message: "invalid user" } });
-    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-      new Response(body, { status: 401 }),
-    );
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(new Response(body, { status: 401 }));
     await reverseGeocode(41.9, 12.5, "user");
     const entry = JSON.parse(warn.mock.calls[0]![0] as string);
     expect(entry.status).toBe(401);

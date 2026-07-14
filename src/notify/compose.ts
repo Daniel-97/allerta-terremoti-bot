@@ -33,7 +33,13 @@ export function formatMagType(magType: string): string {
   return magType ? ` (${magType})` : "";
 }
 
-export function formatTitle(magnitude: number, zone: string, markdown = true, includeLabel = true, magType = ""): string {
+export function formatTitle(
+  magnitude: number,
+  zone: string,
+  markdown = true,
+  includeLabel = true,
+  magType = "",
+): string {
   const magValue = magnitude.toFixed(1);
   const label = includeLabel ? (markdown ? "<b>Magnitudo:</b> " : "Magnitudo: ") : "";
   return `⚠️ ${label}${magValue}${formatMagType(magType)} - ${escapeHtml(zone)}`;
@@ -65,7 +71,12 @@ function buildReasonLabel(reason: Recipient["reason"]): string {
   }
 }
 
-export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string, locId: number): ComposedMessage {
+export function composeProximity(
+  event: ParsedEvent,
+  distanceKm: number,
+  locName: string,
+  locId: number,
+): ComposedMessage {
   const text =
     `${buildReasonLabel("proximity")}\n\n` +
     `${buildTitleLine(event)}\n` +
@@ -78,8 +89,13 @@ export function composeProximity(event: ParsedEvent, distanceKm: number, locName
   return { text, keyboard };
 }
 
-export function composeGeneral(event: ParsedEvent, distanceKm: number | null, locName: string | null): ComposedMessage {
-  const locLine = locName && distanceKm != null ? `${buildLocationLine(distanceKm, locName)}\n` : "";
+export function composeGeneral(
+  event: ParsedEvent,
+  distanceKm: number | null,
+  locName: string | null,
+): ComposedMessage {
+  const locLine =
+    locName && distanceKm != null ? `${buildLocationLine(distanceKm, locName)}\n` : "";
   const text =
     `${buildReasonLabel("general")}\n\n` +
     `${buildTitleLine(event)}\n` +

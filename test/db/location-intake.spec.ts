@@ -47,9 +47,9 @@ async function freshDb() {
 const CONFIG = { GEONAMES_USERNAME: "user", maxLocationsPerUser: 10 };
 
 function mockFetchOnce(body: unknown, status = 200) {
-  return vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-    new Response(JSON.stringify(body), { status }),
-  );
+  return vi
+    .spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(new Response(JSON.stringify(body), { status }));
 }
 
 describe("addLocationFlow", () => {
@@ -69,7 +69,13 @@ describe("addLocationFlow", () => {
 
   it("rejects when the location cap is reached", async () => {
     await addLocation(db, { chat: 1, lat: 41.9, lon: 12.5, name: "Roma" });
-    const outcome = await addLocationFlow(db, { ...CONFIG, maxLocationsPerUser: 1 }, 1, 45.46, 9.19);
+    const outcome = await addLocationFlow(
+      db,
+      { ...CONFIG, maxLocationsPerUser: 1 },
+      1,
+      45.46,
+      9.19,
+    );
     expect(outcome).toEqual({ kind: "cap_reached" });
   });
 

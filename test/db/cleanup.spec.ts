@@ -4,11 +4,11 @@ import { drizzle } from "drizzle-orm/libsql";
 import { sql } from "drizzle-orm";
 import * as schema from "@/db/schema";
 import { insertIfNew as historyInsert } from "@/db/repositories/history";
+import { insertIfNew as deliveryInsert, deleteOlderThan } from "@/db/repositories/deliveries";
 import {
-  insertIfNew as deliveryInsert,
-  deleteOlderThan,
-} from "@/db/repositories/deliveries";
-import { deleteOrphansOlderThan, deleteOlderThan as deleteHistoryOlderThan } from "@/db/repositories/history";
+  deleteOrphansOlderThan,
+  deleteOlderThan as deleteHistoryOlderThan,
+} from "@/db/repositories/history";
 import { upsertActiveChat } from "@/db/repositories/chats";
 
 const DDL = `
@@ -33,17 +33,28 @@ describe("deliveries cleanup", () => {
   beforeEach(async () => {
     db = await freshDb();
     await historyInsert(db, {
-      id: "ev1", zone: "Roma", date: "2026-06-30T12:00:00Z",
-      lat: 41.9, lon: 12.5, depth: 10, stations_count: 5,
-      magnitude_type: "ML", magnitude_value: 4.2, magnitude_uncertainty: 0.3,
+      id: "ev1",
+      zone: "Roma",
+      date: "2026-06-30T12:00:00Z",
+      lat: 41.9,
+      lon: 12.5,
+      depth: 10,
+      stations_count: 5,
+      magnitude_type: "ML",
+      magnitude_value: 4.2,
+      magnitude_uncertainty: 0.3,
     });
     await upsertActiveChat(db, { id: 100, first_name: "U", last_name: null, username: null });
     await deliveryInsert(db, { event_id: "ev1", chat: 100 });
   });
 
   it("deletes deliveries older than cutoff", async () => {
-    const d = await db.select().from(schema.deliveries).then((r) => r[0]!);
-    await db.update(schema.deliveries)
+    const d = await db
+      .select()
+      .from(schema.deliveries)
+      .then((r) => r[0]!);
+    await db
+      .update(schema.deliveries)
       .set({ updated_at: "2020-01-01T00:00:00Z" })
       .where(sql`id = ${d.id}`);
 
@@ -67,14 +78,28 @@ describe("history retention cleanup", () => {
   beforeEach(async () => {
     db = await freshDb();
     await historyInsert(db, {
-      id: "ev-ret-1", zone: "Roma", date: "2020-01-01T00:00:00Z",
-      lat: 41.9, lon: 12.5, depth: 10, stations_count: 5,
-      magnitude_type: "ML", magnitude_value: 4.2, magnitude_uncertainty: 0.3,
+      id: "ev-ret-1",
+      zone: "Roma",
+      date: "2020-01-01T00:00:00Z",
+      lat: 41.9,
+      lon: 12.5,
+      depth: 10,
+      stations_count: 5,
+      magnitude_type: "ML",
+      magnitude_value: 4.2,
+      magnitude_uncertainty: 0.3,
     });
     await historyInsert(db, {
-      id: "ev-ret-2", zone: "Milano", date: new Date().toISOString(),
-      lat: 45.46, lon: 9.19, depth: 8, stations_count: 3,
-      magnitude_type: "ML", magnitude_value: 3.5, magnitude_uncertainty: 0.2,
+      id: "ev-ret-2",
+      zone: "Milano",
+      date: new Date().toISOString(),
+      lat: 45.46,
+      lon: 9.19,
+      depth: 8,
+      stations_count: 3,
+      magnitude_type: "ML",
+      magnitude_value: 3.5,
+      magnitude_uncertainty: 0.2,
     });
   });
 
@@ -110,23 +135,44 @@ describe("history cleanup", () => {
   beforeEach(async () => {
     db = await freshDb();
     await historyInsert(db, {
-      id: "ev1", zone: "Roma", date: "2020-01-01T00:00:00Z",
-      lat: 41.9, lon: 12.5, depth: 10, stations_count: 5,
-      magnitude_type: "ML", magnitude_value: 4.2, magnitude_uncertainty: 0.3,
+      id: "ev1",
+      zone: "Roma",
+      date: "2020-01-01T00:00:00Z",
+      lat: 41.9,
+      lon: 12.5,
+      depth: 10,
+      stations_count: 5,
+      magnitude_type: "ML",
+      magnitude_value: 4.2,
+      magnitude_uncertainty: 0.3,
     });
     await upsertActiveChat(db, { id: 100, first_name: "U", last_name: null, username: null });
     await deliveryInsert(db, { event_id: "ev1", chat: 100 });
 
     await historyInsert(db, {
-      id: "ev2", zone: "Milano", date: "2020-01-02T00:00:00Z",
-      lat: 45.46, lon: 9.19, depth: 8, stations_count: 3,
-      magnitude_type: "ML", magnitude_value: 3.5, magnitude_uncertainty: 0.2,
+      id: "ev2",
+      zone: "Milano",
+      date: "2020-01-02T00:00:00Z",
+      lat: 45.46,
+      lon: 9.19,
+      depth: 8,
+      stations_count: 3,
+      magnitude_type: "ML",
+      magnitude_value: 3.5,
+      magnitude_uncertainty: 0.2,
     });
 
     await historyInsert(db, {
-      id: "ev3", zone: "Napoli", date: new Date().toISOString(),
-      lat: 40.85, lon: 14.27, depth: 5, stations_count: 2,
-      magnitude_type: "ML", magnitude_value: 2.8, magnitude_uncertainty: 0.1,
+      id: "ev3",
+      zone: "Napoli",
+      date: new Date().toISOString(),
+      lat: 40.85,
+      lon: 14.27,
+      depth: 5,
+      stations_count: 2,
+      magnitude_type: "ML",
+      magnitude_value: 2.8,
+      magnitude_uncertainty: 0.1,
     });
   });
 

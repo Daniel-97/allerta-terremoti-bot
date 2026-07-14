@@ -38,14 +38,18 @@ async function main(): Promise<void> {
       ref.lat <= zone.maxLatitude,
   );
   if (inZone.length === 0) {
-    console.warn(`Nessuna città di riferimento ricade in "${zoneId}" — nessun marker verrà disegnato.`);
+    console.warn(
+      `Nessuna città di riferimento ricade in "${zoneId}" — nessun marker verrà disegnato.`,
+    );
   }
 
-  const markers = inZone.map((ref) => {
-    const { x, y } = latLonToPixel(ref.lat, ref.lon, zone);
-    console.log(`${ref.color}  ${ref.name.padEnd(15)} -> pixel (${x}, ${y})`);
-    return `<circle cx="${x}" cy="${y}" r="7" fill="${ref.color}" stroke="black" stroke-width="1.5"/>`;
-  }).join("\n");
+  const markers = inZone
+    .map((ref) => {
+      const { x, y } = latLonToPixel(ref.lat, ref.lon, zone);
+      console.log(`${ref.color}  ${ref.name.padEnd(15)} -> pixel (${x}, ${y})`);
+      return `<circle cx="${x}" cy="${y}" r="7" fill="${ref.color}" stroke="black" stroke-width="1.5"/>`;
+    })
+    .join("\n");
 
   const svg = `<svg width="${zone.width}" height="${zone.height}" xmlns="http://www.w3.org/2000/svg">${markers}</svg>`;
 

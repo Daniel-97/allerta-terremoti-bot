@@ -26,7 +26,11 @@ describe("parseFdsnText", () => {
   });
 
   it("handles header-only input", () => {
-    expect(parseFdsnText("#EventID|Time|Latitude|Longitude|Depth/Km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName|EventType")).toEqual([]);
+    expect(
+      parseFdsnText(
+        "#EventID|Time|Latitude|Longitude|Depth/Km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName|EventType",
+      ),
+    ).toEqual([]);
   });
 
   it("ignores extra EventType column", () => {
