@@ -97,11 +97,12 @@ export function createBot(config: RuntimeConfig, db: Db): Bot {
   });
   bot.command("help", async (ctx) => {
     if (!ctx.chat || !config.adminChatIds.includes(ctx.chat.id)) {
-      await ctx.reply(STRINGS.unknownCommand.hint);
+      await aiuto.handle(ctx, db, log);
       return;
     }
     await help.handle(ctx, log);
   });
+  bot.command("settings", (ctx) => impostazioni.handle(ctx, db, log));
 
   // callback queries (inline button presses)
   bot.on("callback_query:data", (ctx) => handleCallbackQuery(ctx, db));
