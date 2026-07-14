@@ -5,6 +5,7 @@ import { sql } from "drizzle-orm";
 import * as schema from "@/db/schema";
 import { upsertActiveChat, setChatStatus, getChat } from "@/db/repositories/chats";
 import { handle as startHandle } from "@/bot/commands/start";
+import { mainMenuReplyMarkup } from "@/bot/main-menu";
 import { createLogger } from "@/util/log";
 import type { Context } from "grammy";
 
@@ -61,12 +62,14 @@ describe("start.handle reactivation", () => {
     },
   );
 
-  it("sends exactly one welcome reply", async () => {
+  it("sends exactly one welcome reply with the main-menu keyboard", async () => {
     await upsertActiveChat(db, { id: 2, first_name: "Bo", last_name: null, username: null });
     const ctx = fakeCtx(2);
 
     await startHandle(ctx, db, log, CONFIG);
 
     expect(ctx.reply).toHaveBeenCalledTimes(1);
+    const [, options] = (ctx.reply as ReturnType<typeof vi.fn>).mock.calls[0]!;
+    expect(options.reply_markup).toEqual(mainMenuReplyMarkup);
   });
 });

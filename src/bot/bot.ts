@@ -111,6 +111,11 @@ export function createBot(config: RuntimeConfig, db: Db): Bot {
   bot.on("message:location", (ctx) => handleLocation(ctx, db, config));
   bot.on("message:venue", (ctx) => handleLocation(ctx, db, config));
 
+  // main menu reply-keyboard shortcuts
+  bot.hears(STRINGS.mainMenu.posizioni, (ctx) => posizioni.handle(ctx, db, log));
+  bot.hears(STRINGS.mainMenu.impostazioni, (ctx) => impostazioni.handle(ctx, db, log));
+  bot.hears(STRINGS.mainMenu.aiuto, (ctx) => aiuto.handle(ctx, db, log));
+
   // unrecognized text messages
   bot.on("message:text", async (ctx) => {
     log.info(

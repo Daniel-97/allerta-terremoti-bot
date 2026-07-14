@@ -2,6 +2,7 @@ import type { Context } from "grammy";
 import type { Logger } from "@/util/log";
 import type { Db } from "@/db/types";
 import { STRINGS } from "@/i18n/strings";
+import { mainMenuReplyMarkup } from "@/bot/main-menu";
 import { setChatStatus } from "@/db/repositories/chats";
 
 export async function handle(
@@ -21,6 +22,6 @@ export async function handle(
   }, "command handled");
   await ctx.reply(
     STRINGS.start.welcome(config.italyAlertThreshold, config.worldAlertThreshold),
-    { parse_mode: "Markdown" },
+    { parse_mode: "Markdown", reply_markup: mainMenuReplyMarkup },
   );
 }
