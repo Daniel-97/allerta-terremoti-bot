@@ -137,7 +137,12 @@ export async function handleCallbackQuery(
         const chatId = msg.chat.id;
         if (cb.target === "add") {
           await ctx.reply(STRINGS.posizioni.addPrompt, {
-            reply_markup: { remove_keyboard: true },
+            reply_markup: {
+              keyboard: [[{ text: "📍 Invia la mia posizione attuale", request_location: true }]],
+              resize_keyboard: true,
+              one_time_keyboard: true,
+              input_field_placeholder: "Oppure 📎 → Posizione per scegliere sulla mappa",
+            },
             parse_mode: "Markdown",
           });
           break;
