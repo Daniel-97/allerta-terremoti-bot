@@ -18,24 +18,24 @@ describe("composeProximity", () => {
   const msg = composeProximity(EVENT, 15, "Roma", 42);
 
   it("starts with the proximity reason label", () => {
-    expect(msg.text.startsWith("🔔 *Allerta di prossimità*\n\n")).toBe(true);
+    expect(msg.text.startsWith("🔔 <b>Allerta di prossimità</b>\n\n")).toBe(true);
   });
 
   it("includes magnitude and zone in a single title line", () => {
-    expect(msg.text).toContain("⚠️ *Magnitudo:* 4.2 (ML) - Roma");
+    expect(msg.text).toContain("⚠️ <b>Magnitudo:</b> 4.2 (ML) - Roma");
   });
 
   it("includes location name and distance", () => {
-    expect(msg.text).toContain("📍 *Roma* — 15 km");
+    expect(msg.text).toContain("📍 <b>Roma</b> — 15 km");
   });
 
   it("includes depth and time", () => {
-    expect(msg.text).toContain("📏 *Profondità:* 10.0 km");
-    expect(msg.text).toContain(`🕐 *Ora:* ${formatTime(EVENT.time)}`);
+    expect(msg.text).toContain("📏 <b>Profondità:</b> 10.0 km");
+    expect(msg.text).toContain(`🕐 <b>Ora:</b> ${formatTime(EVENT.time)}`);
   });
 
   it("includes INGV source line", () => {
-    expect(msg.text).toContain("*Fonte:* INGV");
+    expect(msg.text).toContain("<b>Fonte:</b> INGV");
   });
 
   it("has inline keyboard with the INGV and soglie buttons", () => {
@@ -52,23 +52,23 @@ describe("composeProximity", () => {
 describe("composeGeneral", () => {
   it("starts with the general reason label", () => {
     const msg = composeGeneral(EVENT, 200, "Milano");
-    expect(msg.text.startsWith("📢 *Terremoto rilevante*\n\n")).toBe(true);
+    expect(msg.text.startsWith("📢 <b>Terremoto rilevante</b>\n\n")).toBe(true);
   });
 
   it("includes location and distance when present", () => {
     const msg = composeGeneral(EVENT, 200, "Milano");
-    expect(msg.text).toContain("📍 *Milano* — 200 km");
+    expect(msg.text).toContain("📍 <b>Milano</b> — 200 km");
   });
 
   it("falls back to event.zone when no location", () => {
     const msg = composeGeneral(EVENT, null, null);
     expect(msg.text).not.toContain("📍");
-    expect(msg.text).toContain("⚠️ *Magnitudo:* 4.2 (ML) - Roma");
+    expect(msg.text).toContain("⚠️ <b>Magnitudo:</b> 4.2 (ML) - Roma");
   });
 
   it("includes magnitude and zone in a single title line", () => {
     const msg = composeGeneral(EVENT, 200, "Milano");
-    expect(msg.text).toContain("⚠️ *Magnitudo:* 4.2 (ML) - Roma");
+    expect(msg.text).toContain("⚠️ <b>Magnitudo:</b> 4.2 (ML) - Roma");
   });
 });
 
@@ -86,11 +86,11 @@ describe("keyboard eventId guard", () => {
 });
 
 describe("formatTitle", () => {
-  it("wraps the 'Magnitudo' label in markdown bold by default", () => {
-    expect(formatTitle(4.2, "Roma")).toBe("⚠️ *Magnitudo:* 4.2 - Roma");
+  it("wraps the 'Magnitudo' label in HTML bold by default", () => {
+    expect(formatTitle(4.2, "Roma")).toBe("⚠️ <b>Magnitudo:</b> 4.2 - Roma");
   });
 
-  it("omits markdown when markdown is false", () => {
+  it("omits markup when markdown is false", () => {
     expect(formatTitle(4.2, "Roma", false)).toBe("⚠️ Magnitudo: 4.2 - Roma");
   });
 
@@ -99,11 +99,15 @@ describe("formatTitle", () => {
   });
 
   it("appends magType after the magnitude when provided", () => {
-    expect(formatTitle(4.2, "Roma", true, true, "ML")).toBe("⚠️ *Magnitudo:* 4.2 (ML) - Roma");
+    expect(formatTitle(4.2, "Roma", true, true, "ML")).toBe("⚠️ <b>Magnitudo:</b> 4.2 (ML) - Roma");
   });
 
   it("omits the parenthesized magType when magType is empty", () => {
-    expect(formatTitle(4.2, "Roma", true, true, "")).toBe("⚠️ *Magnitudo:* 4.2 - Roma");
+    expect(formatTitle(4.2, "Roma", true, true, "")).toBe("⚠️ <b>Magnitudo:</b> 4.2 - Roma");
+  });
+
+  it("escapes HTML-sensitive characters in the zone name", () => {
+    expect(formatTitle(4.2, "A & B")).toBe("⚠️ <b>Magnitudo:</b> 4.2 - A &amp; B");
   });
 });
 
