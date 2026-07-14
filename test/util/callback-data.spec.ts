@@ -18,6 +18,8 @@ import {
   decodeNav,
   encodeLoc,
   decodeLoc,
+  encodeAiuto,
+  decodeAiuto,
   decode,
 } from "@/util/callback-data";
 
@@ -117,6 +119,22 @@ describe("callback-data loc select", () => {
   });
 });
 
+describe("callback-data aiuto", () => {
+  it("round-trips each target", () => {
+    for (const target of ["posizioni", "impostazioni", "credits", "menu"] as const) {
+      const s = encodeAiuto(target);
+      expect(s).toBe(`aiuto;${target}`);
+      expect(decodeAiuto(s)).toEqual({ kind: "aiuto", target });
+      expect(s.length).toBeLessThanOrEqual(64);
+    }
+  });
+
+  it("decode rejects invalid target", () => {
+    expect(decodeAiuto("aiuto;foo")).toBeNull();
+    expect(decodeAiuto("aiuto")).toBeNull();
+  });
+});
+
 describe("decode generic", () => {
   it("returns null for unknown format", () => {
     expect(decode("")).toBeNull();
@@ -131,6 +149,7 @@ describe("decode generic", () => {
     expect(decode("set;ita;1")!.kind).toBe("toggle");
     expect(decode("nav;back")!.kind).toBe("nav");
     expect(decode("l;5")!.kind).toBe("loc");
+    expect(decode("aiuto;posizioni")!.kind).toBe("aiuto");
 
     expect(decode("l;5;r;100")!.kind).toBe("radius");
     expect(decode("l;5;r")!.kind).toBe("radiusMenu");
@@ -150,6 +169,7 @@ describe("decode generic", () => {
       [encodeNav, ["back"]],
       [encodeNav, ["add"]],
       [encodeLoc, [100000]],
+      [encodeAiuto, ["impostazioni"]],
     ] as const) {
       const s = (fn as (...a: unknown[]) => string)(...args);
       expect(s.length).toBeLessThanOrEqual(64);
