@@ -3,11 +3,7 @@ import type { Db } from "@/db/types";
 import type { RuntimeConfig } from "@/config";
 import { isAllowedArea } from "@/util/geo-bbox";
 import { reverseGeocode } from "@/services/geonames";
-import {
-  addLocation,
-  countLocations,
-  findByName,
-} from "@/db/repositories/locations";
+import { addLocation, countLocations, findByName } from "@/db/repositories/locations";
 import { STRINGS } from "@/i18n/strings";
 import { createLogger } from "@/util/log";
 import { mainMenuReplyMarkup } from "@/bot/main-menu";
@@ -51,11 +47,7 @@ export async function addLocationFlow(
   return { kind: "added", id, name };
 }
 
-export async function handleLocation(
-  ctx: Context,
-  db: Db,
-  config: RuntimeConfig,
-): Promise<void> {
+export async function handleLocation(ctx: Context, db: Db, config: RuntimeConfig): Promise<void> {
   const loc = ctx.message?.location ?? ctx.message?.venue?.location;
   if (!loc) return;
   const chatId = ctx.chat!.id;
@@ -88,7 +80,7 @@ export async function handleLocation(
     case "added":
       log.info({ chatId, locId: outcome.id, name: outcome.name }, "location added");
       await ctx.reply(STRINGS.posizioni.added(outcome.name), {
-        parse_mode: "Markdown",
+        parse_mode: "HTML",
         reply_markup: mainMenuReplyMarkup,
       });
       return;

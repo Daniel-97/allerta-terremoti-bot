@@ -15,10 +15,7 @@ import type { Db } from "@/db/types";
 
 const log = createLogger("bot");
 
-export async function handleCallbackQuery(
-  ctx: Context,
-  db: Db,
-): Promise<void> {
+export async function handleCallbackQuery(ctx: Context, db: Db): Promise<void> {
   const data = ctx.callbackQuery?.data ?? "";
   const cb = decode(data);
 
@@ -47,7 +44,10 @@ export async function handleCallbackQuery(
           await ctx.answerCallbackQuery({ text: "Posizione non trovata" });
           return;
         }
-        await panels.editPanel(ctx, panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id));
+        await panels.editPanel(
+          ctx,
+          panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id),
+        );
         break;
       }
       case "radiusMenu": {
@@ -62,7 +62,10 @@ export async function handleCallbackQuery(
         await updateRadius(db, cb.locId, cb.radius);
         const loc = await getLocation(db, cb.locId);
         if (loc) {
-          await panels.editPanel(ctx, panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id));
+          await panels.editPanel(
+            ctx,
+            panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id),
+          );
         }
         break;
       }
@@ -70,7 +73,10 @@ export async function handleCallbackQuery(
         await updateMagnitude(db, cb.locId, cb.magnitude / 10);
         const loc = await getLocation(db, cb.locId);
         if (loc) {
-          await panels.editPanel(ctx, panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id));
+          await panels.editPanel(
+            ctx,
+            panels.renderLocationDetail(loc.name, loc.radius, loc.magnitude_threshold, loc.id),
+          );
         }
         break;
       }
@@ -131,7 +137,7 @@ export async function handleCallbackQuery(
               one_time_keyboard: true,
               input_field_placeholder: "Oppure 📎 → Posizione per scegliere sulla mappa",
             },
-            parse_mode: "Markdown",
+            parse_mode: "HTML",
           });
           break;
         }

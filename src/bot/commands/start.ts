@@ -13,15 +13,18 @@ export async function handle(
 ): Promise<void> {
   const chatId = ctx.chat!.id;
   await setChatStatus(db, chatId, "active");
-  log.info({
-    chatId,
-    userId: ctx.from?.id,
-    first_name: ctx.from?.first_name,
-    command: "/start",
-    outcome: "handled",
-  }, "command handled");
-  await ctx.reply(
-    STRINGS.start.welcome(config.italyAlertThreshold, config.worldAlertThreshold),
-    { parse_mode: "Markdown", reply_markup: mainMenuReplyMarkup },
+  log.info(
+    {
+      chatId,
+      userId: ctx.from?.id,
+      first_name: ctx.from?.first_name,
+      command: "/start",
+      outcome: "handled",
+    },
+    "command handled",
   );
+  await ctx.reply(STRINGS.start.welcome(config.italyAlertThreshold, config.worldAlertThreshold), {
+    parse_mode: "HTML",
+    reply_markup: mainMenuReplyMarkup,
+  });
 }

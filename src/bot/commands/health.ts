@@ -83,7 +83,10 @@ export async function handle(
   config: RuntimeConfig,
   bot: Bot,
 ): Promise<void> {
-  logHandler.info({ chatId: ctx.chat?.id, command: "/health", outcome: "handled" }, "command handled");
+  logHandler.info(
+    { chatId: ctx.chat?.id, command: "/health", outcome: "handled" },
+    "command handled",
+  );
 
   const checks = await Promise.all([
     checkTelegram(bot),
@@ -93,5 +96,5 @@ export async function handle(
   ]);
 
   const lines = checks.map((c) => ADMIN.health.line(c.service, c.ok, c.detail));
-  await ctx.reply([ADMIN.health.title, ...lines].join("\n"), { parse_mode: "Markdown" });
+  await ctx.reply([ADMIN.health.title, ...lines].join("\n"), { parse_mode: "HTML" });
 }

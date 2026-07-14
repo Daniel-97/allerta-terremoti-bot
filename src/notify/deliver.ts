@@ -2,7 +2,11 @@ import { InputFile } from "grammy";
 import { createLogger } from "@/util/log";
 import { captureError, captureWarning } from "@/util/error-handler";
 import { classifyTelegramError } from "@/notify/errors";
-import { insertIfNew as insertDelivery, updateStatus, getDelivery } from "@/db/repositories/deliveries";
+import {
+  insertIfNew as insertDelivery,
+  updateStatus,
+  getDelivery,
+} from "@/db/repositories/deliveries";
 import { setChatStatus } from "@/db/repositories/chats";
 import { composeMessage } from "@/notify/compose";
 import { generateEarthquakeImage } from "@/rendering/map-renderer";
@@ -54,21 +58,25 @@ export async function deliverFirstWave(
     try {
       imageBytes = await generateEarthquakeImage(event, getBaseImage, getFonts);
     } catch (imgErr) {
-      captureWarning(log, imgErr, { chatId: rec.chatId, eventId: event.eventId, action: "image generation fallback" });
+      captureWarning(log, imgErr, {
+        chatId: rec.chatId,
+        eventId: event.eventId,
+        action: "image generation fallback",
+      });
     }
 
     try {
       if (imageBytes) {
-        const caption = `${text}\n\n_La posizione sulla mappa è indicativa e potrebbe non essere precisa._`;
+        const caption = `${text}\n\n<i>La posizione sulla mappa è indicativa e potrebbe non essere precisa.</i>`;
         await bot.api.sendPhoto(rec.chatId, new InputFile(imageBytes, "earthquake.png"), {
           caption,
-          parse_mode: "Markdown",
+          parse_mode: "HTML",
           reply_markup: keyboard,
         });
       } else {
         await bot.api.sendMessage(rec.chatId, text, {
           reply_markup: keyboard,
-          parse_mode: "Markdown",
+          parse_mode: "HTML",
         });
       }
       if (deliveryId) await updateStatus(db, deliveryId, "sent", existing?.attempts ?? 1);
@@ -77,13 +85,23 @@ export async function deliverFirstWave(
       const cls = classifyTelegramError(err);
       if (cls === "permanent") {
         await setChatStatus(db, rec.chatId, "blocked");
-        if (deliveryId) await updateStatus(db, deliveryId, "failed_permanent", existing?.attempts ?? 1);
+        if (deliveryId)
+          await updateStatus(db, deliveryId, "failed_permanent", existing?.attempts ?? 1);
         outcome.failedPermanent++;
-        captureError(log, err, { chatId: rec.chatId, eventId: event.eventId, action: "delivery permanent" });
+        captureError(log, err, {
+          chatId: rec.chatId,
+          eventId: event.eventId,
+          action: "delivery permanent",
+        });
       } else {
-        if (deliveryId) await updateStatus(db, deliveryId, "failed_transient", existing?.attempts ?? 1);
+        if (deliveryId)
+          await updateStatus(db, deliveryId, "failed_transient", existing?.attempts ?? 1);
         outcome.failedTransient++;
-        captureWarning(log, err, { chatId: rec.chatId, eventId: event.eventId, action: "delivery transient" });
+        captureWarning(log, err, {
+          chatId: rec.chatId,
+          eventId: event.eventId,
+          action: "delivery transient",
+        });
       }
     }
 
