@@ -10,6 +10,11 @@ export const STRINGS = {
       `Per le allerte mondiali (M ≥ ${worldThreshold.toFixed(1)}), attivale in /impostazioni.\n\n` +
       "⚠️ _Bot non ufficiale, non affiliato all'INGV._",
   },
+  mainMenu: {
+    posizioni: "📍 Posizioni",
+    impostazioni: "⚙️ Impostazioni",
+    aiuto: "❓ Aiuto",
+  },
   aiuto: {
     body:
       "❓ *Aiuto*\n\n" +
