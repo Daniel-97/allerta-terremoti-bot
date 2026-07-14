@@ -20,6 +20,7 @@ import * as health from "@/bot/commands/health";
 import * as help from "@/bot/commands/help";
 import { notifyNewUser, notifyUserStop } from "@/notify/admin";
 import { STRINGS } from "@/i18n/strings";
+import { mainMenuReplyMarkup } from "@/bot/main-menu";
 
 const log = createLogger("bot");
 
@@ -112,6 +113,9 @@ export function createBot(config: RuntimeConfig, db: Db): Bot {
   bot.hears(STRINGS.mainMenu.posizioni, (ctx) => posizioni.handle(ctx, db, log));
   bot.hears(STRINGS.mainMenu.impostazioni, (ctx) => impostazioni.handle(ctx, db, log));
   bot.hears(STRINGS.mainMenu.aiuto, (ctx) => aiuto.handle(ctx, db, log));
+  bot.hears(STRINGS.posizioni.cancelAddBtn, (ctx) =>
+    ctx.reply(STRINGS.posizioni.addCancelled, { reply_markup: mainMenuReplyMarkup }),
+  );
 
   // unrecognized text messages
   bot.on("message:text", async (ctx) => {
