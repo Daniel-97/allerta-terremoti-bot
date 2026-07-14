@@ -20,14 +20,13 @@ export const STRINGS = {
   aiuto: {
     body:
       "❓ <b>Aiuto</b>\n\n" +
+      "Usa i pulsanti qui sotto per gestire posizioni, impostazioni e crediti.\n\n" +
       "🚀 /start — Avvia il bot\n" +
-      "❓ /aiuto — Questo messaggio\n" +
-      "📍 /posizioni — Aggiungi, visualizza o rimuovi posizioni\n" +
-      "⚙️ /impostazioni — Modifica raggio, magnitudo e preferenze globali\n" +
-      "🛑 /stop — Disattiva il tuo account\n" +
-      "ℹ️ /credits — Fonti e crediti\n\n" +
+      "🛑 /stop — Disattiva il tuo account\n\n" +
       "🇮🇹 Le allerte nazionali sono attive di default.\n" +
       "🌍 Le allerte mondiali sono disattive (opt-in da /impostazioni).",
+    creditsBtn: "ℹ️ Credits",
+    backBtn: "↩️ Indietro",
   },
   posizioni: {
     empty:

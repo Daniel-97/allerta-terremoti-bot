@@ -1,8 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { GrammyError } from "grammy";
 import type { Context } from "grammy";
-import { editPanel, type Panel } from "@/bot/inline/panels";
+import { editPanel, renderAiuto, renderCredits, type Panel } from "@/bot/inline/panels";
 import { InlineKeyboard } from "grammy";
+import { STRINGS } from "@/i18n/strings";
+import { encodeAiuto } from "@/util/callback-data";
 
 function fakeCtx(editMessageTextImpl: () => Promise<unknown>) {
   const editMessageText = vi.fn(editMessageTextImpl);
@@ -59,5 +61,27 @@ describe("editPanel", () => {
     const { ctx, reply } = fakeCtx(() => Promise.reject(notModifiedError()));
     await editPanel(ctx, PANEL);
     expect(reply).not.toHaveBeenCalled();
+  });
+});
+
+describe("renderAiuto", () => {
+  it("returns the aiuto text with the three navigation buttons", () => {
+    const panel = renderAiuto();
+    expect(panel.text).toBe(STRINGS.aiuto.body);
+    const buttons = panel.keyboard.inline_keyboard.flat() as { text: string; callback_data?: string }[];
+    expect(buttons).toEqual([
+      { text: STRINGS.mainMenu.posizioni, callback_data: encodeAiuto("posizioni") },
+      { text: STRINGS.mainMenu.impostazioni, callback_data: encodeAiuto("impostazioni") },
+      { text: STRINGS.aiuto.creditsBtn, callback_data: encodeAiuto("credits") },
+    ]);
+  });
+});
+
+describe("renderCredits", () => {
+  it("returns the credits text with a back-to-aiuto button", () => {
+    const panel = renderCredits();
+    expect(panel.text).toBe(STRINGS.credits.body);
+    const buttons = panel.keyboard.inline_keyboard.flat() as { text: string; callback_data?: string }[];
+    expect(buttons).toEqual([{ text: STRINGS.aiuto.backBtn, callback_data: encodeAiuto("menu") }]);
   });
 });
