@@ -146,6 +146,34 @@ export async function handleCallbackQuery(ctx: Context, db: Db): Promise<void> {
         await panels.editPanel(ctx, panels.renderLocationsList(locs));
         break;
       }
+      case "aiuto": {
+        const msg = ctx.callbackQuery?.message;
+        if (!msg) return;
+        const chatId = msg.chat.id;
+        switch (cb.target) {
+          case "posizioni": {
+            const locs = await listLocations(db, chatId);
+            await panels.editPanel(ctx, panels.renderLocationsList(locs));
+            break;
+          }
+          case "impostazioni": {
+            const chat = await getChat(db, chatId);
+            if (chat) {
+              await panels.editPanel(ctx, panels.renderSettings(chat.italy_alerts, chat.world_alerts));
+            }
+            break;
+          }
+          case "credits": {
+            await panels.editPanel(ctx, panels.renderCredits());
+            break;
+          }
+          case "menu": {
+            await panels.editPanel(ctx, panels.renderAiuto());
+            break;
+          }
+        }
+        break;
+      }
     }
   } catch (err) {
     log.error({ err: String(err), callback: data }, "callback handler error");

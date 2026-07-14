@@ -37,6 +37,10 @@ export interface LocCb {
   kind: "loc";
   locId: number;
 }
+export interface AiutoCb {
+  kind: "aiuto";
+  target: "posizioni" | "impostazioni" | "credits" | "menu";
+}
 export type Callback =
   | RadiusCb
   | MagnitudeCb
@@ -46,7 +50,8 @@ export type Callback =
   | DeleteOkCb
   | ToggleCb
   | NavCb
-  | LocCb;
+  | LocCb
+  | AiutoCb;
 
 // radius
 export function encodeRadius(locId: number, radius: number): string {
@@ -146,6 +151,16 @@ export function decodeLoc(s: string): LocCb | null {
   return { kind: "loc", locId: Number(m[1]) };
 }
 
+// aiuto panel navigation
+export function encodeAiuto(target: AiutoCb["target"]): string {
+  return `aiuto;${target}`;
+}
+export function decodeAiuto(s: string): AiutoCb | null {
+  const m = s.match(/^aiuto;(posizioni|impostazioni|credits|menu)$/);
+  if (!m) return null;
+  return { kind: "aiuto", target: m[1] as AiutoCb["target"] };
+}
+
 // generic decode dispatcher
 export function decode(s: string): Callback | null {
   if (!s) return null;
@@ -159,6 +174,7 @@ export function decode(s: string): Callback | null {
     decodeToggle(s) ??
     decodeNav(s) ??
     decodeLoc(s) ??
+    decodeAiuto(s) ??
     null
   );
 }

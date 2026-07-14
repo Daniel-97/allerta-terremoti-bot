@@ -1,6 +1,6 @@
 import type { Context } from "grammy";
 import type { Logger } from "@/util/log";
-import { STRINGS } from "@/i18n/strings";
+import * as panels from "@/bot/inline/panels";
 
 export async function handle(ctx: Context, _db: unknown, log: Logger): Promise<void> {
   log.info(
@@ -12,5 +12,6 @@ export async function handle(ctx: Context, _db: unknown, log: Logger): Promise<v
     },
     "command handled",
   );
-  await ctx.reply(STRINGS.aiuto.body, { parse_mode: "HTML" });
+  const panel = panels.renderAiuto();
+  await ctx.reply(panel.text, { reply_markup: panel.keyboard, parse_mode: "HTML" });
 }

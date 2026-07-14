@@ -6,7 +6,7 @@ import * as schema from "@/db/schema";
 import { upsertActiveChat } from "@/db/repositories/chats";
 import { addLocation, getLocation } from "@/db/repositories/locations";
 import { handleCallbackQuery } from "@/bot/inline/router";
-import { encodeDeleteOk, encodeNav } from "@/util/callback-data";
+import { encodeDeleteOk, encodeNav, encodeAiuto } from "@/util/callback-data";
 import { STRINGS } from "@/i18n/strings";
 import type { Context } from "grammy";
 
@@ -108,5 +108,51 @@ describe("handleCallbackQuery nav add", () => {
       text: STRINGS.posizioni.requestLocationBtn,
       request_location: true,
     });
+  });
+});
+
+describe("handleCallbackQuery aiuto", () => {
+  let db: Awaited<ReturnType<typeof freshDb>>;
+
+  beforeEach(async () => {
+    db = await freshDb();
+    await upsertActiveChat(db, { id: 1, first_name: "U1", last_name: null, username: null });
+  });
+
+  it("shows the locations panel for target posizioni", async () => {
+    await addLocation(db, { chat: 1, lat: 41.9, lon: 12.5, name: "Roma" });
+    const { ctx, editMessageText } = fakeCallbackCtx(1, encodeAiuto("posizioni"));
+
+    await handleCallbackQuery(ctx, db);
+
+    expect(editMessageText).toHaveBeenCalledWith(STRINGS.posizioni.listHeader, expect.anything());
+  });
+
+  it("shows the settings panel for target impostazioni", async () => {
+    const { ctx, editMessageText } = fakeCallbackCtx(1, encodeAiuto("impostazioni"));
+
+    await handleCallbackQuery(ctx, db);
+
+    expect(editMessageText).toHaveBeenCalledWith(STRINGS.impostazioni.title, expect.anything());
+  });
+
+  it("shows the credits panel with a back button for target credits", async () => {
+    const { ctx, editMessageText } = fakeCallbackCtx(1, encodeAiuto("credits"));
+
+    await handleCallbackQuery(ctx, db);
+
+    const [text, options] = editMessageText.mock.calls[0]!;
+    expect(text).toBe(STRINGS.credits.body);
+    expect(options.reply_markup.inline_keyboard.flat()).toEqual([
+      { text: STRINGS.aiuto.backBtn, callback_data: encodeAiuto("menu") },
+    ]);
+  });
+
+  it("shows the aiuto panel for target menu", async () => {
+    const { ctx, editMessageText } = fakeCallbackCtx(1, encodeAiuto("menu"));
+
+    await handleCallbackQuery(ctx, db);
+
+    expect(editMessageText).toHaveBeenCalledWith(STRINGS.aiuto.body, expect.anything());
   });
 });

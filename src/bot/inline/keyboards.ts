@@ -55,3 +55,16 @@ export function confirmDeleteKeyboard(locId: number): InlineKeyboard {
     .text(STRINGS.delete.confirmBtn, cb.encodeDeleteOk(locId))
     .text(STRINGS.delete.cancelBtn, cb.encodeNav("back"));
 }
+
+export function aiutoKeyboard(): InlineKeyboard {
+  return new InlineKeyboard()
+    .text(STRINGS.mainMenu.posizioni, cb.encodeAiuto("posizioni"))
+    .row()
+    .text(STRINGS.mainMenu.impostazioni, cb.encodeAiuto("impostazioni"))
+    .row()
+    .text(STRINGS.aiuto.creditsBtn, cb.encodeAiuto("credits"));
+}
+
+export function creditsBackKeyboard(): InlineKeyboard {
+  return new InlineKeyboard().text(STRINGS.aiuto.backBtn, cb.encodeAiuto("menu"));
+}

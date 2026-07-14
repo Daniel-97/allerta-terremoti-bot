@@ -61,6 +61,14 @@ export function renderConfirmDelete(name: string, locId: number): Panel {
   };
 }
 
+export function renderAiuto(): Panel {
+  return { text: STRINGS.aiuto.body, keyboard: kb.aiutoKeyboard() };
+}
+
+export function renderCredits(): Panel {
+  return { text: STRINGS.credits.body, keyboard: kb.creditsBackKeyboard() };
+}
+
 export async function editPanel(ctx: Context, panel: Panel): Promise<void> {
   try {
     await ctx.editMessageText(panel.text, {
