@@ -3,6 +3,7 @@ import type { ParsedEvent } from "@/services/ingv/types";
 import type { Recipient } from "@/notify/match";
 import { getLocation } from "@/db/repositories/locations";
 import type { Db } from "@/db/types";
+import { encodeLoc } from "@/util/callback-data";
 
 const INGV_SOURCE_URL_PREFIX = "https://terremoti.ingv.it/event/";
 
@@ -63,7 +64,7 @@ function buildReasonLabel(reason: Recipient["reason"]): string {
   }
 }
 
-export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string): ComposedMessage {
+export function composeProximity(event: ParsedEvent, distanceKm: number, locName: string, locId: number): ComposedMessage {
   const text =
     `${buildReasonLabel("proximity")}\n\n` +
     `${buildTitleLine(event)}\n` +
@@ -71,7 +72,9 @@ export function composeProximity(event: ParsedEvent, distanceKm: number, locName
     `📏 *Profondità:* ${depthLabel(event.depth)}\n` +
     `🕐 *Ora:* ${formatTime(event.time)}\n` +
     `*Fonte:* INGV`;
-  return { text, keyboard: buildKeyboard(event) };
+  const keyboard = buildKeyboard(event);
+  keyboard.text(`⚙️ Soglie per ${locName}`, encodeLoc(locId));
+  return { text, keyboard };
 }
 
 export function composeGeneral(event: ParsedEvent, distanceKm: number | null, locName: string | null): ComposedMessage {
@@ -100,7 +103,7 @@ export async function composeMessage(
   const locName = await getNearestLocationName(db, rec.nearestLocationId);
 
   if (rec.reason === "proximity") {
-    return composeProximity(event, rec.distanceKm!, locName!);
+    return composeProximity(event, rec.distanceKm!, locName!, rec.nearestLocationId!);
   }
   return composeGeneral(event, rec.distanceKm, locName);
 }

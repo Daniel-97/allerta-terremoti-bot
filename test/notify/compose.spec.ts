@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { composeProximity, composeGeneral, formatTime, formatTitle, formatMagType } from "@/notify/compose";
+import { encodeLoc } from "@/util/callback-data";
 import type { ParsedEvent } from "@/services/ingv/types";
 
 const EVENT: ParsedEvent = {
@@ -14,7 +15,7 @@ function buttonCount(kb: { inline_keyboard: unknown[][] }): number {
 }
 
 describe("composeProximity", () => {
-  const msg = composeProximity(EVENT, 15, "Roma");
+  const msg = composeProximity(EVENT, 15, "Roma", 42);
 
   it("starts with the proximity reason label", () => {
     expect(msg.text.startsWith("🔔 *Allerta di prossimità*\n\n")).toBe(true);
@@ -37,8 +38,14 @@ describe("composeProximity", () => {
     expect(msg.text).toContain("*Fonte:* INGV");
   });
 
-  it("has inline keyboard with only the INGV button", () => {
-    expect(buttonCount(msg.keyboard)).toBe(1);
+  it("has inline keyboard with the INGV and soglie buttons", () => {
+    expect(buttonCount(msg.keyboard)).toBe(2);
+  });
+
+  it("includes a soglie button with the encoded location id", () => {
+    const buttons = msg.keyboard.inline_keyboard.flat() as { text: string; callback_data?: string }[];
+    const soglieBtn = buttons.find((b) => b.callback_data === encodeLoc(42));
+    expect(soglieBtn?.text).toBe("⚙️ Soglie per Roma");
   });
 });
 
