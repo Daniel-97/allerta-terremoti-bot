@@ -96,7 +96,7 @@ describe("handleCallbackQuery deleteOk", () => {
 });
 
 describe("handleCallbackQuery nav add", () => {
-  it("sends a request_location reply keyboard", async () => {
+  it("sends a request_location reply keyboard with a cancel button", async () => {
     const db = await freshDb();
     const { ctx, reply } = fakeCallbackCtx(1, encodeNav("add"));
 
@@ -104,10 +104,10 @@ describe("handleCallbackQuery nav add", () => {
 
     expect(reply).toHaveBeenCalledTimes(1);
     const [, options] = reply.mock.calls[0]!;
-    expect(options.reply_markup.keyboard[0][0]).toEqual({
-      text: STRINGS.posizioni.requestLocationBtn,
-      request_location: true,
-    });
+    expect(options.reply_markup.keyboard).toEqual([
+      [{ text: STRINGS.posizioni.requestLocationBtn, request_location: true }],
+      [STRINGS.posizioni.cancelAddBtn],
+    ]);
   });
 });
 

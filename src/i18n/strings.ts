@@ -39,6 +39,8 @@ export const STRINGS = {
       "📍 Invia la tua posizione attuale col pulsante qui sotto, oppure scegli un punto sulla mappa dal menu allegati (📎 → Posizione) — utile ad esempio per la casa di un familiare.",
     requestLocationBtn: "📍 Invia la mia posizione attuale",
     requestLocationPlaceholder: "Oppure 📎 → Posizione per scegliere sulla mappa",
+    cancelAddBtn: "❌ Annulla",
+    addCancelled: "❌ Operazione annullata.",
     detailHeader: (name: string) => `📍 <b>${escapeHtml(name)}</b>`,
     cap: "Hai raggiunto il limite di 10 posizioni.\n" + "Rimuovine una prima di aggiungerne nuove.",
     duplicate:
