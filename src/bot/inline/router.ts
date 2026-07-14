@@ -84,12 +84,19 @@ export async function handleCallbackQuery(
       }
       case "deleteOk": {
         const loc = await getLocation(db, cb.locId);
-        if (loc) {
-          await deleteLocation(db, cb.locId);
-          await ctx.answerCallbackQuery({ text: `Posizione "${loc.name}" rimossa` });
-          const locs = await listLocations(db, loc.chat);
-          await panels.editPanel(ctx, panels.renderLocationsList(locs));
+        if (!loc) {
+          const msg = ctx.callbackQuery?.message;
+          await ctx.answerCallbackQuery({ text: "Posizione già rimossa" });
+          if (msg) {
+            const locs = await listLocations(db, msg.chat.id);
+            await panels.editPanel(ctx, panels.renderLocationsList(locs));
+          }
+          break;
         }
+        await deleteLocation(db, cb.locId);
+        await ctx.answerCallbackQuery({ text: `Posizione "${loc.name}" rimossa` });
+        const locs = await listLocations(db, loc.chat);
+        await panels.editPanel(ctx, panels.renderLocationsList(locs));
         break;
       }
       case "toggle": {
